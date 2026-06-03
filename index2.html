@@ -55,27 +55,6 @@
     gap: 14px;
     margin-bottom: 32px;
   }
-  .logo-hex {
-    width: 58px;
-    height: 58px;
-  }
-  .logo-text {
-    font-size: 48px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    line-height: 1;
-  }
-  .logo-text .stem { color: var(--white); }
-  .logo-text .four-u { color: var(--orange); }
-
-  .tagline {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 40px;
-  }
 
   .coming-soon-badge {
     display: block;
@@ -361,9 +340,7 @@
 <!-- ── HERO ── -->
 <section class="hero">
   <div class="logo-mark">
-    <div style="font-size:clamp(52px,10vw,80px);font-weight:900;letter-spacing:-2px;line-height:1;">
-      <span style="color:#2E74B5;">STEM</span><span style="color:#E85D2F;">4U</span>
-    </div>
+    <img src="STEM4U.png" alt="STEM4U Logo" style="width:min(520px, 88vw);height:auto;"/>
   </div>
 
   <div class="coming-soon-badge">Coming Soon</div>
@@ -422,7 +399,6 @@
     <h2 class="form-title">Reserve Your Spot</h2>
     <p class="form-subtitle">Be first to know when we open. Share a bit about your child and we'll match them to the right program.</p>
 
-    <!-- Replace YOUR_FORM_ID with your Formspree form ID -->
     <form id="waitlistForm" action="https://formspree.io/f/xykagpyw" method="POST">
 
       <div class="form-row">
@@ -538,13 +514,11 @@
 </footer>
 
 <script>
-  // Smooth scroll for CTA button
   document.querySelector('.hero-cta').addEventListener('click', function(e) {
     e.preventDefault();
     document.getElementById('interest-form').scrollIntoView({ behavior: 'smooth' });
   });
 
-  // Form submission handler (works with Formspree)
   const form = document.getElementById('waitlistForm');
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
