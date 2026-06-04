@@ -9,30 +9,42 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --navy:  #1B6E3E;
-    --blue:  #1FAD61;
-    --orange:#FBBF24;
-    --light: #F0FDF4;
-    --white: #FFFFFF;
-    --text:  #0D3320;
-    --muted: #3D7A55;
-    --card:  #FFFFFF;
+    --navy:      #0D2B7A;
+    --blue:      #1A5CD8;
+    --orange:    #E76F51;  /* Burnt Peach — warmer, softer than #FF5500 */
+    --orange-lt: #F08060;  /* hover */
+    --light:     #F4F7FF;
+    --white:     #FFFFFF;
+    --text:      #0A1E52;
+    --muted:     #4A5A80;
+    --card:      #FFFFFF;
   }
   html { scroll-behavior: smooth; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
+  /* ── HERO ── */
   .hero { background: var(--navy); color: var(--white); padding: 60px 24px 80px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
   .hero::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 60px; background: var(--light); clip-path: ellipse(55% 100% at 50% 100%); }
+  .hero-glow { position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 400px; height: 200px; background: radial-gradient(ellipse, rgba(231,111,81,.18) 0%, transparent 70%); pointer-events: none; }
+  .hero > * { position: relative; z-index: 1; }
 
   .logo-mark { display: inline-flex; align-items: center; flex-direction: column; gap: 20px; margin-bottom: 32px; }
-  .coming-soon-badge { display: block; width: fit-content; background: var(--orange); color: var(--navy); font-size: 15px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; padding: 11px 32px; border-radius: 40px; margin: 20px auto 28px; }
-  .hero-headline { font-size: clamp(28px, 5vw, 44px); font-weight: 800; line-height: 1.2; max-width: 700px; margin: 0 auto 16px; }
-  .hero-headline span { color: var(--orange); }
-  .hero-sub { font-size: 17px; color: rgba(255,255,255,0.75); max-width: 520px; margin: 0 auto 40px; line-height: 1.6; }
-  .hero-cta { display: inline-block; background: var(--orange); color: var(--navy); font-size: 15px; font-weight: 800; padding: 14px 36px; border-radius: 8px; text-decoration: none; transition: opacity .15s; }
-  .hero-cta:hover { opacity: .88; }
 
-  .programs { padding: 64px 24px 48px; text-align: center; }
+  .coming-soon-badge { display: block; width: fit-content; background: var(--orange); color: var(--white); font-size: 14px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 10px 30px; border-radius: 6px; margin: 0 auto 28px; }
+
+  .hero-headline { font-size: clamp(28px, 5vw, 48px); font-weight: 900; line-height: 1.15; max-width: 700px; margin: 0 auto 16px; }
+  .hero-headline span { color: var(--orange); }
+  .hero-sub { font-size: 17px; color: rgba(255,255,255,.75); max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
+
+  .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero-cta { display: inline-block; background: var(--orange); color: var(--white); font-size: 15px; font-weight: 800; padding: 14px 36px; border-radius: 6px; text-decoration: none; transition: background .15s; box-shadow: 0 4px 20px rgba(231,111,81,.45); }
+  .hero-cta:hover { background: var(--orange-lt); }
+  .hero-cta-2 { display: inline-block; background: transparent; color: var(--white); font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 6px; text-decoration: none; border: 2px solid rgba(255,255,255,.5); transition: border-color .15s, background .15s; }
+  .hero-cta-2:hover { border-color: white; background: rgba(255,255,255,.08); }
+
+  /* ── PROGRAMS ── */
+  .programs { padding: 64px 24px 48px; text-align: center; background: var(--light); }
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; }
   .section-title { font-size: clamp(22px, 4vw, 30px); font-weight: 800; color: var(--navy); margin-bottom: 8px; }
   .section-sub { font-size: 15px; color: var(--muted); margin-bottom: 40px; }
@@ -40,67 +52,76 @@
   @media (max-width: 720px) { .program-grid { grid-template-columns: repeat(2, 1fr); } }
   .coming-tag { display: inline-block; background: #FFF3E0; color: #E65100; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #FFB74D; }
   .program-card.coming { border-top-style: dashed; opacity: 0.82; }
-  .program-card { background: var(--card); border-radius: 12px; padding: 24px 16px; box-shadow: 0 2px 12px rgba(27,110,62,.08); border-top: 4px solid var(--blue); transition: transform .15s, box-shadow .15s; }
-  .program-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(27,110,62,.14); }
+  .program-card { background: var(--card); border-radius: 8px; padding: 24px 16px; box-shadow: 0 2px 16px rgba(13,43,122,.08); border-top: 4px solid var(--blue); transition: transform .15s, box-shadow .15s; }
+  .program-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(13,43,122,.14); }
   .program-card:nth-child(odd) { border-top-color: var(--orange); }
   .program-icon { font-size: 34px; margin-bottom: 10px; display: block; }
   .program-name { font-size: 14px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 1px; }
   .program-desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 
+  /* ── FORM ── */
   .form-section { background: var(--white); padding: 64px 24px; text-align: center; }
   .form-wrap { max-width: 560px; margin: 0 auto; text-align: left; }
   .form-title { font-size: clamp(20px, 3vw, 26px); font-weight: 800; color: var(--navy); margin-bottom: 6px; text-align: center; }
   .form-subtitle { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 32px; line-height: 1.5; }
   .form-group { margin-bottom: 18px; }
   .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #C8EDD8; border-radius: 8px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--light); outline: none; transition: border-color .15s; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #D0D8EE; border-radius: 6px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--light); outline: none; transition: border-color .15s; }
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue); background: var(--white); }
   .form-group textarea { resize: vertical; min-height: 90px; }
   .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
   .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
-  .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; }
+  .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--orange); cursor: pointer; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } .checkbox-group { grid-template-columns: 1fr; } }
-  .submit-btn { width: 100%; padding: 14px; background: var(--navy); color: var(--white); border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background .15s; }
-  .submit-btn:hover { background: var(--blue); }
+  .submit-btn { width: 100%; padding: 14px; background: var(--orange); color: var(--white); border: none; border-radius: 6px; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 8px; transition: background .15s; letter-spacing: .02em; }
+  .submit-btn:hover { background: var(--orange-lt); }
   .form-note { font-size: 11.5px; color: var(--muted); text-align: center; margin-top: 12px; line-height: 1.5; }
-  .success-msg { display: none; background: #e6f4ea; border: 1.5px solid #2e7d32; border-radius: 10px; padding: 24px; text-align: center; color: #1b5e20; }
+  .success-msg { display: none; background: #EEF3FF; border: 1.5px solid var(--blue); border-radius: 8px; padding: 24px; text-align: center; color: var(--navy); }
   .success-msg h3 { font-size: 18px; margin-bottom: 6px; }
 
-  .why-section { background: var(--navy); color: var(--white); padding: 60px 24px; text-align: center; }
+  /* ── WHY SECTION ── */
+  .why-section { background: var(--navy); color: var(--white); padding: 60px 24px; text-align: center; position: relative; }
+  .why-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--orange); }
   .why-section .section-title { color: var(--white); }
-  .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; max-width: 860px; margin: 0 auto; }
-  .why-card { background: rgba(255,255,255,.1); border-radius: 10px; padding: 24px 20px; text-align: left; border-left: 3px solid var(--orange); }
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 860px; margin: 0 auto; }
+  .why-card { background: rgba(255,255,255,.07); border-radius: 8px; padding: 24px 20px; text-align: left; border-left: 3px solid var(--orange); }
   .why-number { font-size: 32px; font-weight: 900; color: var(--orange); line-height: 1; margin-bottom: 8px; }
   .why-label { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
-  .why-desc { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.5; }
+  .why-desc { font-size: 13px; color: rgba(255,255,255,.65); line-height: 1.5; }
 
-  .location-bar { background: var(--orange); color: var(--navy); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; }
-  .location-bar a { color: var(--navy); text-decoration: underline; }
-  footer { background: #0A3D20; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  /* ── LOCATION + FOOTER ── */
+  .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; }
+  .location-bar a { color: var(--white); text-decoration: underline; }
+  footer { background: #070F2B; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
   footer a { color: var(--orange); text-decoration: none; }
   .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
 </style>
 </head>
 <body>
+
 <section class="hero">
+  <div class="hero-glow"></div>
   <div class="logo-mark">
     <div style="font-size:clamp(52px,10vw,88px);font-weight:900;letter-spacing:-2px;line-height:1;">
-      <span style="color:#FFFFFF;">STEM</span><span style="color:#FBBF24;">4</span><span style="color:#FFFFFF;">U</span>
+      <span style="color:#FFFFFF;">STEM</span><span style="color:#E76F51;">4</span><span style="color:#FFFFFF;">U</span>
     </div>
     <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
-      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="22" rx="6" stroke="white" stroke-width="2"/><circle cx="16" cy="23" r="3" fill="white"/><circle cx="28" cy="23" r="3" fill="white"/><path d="M16 30 Q22 34 28 30" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="22" y1="14" x2="22" y2="8" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="6" r="3" fill="#FBBF24"/><line x1="8" y1="25" x2="4" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="25" x2="40" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:5px;">Robotics</div></div>
-      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><line x1="22" y1="22" x2="10" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="10" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="9" cy="9" rx="6" ry="2.5" stroke="#FBBF24" stroke-width="2"/><ellipse cx="35" cy="9" rx="6" ry="2.5" stroke="#FBBF24" stroke-width="2"/><ellipse cx="9" cy="35" rx="6" ry="2.5" stroke="#FBBF24" stroke-width="2"/><ellipse cx="35" cy="35" rx="6" ry="2.5" stroke="#FBBF24" stroke-width="2"/><rect x="18" y="18" width="8" height="8" rx="2" fill="white"/><circle cx="22" cy="22" r="2" fill="#1B6E3E"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:5px;">Drone</div></div>
-      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="6" width="32" height="32" rx="3" stroke="white" stroke-width="2"/><line x1="6" y1="17" x2="38" y2="17" stroke="white" stroke-width="1" opacity="0.5"/><line x1="6" y1="27" x2="38" y2="27" stroke="white" stroke-width="1" opacity="0.5"/><line x1="17" y1="6" x2="17" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><line x1="27" y1="6" x2="27" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><circle cx="27" cy="17" r="4" fill="#FBBF24"/><line x1="4" y1="6" x2="4" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="4" y1="38" x2="40" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:5px;">CAD</div></div>
+      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="22" rx="6" stroke="white" stroke-width="2"/><circle cx="16" cy="23" r="3" fill="white"/><circle cx="28" cy="23" r="3" fill="white"/><path d="M16 30 Q22 34 28 30" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="22" y1="14" x2="22" y2="8" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="6" r="3" fill="#E76F51"/><line x1="8" y1="25" x2="4" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="25" x2="40" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Robotics</div></div>
+      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><line x1="22" y1="22" x2="10" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="10" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="9" cy="9" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="35" cy="9" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="9" cy="35" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="35" cy="35" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><rect x="18" y="18" width="8" height="8" rx="2" fill="white"/><circle cx="22" cy="22" r="2" fill="#0D2B7A"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Drone</div></div>
+      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="6" width="32" height="32" rx="3" stroke="white" stroke-width="2"/><line x1="6" y1="17" x2="38" y2="17" stroke="white" stroke-width="1" opacity="0.5"/><line x1="6" y1="27" x2="38" y2="27" stroke="white" stroke-width="1" opacity="0.5"/><line x1="17" y1="6" x2="17" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><line x1="27" y1="6" x2="27" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><circle cx="27" cy="17" r="4" fill="#E76F51"/><line x1="4" y1="6" x2="4" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="4" y1="38" x2="40" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">CAD</div></div>
     </div>
   </div>
   <div class="coming-soon-badge">Coming Soon</div>
   <h1 class="hero-headline">Where Kids Discover Their <span>STEM Superpower</span></h1>
   <p class="hero-sub">Hands-on robotics, drone piloting, CAD, FLL & FTC competition programs — built for curious K-12 minds in Northern Virginia.</p>
-  <a href="#interest-form" class="hero-cta">Join the Waitlist →</a>
+  <div class="hero-ctas">
+    <a href="#interest-form" class="hero-cta">Join the Waitlist →</a>
+    <a href="#programs" class="hero-cta-2">See Programs</a>
+  </div>
 </section>
 
-<section class="programs">
+<section class="programs" id="programs">
   <p class="section-label">What We Offer</p>
   <h2 class="section-title">Multiple Programs. One Mission.</h2>
   <p class="section-sub">Every program is hands-on, competition-ready, and built for K-12 students.</p>
@@ -152,28 +173,31 @@
       <button type="submit" class="submit-btn">Join the Waitlist →</button>
       <p class="form-note">We respect your privacy. No spam — ever.</p>
     </form>
-    <div class="success-msg" id="successMsg"><h3>You're on the list! 🎉</h3><p>Thanks! We'll be in touch as soon as enrollment opens.</p></div>
+    <div class="success-msg" id="successMsg"><h3>You're on the list!</h3><p>Thanks! We'll be in touch as soon as enrollment opens.</p></div>
   </div>
 </section>
 
 <section class="why-section">
   <p class="section-label" style="color:var(--orange);">Why STEM4U</p>
   <h2 class="section-title">Built for Northern Virginia Families</h2>
-  <p class="section-sub" style="color:rgba(255,255,255,.65);margin-bottom:36px;">Your kids deserve a program that matches their ambition.</p>
+  <p class="section-sub" style="color:rgba(255,255,255,.65);margin-bottom:36px;">Your child's STEM journey starts here.</p>
   <div class="why-grid">
-    <div class="why-card"><div class="why-number">K–12</div><div class="why-label">All ages welcome</div><div class="why-desc">From Lego for kindergartners to FTC teams for high schoolers.</div></div>
+    <div class="why-card"><div class="why-number">K–12</div><div class="why-label">All ages welcome</div><div class="why-desc">From Lego for kindergartners to FTC competition teams for high schoolers.</div></div>
     <div class="why-card"><div class="why-number">6</div><div class="why-label">Hands-on programs</div><div class="why-desc">Real robots, real drones — not just theory on a screen.</div></div>
     <div class="why-card"><div class="why-number">100%</div><div class="why-label">Competition-ready</div><div class="why-desc">FLL & FTC teams prepared for regional and state competition.</div></div>
-    <div class="why-card"><div class="why-number">NoVA</div><div class="why-label">Locally rooted</div><div class="why-desc">Founded by Northern Virginia parents who want better STEM options.</div></div>
+    <div class="why-card"><div class="why-number">NoVA</div><div class="why-label">Locally rooted</div><div class="why-desc">Founded by Northern Virginia parents who want better STEM options close to home.</div></div>
   </div>
 </section>
+
 <div class="location-bar">📍 Opening in Northern Virginia &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
 <footer>
   <div class="footer-links"><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
   <p>© 2026 STEM4U Corp. · Northern Virginia · K-12 STEM Programs</p>
 </footer>
+
 <script>
   document.querySelector('.hero-cta').addEventListener('click',function(e){e.preventDefault();document.getElementById('interest-form').scrollIntoView({behavior:'smooth'});});
+  document.querySelector('.hero-cta-2').addEventListener('click',function(e){e.preventDefault();document.getElementById('programs').scrollIntoView({behavior:'smooth'});});
   const form=document.getElementById('waitlistForm');
   form.addEventListener('submit',async function(e){e.preventDefault();const btn=form.querySelector('.submit-btn');btn.textContent='Submitting…';btn.disabled=true;try{const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});if(res.ok){form.style.display='none';document.getElementById('successMsg').style.display='block';}else{btn.textContent='Something went wrong — try again';btn.disabled=false;}}catch{btn.textContent='Network error — try again';btn.disabled=false;}});
 </script>
