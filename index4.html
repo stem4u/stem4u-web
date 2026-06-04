@@ -123,7 +123,10 @@
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--peach-dark); margin-bottom: 10px; }
   .section-title { font-size: clamp(22px, 4vw, 30px); font-weight: 800; color: var(--ink); margin-bottom: 8px; }
   .section-sub { font-size: 15px; color: var(--ink-muted); margin-bottom: 40px; }
-  .program-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; max-width: 860px; margin: 0 auto; }
+  .program-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 940px; margin: 0 auto; }
+  @media (max-width: 720px) { .program-grid { grid-template-columns: repeat(2, 1fr); } }
+  .coming-tag { display: inline-block; background: #FFF3E0; color: #E65100; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #FFB74D; }
+  .program-card.coming { border-top-style: dashed; opacity: 0.82; }
   .program-card {
     background: var(--surface);
     border-radius: 16px;
@@ -212,7 +215,7 @@
 <!-- ── PROGRAMS ── -->
 <section class="programs" id="programs">
   <p class="section-label">What We Offer</p>
-  <h2 class="section-title">6 Programs. One Mission.</h2>
+  <h2 class="section-title">Multiple Programs. One Mission.</h2>
   <p class="section-sub">Every program is hands-on, competition-ready, and built for K-12 students.</p>
   <div class="program-grid">
     <div class="program-card"><span class="program-icon">🤖</span><div class="program-name">Robotics</div><div class="program-desc">Design, build & code robots from the ground up</div></div>
@@ -221,6 +224,10 @@
     <div class="program-card"><span class="program-icon">🧱</span><div class="program-name">Lego</div><div class="program-desc">Creative engineering with Lego Technic & Mindstorms</div></div>
     <div class="program-card"><span class="program-icon">🚁</span><div class="program-name">Drone</div><div class="program-desc">Learn to pilot, program & race drones safely</div></div>
     <div class="program-card"><span class="program-icon">📐</span><div class="program-name">CAD</div><div class="program-desc">Computer-Aided Design — turn ideas into 3D models</div></div>
+    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🧠</span><div class="program-name">AI & Machine Learning</div><div class="program-desc">Python, Teachable Machine & ML for K-12 minds</div></div>
+    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🔐</span><div class="program-name">Cybersecurity</div><div class="program-desc">CyberPatriot competition & ethical hacking basics</div></div>
+    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🖨️</span><div class="program-name">3D Printing</div><div class="program-desc">Additive manufacturing — bring your CAD designs to life</div></div>
+    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">⚡</span><div class="program-name">Electronics & Arduino</div><div class="program-desc">Circuits, sensors & microcontrollers — build real things</div></div>
   </div>
 </section>
 
