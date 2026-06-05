@@ -9,13 +9,13 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --teal-dark:  #264653;  /* hero bg, footer — Charcoal Blue */
-    --teal:       #2A9D8F;  /* primary accent, links */
-    --gold:       #E9C46A;  /* highlights, secondary */
-    --peach:      #F4A261;  /* warm accent, badges */
-    --coral:      #E76F51;  /* primary CTA */
+    --charcoal:   #1b263b;  /* hero bg, footer — deep navy charcoal */
+    --teal:       #2A9D8F;  /* Verdigris — primary accent, links */
+    --gold:       #E9C46A;  /* Jasmine — highlights (dark text) */
+    --peach:      #F4A261;  /* Sandy Brown — warm accent (dark text) */
+    --coral:      #E76F51;  /* Burnt Peach — primary CTA (white text) */
     --coral-dark: #C85A3E;  /* hover */
-    --light:      #FAF8F2;  /* page background */
+    --light:      #FAF8F2;  /* warm cream page background */
     --white:      #FFFFFF;
     --text:       #1A3340;
     --muted:      #4A6475;
@@ -24,7 +24,7 @@
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
   /* ── HERO ── */
-  .hero { background: var(--teal-dark); color: var(--white); padding: 60px 24px 80px; text-align: center; position: relative; overflow: hidden; }
+  .hero { background: var(--charcoal); color: var(--white); padding: 60px 24px 80px; text-align: center; position: relative; overflow: hidden; }
   .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--coral), var(--peach), var(--gold)); }
   .hero::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 60px; background: var(--light); clip-path: ellipse(55% 100% at 50% 100%); }
   .hero > * { position: relative; z-index: 1; }
@@ -46,29 +46,29 @@
   /* ── PROGRAMS ── */
   .programs { padding: 64px 24px 48px; text-align: center; }
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--coral); margin-bottom: 10px; }
-  .section-title { font-size: clamp(22px, 4vw, 30px); font-weight: 800; color: var(--teal-dark); margin-bottom: 8px; }
+  .section-title { font-size: clamp(22px, 4vw, 30px); font-weight: 800; color: var(--charcoal); margin-bottom: 8px; }
   .section-sub { font-size: 15px; color: var(--muted); margin-bottom: 40px; }
   .program-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 940px; margin: 0 auto; }
   @media (max-width: 720px) { .program-grid { grid-template-columns: repeat(2, 1fr); } }
   .coming-tag { display: inline-block; background: #FFF3E0; color: #E65100; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #FFB74D; }
   .program-card.coming { border-top-style: dashed; opacity: 0.82; }
   .program-card:nth-child(n+6) { opacity: 0.07 !important; filter: blur(4px); pointer-events: none; user-select: none; }
-  .program-card { background: var(--white); border-radius: 12px; padding: 24px 16px; box-shadow: 0 2px 14px rgba(38,70,83,.08); border-top: 4px solid var(--teal); transition: transform .15s, box-shadow .15s; }
-  .program-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(38,70,83,.14); }
+  .program-card { background: var(--white); border-radius: 12px; padding: 24px 16px; box-shadow: 0 2px 14px rgba(27,38,59,.08); border-top: 4px solid var(--teal); transition: transform .15s, box-shadow .15s; }
+  .program-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(27,38,59,.14); }
   .program-card:nth-child(2n) { border-top-color: var(--coral); }
   .program-card:nth-child(3n) { border-top-color: var(--gold); }
   .program-card:nth-child(5n) { border-top-color: var(--peach); }
   .program-icon { font-size: 34px; margin-bottom: 10px; display: block; }
-  .program-name { font-size: 14px; font-weight: 700; color: var(--teal-dark); text-transform: uppercase; letter-spacing: 1px; }
+  .program-name { font-size: 14px; font-weight: 700; color: var(--charcoal); text-transform: uppercase; letter-spacing: 1px; }
   .program-desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
 
   /* ── FORM ── */
   .form-section { background: var(--white); padding: 64px 24px; text-align: center; }
   .form-wrap { max-width: 560px; margin: 0 auto; text-align: left; }
-  .form-title { font-size: clamp(20px, 3vw, 26px); font-weight: 800; color: var(--teal-dark); margin-bottom: 6px; text-align: center; }
+  .form-title { font-size: clamp(20px, 3vw, 26px); font-weight: 800; color: var(--charcoal); margin-bottom: 6px; text-align: center; }
   .form-subtitle { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 32px; line-height: 1.5; }
   .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--teal-dark); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--charcoal); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
   .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #DDEAE8; border-radius: 8px; font-size: 14px; font-family: inherit; color: var(--text); background: var(--light); outline: none; transition: border-color .15s; }
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--teal); background: var(--white); }
   .form-group textarea { resize: vertical; min-height: 90px; }
@@ -80,11 +80,11 @@
   .submit-btn { width: 100%; padding: 14px; background: var(--coral); color: var(--white); border: none; border-radius: 50px; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 8px; transition: background .15s; }
   .submit-btn:hover { background: var(--coral-dark); }
   .form-note { font-size: 11.5px; color: var(--muted); text-align: center; margin-top: 12px; line-height: 1.5; }
-  .success-msg { display: none; background: #EAF7F5; border: 1.5px solid var(--teal); border-radius: 10px; padding: 24px; text-align: center; color: var(--teal-dark); }
+  .success-msg { display: none; background: #EAF7F5; border: 1.5px solid var(--teal); border-radius: 10px; padding: 24px; text-align: center; color: var(--charcoal); }
   .success-msg h3 { font-size: 18px; margin-bottom: 6px; }
 
   /* ── WHY SECTION ── */
-  .why-section { background: var(--teal-dark); color: var(--white); padding: 60px 24px; text-align: center; position: relative; }
+  .why-section { background: var(--charcoal); color: var(--white); padding: 60px 24px; text-align: center; position: relative; }
   .why-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--coral), var(--peach), var(--gold)); }
   .why-section .section-title { color: var(--white); }
   .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 860px; margin: 0 auto; }
@@ -95,8 +95,8 @@
 
   /* ── LOCATION + FOOTER ── */
   .location-bar { background: var(--peach); color: var(--text); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; }
-  .location-bar a { color: var(--teal-dark); text-decoration: underline; }
-  footer { background: #182E39; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  .location-bar a { color: var(--charcoal); text-decoration: underline; }
+  footer { background: #0f1826; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
   footer a { color: var(--gold); text-decoration: none; }
   .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
 </style>
@@ -108,10 +108,10 @@
     <div style="font-size:clamp(52px,10vw,88px);font-weight:900;letter-spacing:-2px;line-height:1;">
       <span style="color:#E9C46A;">STEM</span><span style="color:#E76F51;">4</span><span style="color:#FFFFFF;">U</span>
     </div>
-    <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.8);margin-top:-12px;">Where kids discover their superpower</div>
+    <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.8);margin-top:-12px;">Where Kids Discover Their Superpower</div>
     <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
       <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="22" rx="6" stroke="white" stroke-width="2"/><circle cx="16" cy="23" r="3" fill="white"/><circle cx="28" cy="23" r="3" fill="white"/><path d="M16 30 Q22 34 28 30" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="22" y1="14" x2="22" y2="8" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="6" r="3" fill="#E9C46A"/><line x1="8" y1="25" x2="4" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="25" x2="40" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Robotics</div></div>
-      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><line x1="22" y1="22" x2="10" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="10" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="9" cy="9" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="35" cy="9" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="9" cy="35" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="35" cy="35" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><rect x="18" y="18" width="8" height="8" rx="2" fill="white"/><circle cx="22" cy="22" r="2" fill="#264653"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Drone</div></div>
+      <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><line x1="22" y1="22" x2="10" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="10" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="9" cy="9" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="35" cy="9" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="9" cy="35" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><ellipse cx="35" cy="35" rx="6" ry="2.5" stroke="#E76F51" stroke-width="2"/><rect x="18" y="18" width="8" height="8" rx="2" fill="white"/><circle cx="22" cy="22" r="2" fill="#1b263b"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Drone</div></div>
       <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="6" width="32" height="32" rx="3" stroke="white" stroke-width="2"/><line x1="6" y1="17" x2="38" y2="17" stroke="white" stroke-width="1" opacity="0.5"/><line x1="6" y1="27" x2="38" y2="27" stroke="white" stroke-width="1" opacity="0.5"/><line x1="17" y1="6" x2="17" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><line x1="27" y1="6" x2="27" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><circle cx="27" cy="17" r="4" fill="#F4A261"/><line x1="4" y1="6" x2="4" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="4" y1="38" x2="40" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">CAD</div></div>
     </div>
   </div>

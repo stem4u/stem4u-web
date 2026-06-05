@@ -340,7 +340,7 @@
   <div class="logo-mark">
     <img src="STEM4U.png" alt="STEM4U Logo" style="width:min(520px, 88vw);height:auto;"/>
   </div>
-  <div style="font-size:11px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.8);margin-top:-24px;margin-bottom:28px;">Where kids discover their superpower</div>
+  <div style="font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.8);margin-top:-24px;margin-bottom:28px;">Where Kids Discover Their Superpower</div>
 
   <div class="coming-soon-badge">Coming Soon</div>
   <p class="hero-sub">
