@@ -54,6 +54,7 @@
   @media (max-width: 720px) { .program-grid { grid-template-columns: repeat(2, 1fr); } }
   .coming-tag { display: inline-block; background: #FFF3E0; color: #E65100; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #FFB74D; }
   .program-card.coming { border-top-style: dashed; opacity: 0.82; }
+  .program-card:nth-child(n+6) { opacity: 0.07 !important; filter: blur(4px); pointer-events: none; user-select: none; }
   .program-card { background: var(--card); border-radius: 12px; padding: 24px 16px; box-shadow: 0 2px 14px rgba(31,58,110,.08); border-top: 4px solid var(--saffron); transition: transform .15s, box-shadow .15s; }
   .program-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(31,58,110,.14); }
   .program-card:nth-child(2n) { border-top-color: var(--gold-dark); }
