@@ -23,11 +23,11 @@
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
   /* ── HERO ── */
-  .hero { background: var(--navy); color: var(--white); padding: 32px 24px 80px; text-align: center; position: relative; overflow: hidden; }
+  .hero { background: var(--navy); color: var(--white); padding: 40px 24px 80px; text-align: center; position: relative; overflow: hidden; }
   .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
   .hero::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 60px; background: var(--light); clip-path: ellipse(55% 100% at 50% 100%); }
   /* Subtle glow behind logo */
-  .hero-glow { position: absolute; top: 45%; left: 50%; transform: translateX(-50%); width: 400px; height: 200px; background: radial-gradient(ellipse, rgba(255,85,0,.18) 0%, transparent 70%); pointer-events: none; }
+  .hero-glow { position: absolute; top: 38%; left: 50%; transform: translate(-50%,-50%); width: 320px; height: 160px; background: radial-gradient(ellipse, rgba(255,85,0,.16) 0%, transparent 70%); pointer-events: none; }
   .hero > * { position: relative; z-index: 1; }
 
   .logo-mark { display: inline-flex; align-items: center; flex-direction: column; gap: 20px; margin-bottom: 32px; }
