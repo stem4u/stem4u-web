@@ -126,13 +126,6 @@
   </div>
   <div class="coming-soon-badge"><span class="dot"></span>Coming Soon</div>
   <p class="hero-sub">Hands-on robotics, drone piloting, CAD, FLL & FTC competition programs — built for curious K-12 minds in Northern Virginia.</p>
-  <p class="launch-line">Doors open Fall 2026 — countdown is on</p>
-  <div class="countdown" id="countdown">
-    <div class="cd-box"><div class="cd-num" id="cd-days">--</div><div class="cd-label">Days</div></div>
-    <div class="cd-box"><div class="cd-num" id="cd-hours">--</div><div class="cd-label">Hours</div></div>
-    <div class="cd-box"><div class="cd-num" id="cd-mins">--</div><div class="cd-label">Minutes</div></div>
-    <div class="cd-box"><div class="cd-num" id="cd-secs">--</div><div class="cd-label">Seconds</div></div>
-  </div>
   <div class="hero-ctas">
     <a href="#interest-form" class="hero-cta">Join the Waitlist →</a>
     <a href="#programs" class="hero-cta-2">See Programs</a>
@@ -214,17 +207,6 @@
 </footer>
 
 <script>
-  (function(){
-    const launch = new Date('2026-09-01T09:00:00-04:00').getTime();
-    const d=document.getElementById('cd-days'),h=document.getElementById('cd-hours'),m=document.getElementById('cd-mins'),s=document.getElementById('cd-secs');
-    function tick(){
-      const now=Date.now(), diff=launch-now;
-      if(diff<=0){d.textContent='0';h.textContent='0';m.textContent='0';s.textContent='0';return;}
-      const day=Math.floor(diff/86400000),hr=Math.floor(diff%86400000/3600000),mi=Math.floor(diff%3600000/60000),se=Math.floor(diff%60000/1000);
-      d.textContent=day;h.textContent=String(hr).padStart(2,'0');m.textContent=String(mi).padStart(2,'0');s.textContent=String(se).padStart(2,'0');
-    }
-    tick(); setInterval(tick,1000);
-  })();
   document.querySelector('.hero-cta').addEventListener('click',function(e){e.preventDefault();document.getElementById('interest-form').scrollIntoView({behavior:'smooth'});});
   document.querySelector('.hero-cta-2').addEventListener('click',function(e){e.preventDefault();document.getElementById('programs').scrollIntoView({behavior:'smooth'});});
   const form=document.getElementById('waitlistForm');
