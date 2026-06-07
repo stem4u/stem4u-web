@@ -34,8 +34,8 @@
 
   .coming-soon-badge { display: flex; align-items: center; justify-content: center; gap: 14px; width: fit-content; color: #F5C518; font-size: 16px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; margin: 0 auto 28px; }
   .coming-soon-badge::before, .coming-soon-badge::after { content: ''; width: 36px; height: 1px; background: rgba(255,255,255,.3); }
-  .coming-soon-badge .csb-dot { width: 8px; height: 8px; border-radius: 50%; background: #F5C518; animation: csbpulse 1.8s infinite; }
-  @keyframes csbpulse { 0% { box-shadow: 0 0 0 0 rgba(245,197,24,.6); } 70% { box-shadow: 0 0 0 8px rgba(245,197,24,0); } 100% { box-shadow: 0 0 0 0 rgba(245,197,24,0); } }
+  .coming-soon-badge .csb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); animation: csbpulse 1.8s infinite; }
+  @keyframes csbpulse { 0% { box-shadow: 0 0 0 0 rgba(255,85,0,.6); } 70% { box-shadow: 0 0 0 8px rgba(255,85,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,85,0,0); } }
 
   .hero-headline { font-size: clamp(28px, 5vw, 48px); font-weight: 900; line-height: 1.15; max-width: 700px; margin: 0 auto 16px; }
   .hero-headline span { color: var(--orange); }
@@ -121,11 +121,7 @@
     <div style="font-size:18px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.85);margin-top:-12px;">Where kids discover their superpower</div>
   </div>
   <div class="coming-soon-badge"><span class="csb-dot"></span>Coming Soon<span class="csb-dot"></span></div>
-  <p class="hero-sub" style="margin-bottom:8px;"><span style="display:block;font-size:11px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:2px;">Option 1</span>Hands-on Robotics, Drone, CAD, and FLL & FTC competition teams. Built for curious K-12 minds in Northern Virginia.</p>
-  <p class="hero-sub" style="margin-bottom:8px;"><span style="display:block;font-size:11px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:2px;">Option 2</span>Built for curious K-12 minds in Northern Virginia. Hands-on Robotics, Drone, CAD, and FLL & FTC competition programs.</p>
-  <p class="hero-sub" style="margin-bottom:8px;"><span style="display:block;font-size:11px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:2px;">Option 3</span>Robotics, Drone, CAD, and FLL & FTC competition teams. Real tools. Real builds. Built for curious K-12 minds.</p>
-  <p class="hero-sub" style="margin-bottom:8px;"><span style="display:block;font-size:11px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:2px;">Option 4</span>Where K-12 students build real robots, fly drones, and design in CAD. Plus FLL & FTC competition teams — right here in Northern Virginia.</p>
-  <p class="hero-sub"><span style="display:block;font-size:11px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:2px;">Option 5</span>Hands-on Robotics, Drone & CAD. FLL & FTC competition teams. For curious K-12 minds in Northern Virginia.</p>
+  <p class="hero-sub">Hands-on Robotics, Drone, CAD, and FLL & FTC competition teams. Built for curious K-12 minds in Northern Virginia.</p>
   <div class="hero-ctas">
     <a href="#interest-form" class="hero-cta">Join the Waitlist →</a>
     <a href="#programs" class="hero-cta-2">See Programs</a>
