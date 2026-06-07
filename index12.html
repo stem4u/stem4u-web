@@ -9,14 +9,15 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --navy:      #0D2B7A;
-    --blue:      #1A5CD8;
-    --orange:    #FF5500;
-    --orange-lt: #FF7733;
-    --light:     #F4F7FF;
+    --navy:      #3A61B2;   /* logo blue */
+    --blue:      #2F52A0;   /* deeper blue accent */
+    --orange:    #FF9300;   /* logo orange */
+    --orange-lt: #FFA733;
+    --magenta:   #FF40FF;   /* logo magenta */
+    --light:     #F2F5FB;
     --white:     #FFFFFF;
-    --text:      #0A1E52;
-    --muted:     #4A5A80;
+    --text:      #1B2A4A;
+    --muted:     #5a6478;
     --card:      #FFFFFF;
   }
   html { scroll-behavior: smooth; }
@@ -41,7 +42,7 @@
   }
 
   /* ── HERO ── */
-  .hero { background: #3A61B2; color: var(--white); padding: 40px 24px 80px; text-align: center; position: relative; overflow: hidden; }
+  .hero { background: var(--navy); color: var(--white); padding: 16px 24px 80px; text-align: center; position: relative; overflow: hidden; }
   .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
   .hero::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 60px; background: var(--light); clip-path: ellipse(55% 100% at 50% 100%); }
   /* Subtle glow behind logo */
@@ -126,7 +127,7 @@
 <body>
 
 <nav class="site-nav">
-  <a href="index8.html" class="nav-logo">STEM<span>4</span>U</a>
+  <a href="index12.html" class="nav-logo"><img src="STEM4U-logo-blue.png" alt="STEM4U" style="height:46px;width:auto;display:block;border-radius:6px;" /></a>
   <div class="nav-links" id="navLinks">
     <a href="index8.html" class="nav-link active">Home</a>
     <a href="programs.html" class="nav-link">Programs</a>
@@ -140,7 +141,16 @@
 
 <section class="hero">
   <div class="logo-mark">
-    <img src="STEM4U-logo-blue.png" alt="STEM4U — Kids Superpower" style="width:clamp(260px,38vw,360px);height:auto;display:block;border-radius:12px;" />
+    <div style="display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="22" rx="6" stroke="white" stroke-width="2"/><circle cx="16" cy="23" r="3" fill="white"/><circle cx="28" cy="23" r="3" fill="white"/><path d="M16 30 Q22 34 28 30" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="22" y1="14" x2="22" y2="8" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="6" r="3" fill="#FF9300"/><line x1="8" y1="25" x2="4" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="25" x2="40" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Robotics</div></div>
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><line x1="22" y1="22" x2="10" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="10" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="9" cy="9" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><ellipse cx="35" cy="9" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><ellipse cx="9" cy="35" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><ellipse cx="35" cy="35" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><rect x="18" y="18" width="8" height="8" rx="2" fill="white"/><circle cx="22" cy="22" r="2" fill="#0D2B7A"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Drone</div></div>
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="6" width="32" height="32" rx="3" stroke="white" stroke-width="2"/><line x1="6" y1="17" x2="38" y2="17" stroke="white" stroke-width="1" opacity="0.5"/><line x1="6" y1="27" x2="38" y2="27" stroke="white" stroke-width="1" opacity="0.5"/><line x1="17" y1="6" x2="17" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><line x1="27" y1="6" x2="27" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><circle cx="27" cy="17" r="4" fill="#FF9300"/><line x1="4" y1="6" x2="4" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="4" y1="38" x2="40" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">CAD</div></div>
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="58" height="58" viewBox="0 0 44 44" fill="none"><rect x="3" y="14" width="38" height="18" rx="9" stroke="white" stroke-width="2"/><line x1="11" y1="20" x2="11" y2="26" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="23" x2="14" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="29" cy="20" r="1.8" fill="#FF9300"/><circle cx="34" cy="23" r="1.8" fill="#FF9300"/><circle cx="29" cy="26" r="1.8" fill="white"/><circle cx="24.5" cy="23" r="1.8" fill="white"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Game Design</div></div>
+    </div>
+    <div style="font-size:clamp(52px,10vw,88px);font-weight:900;letter-spacing:-2px;line-height:1;">
+      <span style="color:#FFFFFF;">STEM</span><span style="color:#FF9300;">4</span><span style="color:#FF40FF;">U</span>
+    </div>
+    <div style="font-size:18px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.85);margin-top:-12px;">Where kids discover their superpower</div>
   </div>
   <div class="coming-soon-badge"><span class="csb-dot"></span>Coming Soon<span class="csb-dot"></span></div>
   <p class="hero-sub"><strong style="font-weight:700;color:#fff;">Hands-on Robotics, Drone, CAD, and FLL & FTC competition.</strong><br>Built for curious K-12 minds in Northern Virginia.</p>
