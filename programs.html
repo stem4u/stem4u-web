@@ -74,7 +74,7 @@
   @media (max-width: 720px) { .program-grid { grid-template-columns: repeat(2, 1fr); } }
   .coming-tag { display: inline-block; background: #FFF3E0; color: #E65100; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #FFB74D; }
   .program-card.coming { border-top-style: dashed; opacity: 0.82; }
-  .program-grid.upcoming .program-card { opacity: 0.20 !important; filter: blur(3px); pointer-events: none; user-select: none; }
+  .program-grid.upcoming .program-card, .page-grid.upcoming .program-card { opacity: 0.20 !important; filter: blur(3px); pointer-events: none; user-select: none; }
   .upcoming-label { font-size: 13px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin: 48px auto 22px; display: flex; align-items: center; justify-content: center; gap: 16px; max-width: 940px; }
   .upcoming-label::before, .upcoming-label::after { content: ''; flex: 1; height: 1px; background: rgba(74,90,128,.25); }
   .program-card { background: var(--card); border-radius: 8px; padding: 24px 16px; box-shadow: 0 2px 16px rgba(13,43,122,.08); border-top: 4px solid var(--blue); transition: transform .15s, box-shadow .15s; }
@@ -214,7 +214,7 @@
   </div>
 
   <p class="upcoming-label">Upcoming Programs</p>
-  <div class="page-grid">
+  <div class="page-grid upcoming">
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🧠</span><div class="program-name">AI &amp; Machine Learning</div><div class="program-desc">Python, Teachable Machine, and hands-on ML projects built for K-12 minds.</div></div>
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🔐</span><div class="program-name">Cybersecurity</div><div class="program-desc">CyberPatriot competition prep and ethical hacking fundamentals.</div></div>
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🖨️</span><div class="program-name">3D Printing</div><div class="program-desc">Additive manufacturing — bring your CAD designs to life in real material.</div></div>
