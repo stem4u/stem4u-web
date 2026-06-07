@@ -9,18 +9,18 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --navy:      #00B6E2;   /* hero / primary = cyan */
-    --blue:      #00B6E2;   /* card accent cyan */
-    --orange:    #FF9900;   /* camps orange */
-    --orange-lt: #FFB347;
-    --pink:      #EC4FB8;   /* events pink */
-    --yellow:    #FFCA05;   /* nav band */
+    --navy:      #014AAC;   /* Looka deep blue hero */
+    --blue:      #014AAC;   /* primary blue accent */
+    --orange:    #FF9300;   /* Looka icon orange */
+    --orange-lt: #FFA733;
+    --pink:      #FF40FF;   /* Looka magenta slogan */
+    --yellow:    #FFCA05;
     --green:     #34C373;
-    --plum:      #281A39;   /* dark text */
-    --light:     #F6F6F6;   /* page bg */
+    --plum:      #1B2A4A;   /* dark text */
+    --light:     #F2F5FA;   /* page bg */
     --white:     #FFFFFF;
-    --text:      #281A39;
-    --muted:     #5a5470;
+    --text:      #1B2A4A;
+    --muted:     #5a6478;
     --card:      #FFFFFF;
   }
   html { scroll-behavior: smooth; }
@@ -45,25 +45,25 @@
   }
 
   /* ── HERO ── */
-  .hero { background: var(--white); color: var(--plum); padding: 40px 24px 56px; text-align: center; position: relative; overflow: hidden; }
+  .hero { background: var(--navy); color: var(--white); padding: 40px 24px 64px; text-align: center; position: relative; overflow: hidden; }
   .hero > * { position: relative; z-index: 1; }
 
   .logo-mark { display: inline-flex; align-items: center; flex-direction: column; gap: 20px; margin-bottom: 32px; }
 
-  .coming-soon-badge { display: flex; align-items: center; justify-content: center; gap: 14px; width: fit-content; color: var(--blue); font-size: 16px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; margin: 0 auto 28px; }
-  .coming-soon-badge::before, .coming-soon-badge::after { content: ''; width: 36px; height: 1px; background: rgba(40,26,57,.18); }
+  .coming-soon-badge { display: flex; align-items: center; justify-content: center; gap: 14px; width: fit-content; color: var(--orange); font-size: 16px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; margin: 0 auto 28px; }
+  .coming-soon-badge::before, .coming-soon-badge::after { content: ''; width: 36px; height: 1px; background: rgba(255,255,255,.3); }
   .coming-soon-badge .csb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); animation: csbpulse 1.8s infinite; }
-  @keyframes csbpulse { 0% { box-shadow: 0 0 0 0 rgba(236,79,184,.6); } 70% { box-shadow: 0 0 0 8px rgba(236,79,184,0); } 100% { box-shadow: 0 0 0 0 rgba(236,79,184,0); } }
+  @keyframes csbpulse { 0% { box-shadow: 0 0 0 0 rgba(255,64,255,.6); } 70% { box-shadow: 0 0 0 8px rgba(255,64,255,0); } 100% { box-shadow: 0 0 0 0 rgba(255,64,255,0); } }
 
-  .hero-headline { font-size: clamp(28px, 5vw, 48px); font-weight: 900; line-height: 1.15; max-width: 700px; margin: 0 auto 16px; color: var(--blue); }
+  .hero-headline { font-size: clamp(28px, 5vw, 48px); font-weight: 900; line-height: 1.15; max-width: 700px; margin: 0 auto 16px; color: var(--white); }
   .hero-headline span { color: var(--pink); }
-  .hero-sub { font-size: 17px; color: var(--muted); max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
+  .hero-sub { font-size: 17px; color: rgba(255,255,255,.8); max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
 
   .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .hero-cta { display: inline-block; background: var(--blue); color: var(--white); font-size: 15px; font-weight: 800; padding: 14px 36px; border-radius: 8px; text-decoration: none; transition: background .15s; box-shadow: 0 4px 20px rgba(0,182,226,.35); }
-  .hero-cta:hover { background: #00A0C8; }
-  .hero-cta-2 { display: inline-block; background: transparent; color: var(--plum); font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 8px; text-decoration: none; border: 2px solid rgba(40,26,57,.25); transition: border-color .15s, background .15s; }
-  .hero-cta-2:hover { border-color: var(--plum); background: rgba(40,26,57,.04); }
+  .hero-cta { display: inline-block; background: var(--orange); color: var(--white); font-size: 15px; font-weight: 800; padding: 14px 36px; border-radius: 8px; text-decoration: none; transition: background .15s; box-shadow: 0 4px 20px rgba(255,147,0,.4); }
+  .hero-cta:hover { background: var(--orange-lt); }
+  .hero-cta-2 { display: inline-block; background: transparent; color: var(--white); font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 8px; text-decoration: none; border: 2px solid rgba(255,255,255,.5); transition: border-color .15s, background .15s; }
+  .hero-cta-2:hover { border-color: white; background: rgba(255,255,255,.08); }
 
   /* ── PROGRAMS ── */
   .programs { padding: 28px 24px 48px; text-align: center; background: var(--light); }
@@ -127,7 +127,7 @@
 <body>
 
 <nav class="site-nav">
-  <a href="index8.html" class="nav-logo">STEM<span>4</span>U</a>
+  <a href="index8.html" class="nav-logo">STEM<span style="color:#FF9300;">4</span><span style="color:#FF40FF;">U</span></a>
   <div class="nav-links" id="navLinks">
     <a href="index8.html" class="nav-link active">Home</a>
     <a href="programs.html" class="nav-link">Programs</a>
@@ -142,15 +142,15 @@
 <section class="hero">
   <div class="logo-mark">
     <div style="display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
-      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="22" rx="6" stroke="#00B6E2" stroke-width="2"/><circle cx="16" cy="23" r="3" fill="#00B6E2"/><circle cx="28" cy="23" r="3" fill="#00B6E2"/><path d="M16 30 Q22 34 28 30" stroke="#00B6E2" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="22" y1="14" x2="22" y2="8" stroke="#00B6E2" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="6" r="3" fill="#EC4FB8"/><line x1="8" y1="25" x2="4" y2="25" stroke="#00B6E2" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="25" x2="40" y2="25" stroke="#00B6E2" stroke-width="2" stroke-linecap="round"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#5a5470;text-transform:uppercase;margin-top:5px;">Robotics</div></div>
-      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><line x1="22" y1="22" x2="10" y2="10" stroke="#00B6E2" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="10" stroke="#00B6E2" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="10" y2="34" stroke="#00B6E2" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="34" stroke="#00B6E2" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="9" cy="9" rx="6" ry="2.5" stroke="#EC4FB8" stroke-width="2"/><ellipse cx="35" cy="9" rx="6" ry="2.5" stroke="#EC4FB8" stroke-width="2"/><ellipse cx="9" cy="35" rx="6" ry="2.5" stroke="#EC4FB8" stroke-width="2"/><ellipse cx="35" cy="35" rx="6" ry="2.5" stroke="#EC4FB8" stroke-width="2"/><rect x="18" y="18" width="8" height="8" rx="2" fill="#00B6E2"/><circle cx="22" cy="22" r="2" fill="#00B6E2"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#5a5470;text-transform:uppercase;margin-top:5px;">Drone</div></div>
-      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="6" width="32" height="32" rx="3" stroke="#00B6E2" stroke-width="2"/><line x1="6" y1="17" x2="38" y2="17" stroke="#00B6E2" stroke-width="1" opacity="0.5"/><line x1="6" y1="27" x2="38" y2="27" stroke="#00B6E2" stroke-width="1" opacity="0.5"/><line x1="17" y1="6" x2="17" y2="38" stroke="#00B6E2" stroke-width="1" opacity="0.5"/><line x1="27" y1="6" x2="27" y2="38" stroke="#00B6E2" stroke-width="1" opacity="0.5"/><circle cx="27" cy="17" r="4" fill="#EC4FB8"/><line x1="4" y1="6" x2="4" y2="38" stroke="#00B6E2" stroke-width="2.5" stroke-linecap="round"/><line x1="4" y1="38" x2="40" y2="38" stroke="#00B6E2" stroke-width="2.5" stroke-linecap="round"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#5a5470;text-transform:uppercase;margin-top:5px;">CAD</div></div>
-      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="58" height="58" viewBox="0 0 44 44" fill="none"><rect x="3" y="14" width="38" height="18" rx="9" stroke="#00B6E2" stroke-width="2"/><line x1="11" y1="20" x2="11" y2="26" stroke="#00B6E2" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="23" x2="14" y2="23" stroke="#00B6E2" stroke-width="2" stroke-linecap="round"/><circle cx="29" cy="20" r="1.8" fill="#EC4FB8"/><circle cx="34" cy="23" r="1.8" fill="#EC4FB8"/><circle cx="29" cy="26" r="1.8" fill="#00B6E2"/><circle cx="24.5" cy="23" r="1.8" fill="#00B6E2"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#5a5470;text-transform:uppercase;margin-top:5px;">Game Design</div></div>
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="22" rx="6" stroke="white" stroke-width="2"/><circle cx="16" cy="23" r="3" fill="white"/><circle cx="28" cy="23" r="3" fill="white"/><path d="M16 30 Q22 34 28 30" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="22" y1="14" x2="22" y2="8" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="6" r="3" fill="#FF9300"/><line x1="8" y1="25" x2="4" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="25" x2="40" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:5px;">Robotics</div></div>
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><line x1="22" y1="22" x2="10" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="10" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="10" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="22" x2="34" y2="34" stroke="white" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="9" cy="9" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><ellipse cx="35" cy="9" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><ellipse cx="9" cy="35" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><ellipse cx="35" cy="35" rx="6" ry="2.5" stroke="#FF9300" stroke-width="2"/><rect x="18" y="18" width="8" height="8" rx="2" fill="white"/><circle cx="22" cy="22" r="2" fill="white"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:5px;">Drone</div></div>
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="6" width="32" height="32" rx="3" stroke="white" stroke-width="2"/><line x1="6" y1="17" x2="38" y2="17" stroke="white" stroke-width="1" opacity="0.5"/><line x1="6" y1="27" x2="38" y2="27" stroke="white" stroke-width="1" opacity="0.5"/><line x1="17" y1="6" x2="17" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><line x1="27" y1="6" x2="27" y2="38" stroke="white" stroke-width="1" opacity="0.5"/><circle cx="27" cy="17" r="4" fill="#FF9300"/><line x1="4" y1="6" x2="4" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="4" y1="38" x2="40" y2="38" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:5px;">CAD</div></div>
+      <div style="text-align:center;"><div style="height:58px;display:flex;align-items:center;justify-content:center;"><svg width="58" height="58" viewBox="0 0 44 44" fill="none"><rect x="3" y="14" width="38" height="18" rx="9" stroke="white" stroke-width="2"/><line x1="11" y1="20" x2="11" y2="26" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="23" x2="14" y2="23" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="29" cy="20" r="1.8" fill="#FF9300"/><circle cx="34" cy="23" r="1.8" fill="#FF9300"/><circle cx="29" cy="26" r="1.8" fill="white"/><circle cx="24.5" cy="23" r="1.8" fill="white"/></svg></div><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.75);text-transform:uppercase;margin-top:5px;">Game Design</div></div>
     </div>
     <div style="font-size:clamp(52px,10vw,88px);font-weight:900;letter-spacing:-2px;line-height:1;">
-      <span style="color:#281A39;">STEM</span><span style="color:#EC4FB8;">4</span><span style="color:#281A39;">U</span>
+      <span style="color:#FFFFFF;">STEM</span><span style="color:#FF9300;">4</span><span style="color:#FF40FF;">U</span>
     </div>
-    <div style="font-size:18px;font-weight:600;letter-spacing:2px;color:#5a5470;margin-top:-12px;">Where kids discover their superpower</div>
+    <div style="font-size:18px;font-weight:700;letter-spacing:1px;color:#FF40FF;margin-top:-12px;">Where kids discover their superpower</div>
   </div>
   <div class="coming-soon-badge"><span class="csb-dot"></span>Coming Soon<span class="csb-dot"></span></div>
   <p class="hero-sub"><strong style="font-weight:700;color:#fff;">Hands-on Robotics, Drone, CAD, and FLL & FTC competition.</strong><br>Built for curious K-12 minds in Northern Virginia.</p>
@@ -169,7 +169,7 @@
     <div class="program-card"><span class="program-icon">🏆</span><div class="program-name">FTC</div><div class="program-desc">First Tech Challenge — high-school competition teams</div></div>
     <div class="program-card"><span class="program-icon">🥇</span><div class="program-name">FLL</div><div class="program-desc">First Lego League — elementary & middle school teams</div></div>
     <div class="program-card"><span class="program-icon">🧩</span><div class="program-name">Lego Education CS &amp; AI</div><div class="program-desc">Hands-on CS &amp; AI with LEGO Education's K-8 platform</div></div>
-    <div class="program-card"><span class="program-icon" style="font-size:0"><svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="#00B6E2"/></svg></span><div class="program-name">Drone</div><div class="program-desc">Pilot, program &amp; race drones with real UAV hardware</div></div>
+    <div class="program-card"><span class="program-icon" style="font-size:0"><svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="white"/></svg></span><div class="program-name">Drone</div><div class="program-desc">Pilot, program &amp; race drones with real UAV hardware</div></div>
   </div>
   <p class="upcoming-label">Upcoming Programs</p>
   <div class="program-grid upcoming">
@@ -177,7 +177,7 @@
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🧠</span><div class="program-name">AI & Machine Learning</div><div class="program-desc">Python, Teachable Machine & ML for K-12 minds</div></div>
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🔐</span><div class="program-name">Cybersecurity</div><div class="program-desc">CyberPatriot competition & ethical hacking basics</div></div>
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon" style="font-size:0"><svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><rect x="3" y="3" width="38" height="6" rx="2" fill="#2d3748"/><line x1="5" y1="9" x2="5" y2="40" stroke="#2d3748" stroke-width="2.8" stroke-linecap="round"/><line x1="39" y1="9" x2="39" y2="40" stroke="#2d3748" stroke-width="2.8" stroke-linecap="round"/><rect x="3" y="38" width="38" height="4" rx="2" fill="#2d3748"/><line x1="5" y1="15" x2="39" y2="15" stroke="#2d3748" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="15" x2="22" y2="22" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><path d="M19,22 L25,22 L22,26 Z" fill="#2d3748"/><polygon points="22,27 28,30 28,37 22,34" fill="none" stroke="#2d3748" stroke-width="1.6" stroke-linejoin="round"/><polygon points="22,27 16,30 16,37 22,34" fill="none" stroke="#2d3748" stroke-width="1.6" stroke-linejoin="round"/><polygon points="22,27 28,30 22,34 16,30" fill="none" stroke="#2d3748" stroke-width="1.6" stroke-linejoin="round"/></svg></span><div class="program-name">3D Printing</div><div class="program-desc">Additive manufacturing — bring your CAD designs to life</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon" style="font-size:0"><svg width="42" height="23" viewBox="0 0 80 44" fill="#2d3748" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><circle cx="22" cy="22" r="20"/><circle cx="58" cy="22" r="20"/><rect x="11" y="20" width="22" height="4" rx="1.5" fill="#00B6E2"/><rect x="47" y="20" width="22" height="4" rx="1.5" fill="#00B6E2"/><rect x="56" y="11" width="4" height="22" rx="1.5" fill="#00B6E2"/></svg></span><div class="program-name">Electronics &amp; Arduino</div><div class="program-desc">Circuits, sensors &amp; microcontrollers — build real things</div></div>
+    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon" style="font-size:0"><svg width="42" height="23" viewBox="0 0 80 44" fill="#2d3748" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><circle cx="22" cy="22" r="20"/><circle cx="58" cy="22" r="20"/><rect x="11" y="20" width="22" height="4" rx="1.5" fill="white"/><rect x="47" y="20" width="22" height="4" rx="1.5" fill="white"/><rect x="56" y="11" width="4" height="22" rx="1.5" fill="white"/></svg></span><div class="program-name">Electronics &amp; Arduino</div><div class="program-desc">Circuits, sensors &amp; microcontrollers — build real things</div></div>
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">📱</span><div class="program-name">App Development</div><div class="program-desc">Build real apps — App Challenge competitions & beyond</div></div>
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🚀</span><div class="program-name">Aerospace Engineering</div><div class="program-desc">Rocketry, design simulation & the SpaceX generation</div></div>
     <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🌐</span><div class="program-name">IoT</div><div class="program-desc">Smart home projects, sensors & connected devices</div></div>
