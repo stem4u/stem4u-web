@@ -23,25 +23,19 @@
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
   /* ── HERO ── */
-  .hero { background: var(--navy); color: var(--white); padding: 32px 24px 80px; text-align: center; position: relative; overflow: hidden; }
+  .hero { background: var(--navy); color: var(--white); padding: 16px 24px 80px; text-align: center; position: relative; overflow: hidden; }
   .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
   .hero::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 60px; background: var(--light); clip-path: ellipse(55% 100% at 50% 100%); }
   /* Subtle glow behind logo */
-  .hero-glow { position: absolute; top: 45%; left: 50%; transform: translateX(-50%); width: 400px; height: 200px; background: radial-gradient(ellipse, rgba(255,85,0,.18) 0%, transparent 70%); pointer-events: none; }
+  .hero-glow { position: absolute; top: 38%; left: 50%; transform: translate(-50%,-50%); width: 320px; height: 160px; background: radial-gradient(ellipse, rgba(255,85,0,.16) 0%, transparent 70%); pointer-events: none; }
   .hero > * { position: relative; z-index: 1; }
 
   .logo-mark { display: inline-flex; align-items: center; flex-direction: column; gap: 20px; margin-bottom: 32px; }
 
-  .coming-soon-badge { display: inline-flex; align-items: center; gap: 10px; width: fit-content; background: rgba(255,85,0,.12); color: var(--white); font-size: 13px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; padding: 9px 22px; border-radius: 999px; border: 1.5px solid rgba(255,85,0,.55); margin: 0 auto 26px; }
-  .coming-soon-badge .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); animation: pulse 1.8s infinite; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,85,0,.6); } 70% { box-shadow: 0 0 0 10px rgba(255,85,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,85,0,0); } }
-
-  /* ── COUNTDOWN ── */
-  .launch-line { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.6); margin: 0 auto 14px; }
-  .countdown { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin: 0 auto 36px; }
-  .cd-box { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 14px 8px; min-width: 78px; }
-  .cd-num { font-size: 34px; font-weight: 900; line-height: 1; color: var(--white); font-variant-numeric: tabular-nums; }
-  .cd-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.55); margin-top: 7px; }
+  .coming-soon-badge { display: flex; align-items: center; justify-content: center; gap: 14px; width: fit-content; color: rgba(255,255,255,.85); font-size: 16px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; margin: 0 auto 28px; }
+  .coming-soon-badge::before, .coming-soon-badge::after { content: ''; width: 36px; height: 1px; background: rgba(255,255,255,.3); }
+  .coming-soon-badge .csb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); animation: csbpulse 1.8s infinite; }
+  @keyframes csbpulse { 0% { box-shadow: 0 0 0 0 rgba(255,85,0,.6); } 70% { box-shadow: 0 0 0 8px rgba(255,85,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,85,0,0); } }
 
   .hero-headline { font-size: clamp(28px, 5vw, 48px); font-weight: 900; line-height: 1.15; max-width: 700px; margin: 0 auto 16px; }
   .hero-headline span { color: var(--orange); }
@@ -112,7 +106,6 @@
 <body>
 
 <section class="hero">
-  <div class="hero-glow"></div>
   <div class="logo-mark">
     <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
       <div style="text-align:center;"><svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="8" y="14" width="28" height="22" rx="6" stroke="white" stroke-width="2"/><circle cx="16" cy="23" r="3" fill="white"/><circle cx="28" cy="23" r="3" fill="white"/><path d="M16 30 Q22 34 28 30" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/><line x1="22" y1="14" x2="22" y2="8" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="6" r="3" fill="#FF5500"/><line x1="8" y1="25" x2="4" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/><line x1="36" y1="25" x2="40" y2="25" stroke="white" stroke-width="2" stroke-linecap="round"/></svg><div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.7);text-transform:uppercase;margin-top:5px;">Robotics</div></div>
@@ -124,7 +117,7 @@
     </div>
     <div style="font-size:18px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.85);margin-top:-12px;">Where kids discover their superpower</div>
   </div>
-  <div class="coming-soon-badge"><span class="dot"></span>Coming Soon</div>
+  <div class="coming-soon-badge"><span class="csb-dot"></span>Coming Soon<span class="csb-dot"></span></div>
   <p class="hero-sub">Hands-on robotics, drone piloting, CAD, FLL & FTC competition programs — built for curious K-12 minds in Northern Virginia.</p>
   <div class="hero-ctas">
     <a href="#interest-form" class="hero-cta">Join the Waitlist →</a>
