@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>STEM4U — Where Kids Discover Their Superpower</title>
 <meta name="description" content="STEM4U is opening soon in Northern Virginia. K-12 programs in Robotics, Drone, CAD and more. Join the waitlist today."/>
-<link rel="icon" type="image/png" href="STEM4U.png"/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -21,6 +21,24 @@
   }
   html { scroll-behavior: smooth; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── NAV ── */
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav .nav-logo span { color: var(--orange); }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
 
   /* ── HERO ── */
   .hero { background: var(--navy); color: var(--white); padding: 16px 24px 80px; text-align: center; position: relative; overflow: hidden; }
@@ -107,6 +125,19 @@
 </head>
 <body>
 
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link active">Home</a>
+    <a href="programs.html" class="nav-link">Programs</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="pricing.html" class="nav-link">Pricing</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <a href="#interest-form" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
 <section class="hero">
   <div class="logo-mark">
     <div style="display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
@@ -120,7 +151,11 @@
     </div>
     <div style="font-size:18px;font-weight:600;letter-spacing:2px;color:rgba(255,255,255,.85);margin-top:-12px;">Where kids discover their superpower</div>
   </div>
-  <div class="coming-soon-badge"><span class="csb-dot"></span>Coming Soon<span class="csb-dot"></span></div>
+  <div class="coming-soon-badge"><span class="csb-dot"></span>Opening August 2026<span class="csb-dot"></span></div>
+  <div style="max-width:600px;margin:0 auto 26px;background:rgba(255,85,0,.13);border:1px solid rgba(255,133,51,.5);border-radius:12px;padding:22px 28px;text-align:center;">
+    <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;line-height:1.2;">Is your builder ready to compete?</div>
+    <div style="font-size:16.5px;line-height:1.6;color:rgba(255,255,255,.9);">We&rsquo;re forming <strong style="color:#FF9366;">FTC &amp; FLL</strong> competition teams now for the 2026&ndash;27 season &mdash; and spots are limited. If your child lives for FTC or FLL, <a href="#interest-form" class="ftc-cta" style="color:#FF9366;font-weight:800;text-decoration:underline;">get your builder on a team &rarr;</a></div>
+  </div>
   <p class="hero-sub"><strong style="font-weight:700;color:#fff;">Hands-on Robotics, Drone, CAD, and FLL & FTC competition.</strong><br>Built for curious K-12 minds in Northern Virginia.</p>
   <div class="hero-ctas">
     <a href="#interest-form" class="hero-cta">Join the Waitlist →</a>
@@ -182,7 +217,7 @@
       <button type="submit" class="submit-btn">Join the Waitlist →</button>
       <p class="form-note">We respect your privacy. No spam — ever.</p>
     </form>
-    <div class="success-msg" id="successMsg"><h3>Thank you for registering!</h3><p>We'll be in touch soon. In the meantime, check back at <a href="https://stem4u.com" style="color:var(--orange);font-weight:700;">stem4u.com</a> for updates, or reach us anytime at <a href="mailto:contact@stem4u.com" style="color:var(--orange);font-weight:700;">contact@stem4u.com</a>.</p></div>
+    <div class="success-msg" id="successMsg"><h3>You're on the list!</h3><p>Thanks! We'll be in touch as soon as enrollment opens.</p></div>
   </div>
 </section>
 
@@ -201,12 +236,13 @@
 <div class="location-bar">📍 Opening in Northern Virginia &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
 <footer>
   <div class="footer-links"><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
-  <p>© 2026 STEM4U Corp. · Northern Virginia · K-12 STEM Programs</p>
+  <p>© 2026 STEM<span style="color:var(--orange);">4</span>U Corp. · Northern Virginia · K-12 STEM Programs</p>
 </footer>
 
 <script>
   document.querySelector('.hero-cta').addEventListener('click',function(e){e.preventDefault();document.getElementById('interest-form').scrollIntoView({behavior:'smooth'});});
   document.querySelector('.hero-cta-2').addEventListener('click',function(e){e.preventDefault();document.getElementById('programs').scrollIntoView({behavior:'smooth'});});
+  document.querySelector('.ftc-cta').addEventListener('click',function(e){e.preventDefault();document.getElementById('interest-form').scrollIntoView({behavior:'smooth'});});
   const form=document.getElementById('waitlistForm');
   form.addEventListener('submit',async function(e){e.preventDefault();const btn=form.querySelector('.submit-btn');btn.textContent='Submitting…';btn.disabled=true;try{const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});if(res.ok){form.style.display='none';document.getElementById('successMsg').style.display='block';}else{btn.textContent='Something went wrong — try again';btn.disabled=false;}}catch{btn.textContent='Network error — try again';btn.disabled=false;}});
 </script>
