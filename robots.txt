@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /index8.html
+
+Sitemap: https://stem4u.com/sitemap.xml
