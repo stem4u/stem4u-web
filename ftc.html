@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FTC Robotics Team in Loudoun County & Northern Virginia | STEM4U</title>
+<meta name="description" content="Join a FIRST Tech Challenge (FTC) competition robotics team in Northern Virginia. Grades 7–12 design, build & code real robots. Serving Loudoun, Fairfax & Prince William. Opening August 2026."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0D2B7A; --blue:#1A5CD8; --orange:#FF5500; --orange-lt:#FF7733;
+    --light:#F4F7FF; --white:#FFFFFF; --text:#0A1E52; --muted:#4A5A80; --card:#FFFFFF;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
+
+  .page-hero { background: var(--navy); color: var(--white); padding: 46px 24px 40px; text-align: center; position: relative; }
+  .page-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
+  .hero-badge { display:inline-flex; align-items:center; gap:10px; color:#F5C518; font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; }
+  .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); }
+  .page-hero h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; line-height: 1.12; }
+  .page-hero h1 span { color: var(--orange); }
+  .page-hero .lede { font-size: 17px; color: rgba(255,255,255,.8); max-width: 600px; margin: 14px auto 24px; line-height: 1.6; }
+  .hero-cta { display:inline-block; background:var(--orange); color:#fff; font-size:15px; font-weight:800; padding:14px 34px; border-radius:6px; text-decoration:none; box-shadow:0 4px 20px rgba(255,85,0,.4); }
+  .hero-cta:hover { background:var(--orange-lt); }
+
+  .facts { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; max-width:900px; margin:-28px auto 0; padding:0 24px; position:relative; z-index:2; }
+  @media (max-width:720px){ .facts { grid-template-columns:repeat(2,1fr); } }
+  .fact { background:#fff; border-radius:10px; padding:18px 14px; text-align:center; box-shadow:0 4px 20px rgba(13,43,122,.1); border-top:3px solid var(--orange); }
+  .fact .n { font-size:20px; font-weight:900; color:var(--navy); line-height:1.1; }
+  .fact .l { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+
+  .prose { max-width: 720px; margin: 44px auto 0; text-align: left; background: var(--white); border-radius: 12px; padding: 36px 40px; box-shadow: 0 2px 18px rgba(13,43,122,.07); }
+  .prose h3 { font-size: 19px; font-weight: 800; color: var(--navy); margin: 30px 0 10px; padding-left: 12px; border-left: 4px solid var(--orange); }
+  .prose h3:first-child { margin-top: 0; }
+  .prose p { font-size: 16px; color: var(--text); line-height: 1.75; margin-bottom: 16px; }
+  .prose ul { margin: 0 0 16px 4px; list-style: none; }
+  .prose li { font-size: 16px; line-height: 1.7; padding-left: 26px; position: relative; margin-bottom: 8px; }
+  .prose li::before { content: '▸'; position: absolute; left: 4px; color: var(--orange); font-weight: 900; }
+  @media (max-width: 500px) { .prose { padding: 28px 22px; } }
+
+  .path { max-width:720px; margin:20px auto 0; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; }
+  .path .step { background:#fff; border:1.5px solid var(--line,#E2E8F5); border-radius:20px; padding:8px 16px; font-size:13px; font-weight:700; color:var(--navy); box-shadow:0 2px 10px rgba(13,43,122,.06); }
+  .path .arrow { color:var(--orange); font-weight:900; }
+
+  .form-section { background: var(--navy); padding: 56px 24px; text-align: center; margin-top:52px; position:relative; }
+  .form-section::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--orange); }
+  .form-wrap { max-width: 520px; margin: 0 auto; text-align: left; }
+  .form-title { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 6px; text-align: center; }
+  .form-subtitle { font-size: 14px; color: rgba(255,255,255,.7); text-align: center; margin-bottom: 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display:block; font-size:12px; font-weight:700; color:rgba(255,255,255,.85); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .form-group input, .form-group select { width:100%; padding:12px 14px; border:1px solid rgba(255,255,255,.2); border-radius:8px; font-size:15px; background:rgba(255,255,255,.06); color:#fff; }
+  .form-group input::placeholder { color:rgba(255,255,255,.4); }
+  .form-group select { color:#fff; }
+  .form-group select option { color:#000; }
+  .submit-btn { width:100%; background:var(--orange); color:#fff; font-size:16px; font-weight:800; padding:15px; border:none; border-radius:8px; cursor:pointer; margin-top:8px; transition:background .15s; }
+  .submit-btn:hover { background:var(--orange-lt); }
+  .success-msg { display:none; text-align:center; color:#fff; }
+  .success-msg h3 { font-size:20px; margin-bottom:8px; }
+  .success-msg p { color:rgba(255,255,255,.8); }
+  .priv { font-size:12px; color:rgba(255,255,255,.55); text-align:center; margin-top:14px; }
+
+  .related { max-width:720px; margin:44px auto 0; text-align:center; }
+  .related .section-label { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:14px; }
+  .related-grid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .related-grid a { background:#fff; border-radius:10px; padding:16px 22px; text-decoration:none; color:var(--navy); font-weight:800; font-size:14px; box-shadow:0 2px 14px rgba(13,43,122,.08); border-top:3px solid var(--blue); transition:transform .15s; }
+  .related-grid a:hover { transform:translateY(-3px); }
+
+  .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; margin-top:52px; }
+  .location-bar a { color: var(--white); text-decoration: underline; }
+  footer { background: #070F2B; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  footer a { color: var(--orange); text-decoration: none; }
+  .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
+  .areas { background:var(--navy); color:#fff; padding:36px 24px; text-align:center; }
+</style>
+<link rel="canonical" href="https://stem4u.com/ftc.html"/>
+<meta property="og:title" content="FTC Robotics Team in Loudoun County & Northern Virginia | STEM4U"/>
+<meta property="og:description" content="Join a FIRST Tech Challenge (FTC) competition robotics team in Northern Virginia. Grades 7–12 design, build & code real robots. Opening August 2026."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://stem4u.com/ftc.html"/>
+<meta property="og:image" content="https://stem4u.com/STEM4U-Logo-V3-clean.png"/>
+<meta name="geo.region" content="US-VA"/>
+<meta name="geo.placename" content="Loudoun County, Northern Virginia"/>
+<meta name="keywords" content="FTC team Loudoun County, FIRST Tech Challenge Northern Virginia, robotics competition team Ashburn, FTC robotics Fairfax, high school robotics Virginia, FTC team near me"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Course","name":"FIRST Tech Challenge (FTC) Robotics Team","description":"Competition robotics for students in grades 7–12 in Northern Virginia. Teams design, build, and program a real robot and compete through FIRST Chesapeake qualifiers and championships.","provider":{"@type":"EducationalOrganization","name":"STEM4U","url":"https://stem4u.com"},"educationalLevel":"Grades 7-12","about":"FIRST Tech Challenge","areaServed":["Loudoun County, Virginia","Fairfax County, Virginia","Prince William County, Virginia","Northern Virginia"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":["EducationalOrganization","LocalBusiness"],"name":"STEM4U","legalName":"STEM4U LLC","url":"https://stem4u.com","email":"contact@stem4u.com","image":"https://stem4u.com/STEM4U-Logo-V3-clean.png","logo":"https://stem4u.com/STEM4U-Logo-V3-clean.png","description":"K-12 STEM enrichment center offering robotics, drone, CAD, and FLL & FTC competition teams in Northern Virginia. Opening August 2026.","slogan":"Where kids discover their superpower","foundingDate":"2026","address":{"@type":"PostalAddress","addressLocality":"Aldie","addressRegion":"VA","addressCountry":"US"},"areaServed":[{"@type":"AdministrativeArea","name":"Loudoun County, Virginia"},{"@type":"AdministrativeArea","name":"Fairfax County, Virginia"},{"@type":"AdministrativeArea","name":"Prince William County, Virginia"},{"@type":"AdministrativeArea","name":"Fauquier County, Virginia"},{"@type":"AdministrativeArea","name":"Arlington County, Virginia"}],"knowsAbout":["Robotics","FIRST Tech Challenge (FTC)","FIRST LEGO League (FLL)","Drone Programming","CAD","STEM Education"]}
+</script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programs.html" class="nav-link active">Programs</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="pricing.html" class="nav-link">Pricing</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <a href="#reserve" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<section class="page-hero">
+  <div class="hero-badge"><span class="dot"></span>Opening August 2026<span class="dot"></span></div>
+  <h1>FIRST Tech Challenge <span>(FTC)</span></h1>
+  <p class="lede">Competition robotics for grades 7–12. Design, build, and code a real robot — then take it to the field against teams across Virginia.</p>
+  <a href="#reserve" class="hero-cta">Get your builder on a team →</a>
+</section>
+
+<div class="facts">
+  <div class="fact"><div class="n">7–12</div><div class="l">Grades</div></div>
+  <div class="fact"><div class="n">10–12</div><div class="l">Per team</div></div>
+  <div class="fact"><div class="n">4 hrs</div><div class="l">Per week</div></div>
+  <div class="fact"><div class="n">Sep–Feb</div><div class="l">Season</div></div>
+  <div class="fact"><div class="n">Worlds</div><div class="l">Competition path</div></div>
+</div>
+
+<div class="prose">
+  <h3>What is FTC?</h3>
+  <p>FIRST Tech Challenge is the premier robotics competition for middle and high school students. Each season, teams design, build, and program a robot to take on a brand-new game challenge — then compete head-to-head in alliances through the FIRST Chesapeake region. It's as close to real engineering as it gets: a deadline, a budget, a team, and a machine that has to actually work.</p>
+
+  <h3>Who it's for</h3>
+  <p>FTC is built for students in grades 7–12 who are ready for a serious, hands-on engineering challenge. Newer builders are welcome — we meet students at their level and grow their skills across the season, from first wiring to autonomous code.</p>
+
+  <h3>What your student will do</h3>
+  <ul>
+    <li>Build a competition robot from metal, motors, gears, and sensors</li>
+    <li>Program autonomous routines and driver-controlled operation in Java</li>
+    <li>Keep an engineering notebook that documents the whole design process</li>
+    <li>Compete in alliances, scout opponents, and refine strategy between matches</li>
+    <li>Present their work to judges and earn awards beyond the playing field</li>
+  </ul>
+
+  <h3>The season</h3>
+  <p>Our FTC season runs September through February — roughly four hours a week, in teams of 10 to 12 students. Teams build through the fall, then compete through qualifiers and championships in the winter. Coaching is hands-on and mentor-led; students own the robot, we guide the engineering.</p>
+
+  <h3>The path to the World Championship</h3>
+  <div class="path">
+    <span class="step">FIRST Chesapeake Regional Qualifier</span><span class="arrow">→</span>
+    <span class="step">FIRST Chesapeake Championship</span><span class="arrow">→</span>
+    <span class="step">FIRST World Championship</span>
+  </div>
+  <p style="margin-top:18px;">Every season is a real shot at advancing. Teams earn their way up through performance on the field and recognition from judges — the same FIRST Chesapeake pathway that sends Virginia, Maryland, and DC teams to the world championship each year.</p>
+
+  <h3>Why FTC matters</h3>
+  <p>FTC students build far more than robots. They gain real engineering and coding skills, learn to work under a deadline as a team, and come away with a standout story for high school and college applications. FIRST alumni pursue engineering, computer science, and STEM careers at high rates — and the FIRST community awards millions in college scholarships each year.</p>
+</div>
+
+<section class="related">
+  <p class="section-label">Explore More Programs</p>
+  <div class="related-grid">
+    <a href="programs.html">🥇 FLL — younger builders</a>
+    <a href="programs.html">🤖 Robotics</a>
+    <a href="programs.html">Drone</a>
+    <a href="programs.html">All programs →</a>
+  </div>
+</section>
+
+<section class="form-section" id="reserve">
+  <div class="form-wrap">
+    <h2 class="form-title">Reserve your FTC team spot</h2>
+    <p class="form-subtitle">Teams are capped and forming now for the 2026–27 season. Join the waitlist and we'll be in touch as team-building begins.</p>
+    <form id="ftcForm" action="https://formspree.io/f/xykagpyw" method="POST">
+      <input type="hidden" name="interest" value="FTC Team"/>
+      <div class="form-group"><label>Parent / Guardian Name</label><input type="text" name="parent_name" placeholder="Jane Smith" required/></div>
+      <div class="form-group"><label>Email Address</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
+      <div class="form-group"><label>Student's Grade (2026–27)</label><select name="grade" required><option value="" disabled selected>Select grade</option><option>7th Grade</option><option>8th Grade</option><option>9th Grade</option><option>10th Grade</option><option>11th Grade</option><option>12th Grade</option></select></div>
+      <button type="submit" class="submit-btn">Join the FTC Waitlist →</button>
+      <p class="priv">We respect your privacy. No spam — ever.</p>
+    </form>
+    <div class="success-msg" id="successMsg">
+      <h3>You're on the FTC list!</h3>
+      <p>Thanks — we'll reach out as soon as team-building opens for the 2026–27 season.</p>
+    </div>
+  </div>
+</section>
+
+<section class="areas">
+  <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
+  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">FTC Robotics across Northern Virginia</h2>
+  <p style="max-width:760px;margin:0 auto;font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);">
+    STEM4U runs FIRST Tech Challenge teams for families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Herndon, Reston, Gainesville, Haymarket, Bristow, Manassas and surrounding Northern Virginia communities.
+  </p>
+</section>
+
+<div class="location-bar">📍 Opening in Northern Virginia &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+<footer>
+  <div class="footer-links"><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
+  <p>© 2026 STEM<span style="color:var(--orange);">4</span>U Corp. · Northern Virginia · K-12 STEM Programs</p>
+</footer>
+
+<script>
+  var f=document.getElementById('ftcForm');
+  f.addEventListener('submit',async function(e){
+    e.preventDefault();
+    var btn=f.querySelector('.submit-btn'); btn.textContent='Submitting…'; btn.disabled=true;
+    try{
+      var res=await fetch(f.action,{method:'POST',body:new FormData(f),headers:{'Accept':'application/json'}});
+      if(res.ok){ f.style.display='none'; document.getElementById('successMsg').style.display='block'; }
+      else{ btn.textContent='Something went wrong — try again'; btn.disabled=false; }
+    }catch{ btn.textContent='Network error — try again'; btn.disabled=false; }
+  });
+</script>
+</body>
+</html>
