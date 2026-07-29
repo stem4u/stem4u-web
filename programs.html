@@ -77,12 +77,16 @@
   .program-grid.upcoming .program-card, .page-grid.upcoming .program-card { opacity: 0.20 !important; filter: blur(3px); pointer-events: none; user-select: none; }
   .upcoming-label { font-size: 13px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin: 48px auto 22px; display: flex; align-items: center; justify-content: center; gap: 16px; max-width: 940px; }
   .upcoming-label::before, .upcoming-label::after { content: ''; flex: 1; height: 1px; background: rgba(74,90,128,.25); }
+  .chip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 820px; margin: 0 auto; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #E2E8F5; border-radius: 22px; padding: 9px 18px; font-size: 14px; font-weight: 700; color: var(--navy); box-shadow: 0 1px 8px rgba(13,43,122,.05); }
+  .chip .ci { font-size: 15px; line-height: 1; }
+  .chip-note { text-align: center; font-size: 13px; color: var(--muted); margin: 18px auto 0; }
   .program-card { background: var(--card); border-radius: 8px; padding: 24px 16px; box-shadow: 0 2px 16px rgba(13,43,122,.08); border-top: 4px solid var(--blue); transition: transform .15s, box-shadow .15s; }
   .program-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(13,43,122,.14); }
   .program-card:nth-child(odd) { border-top-color: var(--orange); }
   .program-icon { font-size: 34px; margin-bottom: 10px; display: block; }
   .program-name { font-size: 14px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 1px; }
-  .program-desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  .program-desc { font-size: 15px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
   /* ── FORM ── */
   .form-section { background: var(--white); padding: 64px 24px; text-align: center; }
@@ -233,19 +237,20 @@
     </a>
   </div>
 
-  <p class="upcoming-label">Upcoming Programs</p>
-  <div class="page-grid upcoming">
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">📐</span><div class="program-name">CAD</div><div class="program-desc">Computer-Aided Design and 3D modeling — turn ideas into precise 3D models.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🧠</span><div class="program-name">AI &amp; Machine Learning</div><div class="program-desc">Python, Teachable Machine, and hands-on ML projects built for K-12 students.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🔐</span><div class="program-name">Cybersecurity</div><div class="program-desc">CyberPatriot competition prep and ethical hacking fundamentals.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🖨️</span><div class="program-name">3D Printing</div><div class="program-desc">Additive manufacturing — print your CAD designs in real material in real material.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🔌</span><div class="program-name">Electronics &amp; Arduino</div><div class="program-desc">Circuits, sensors, and microcontrollers — build real working things.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">📱</span><div class="program-name">App Development</div><div class="program-desc">Build real apps and enter App Challenge competitions and beyond.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🚀</span><div class="program-name">Aerospace Engineering</div><div class="program-desc">Rocketry, design simulation, and the science of flight and space.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🌐</span><div class="program-name">IoT</div><div class="program-desc">Smart-home projects, sensors, and connected devices in action.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🎮</span><div class="program-name">Game Design</div><div class="program-desc">Build your own games with Unity, Godot, and Scratch.</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">⚙️</span><div class="program-name">Automation / PLC</div><div class="program-desc">Industrial automation concepts built for the NoVA tech corridor.</div></div>
+  <p class="upcoming-label">More Coming Soon</p>
+  <div class="chip-row">
+    <span class="chip"><span class="ci">📐</span>CAD</span>
+    <span class="chip"><span class="ci">🧠</span>AI &amp; Machine Learning</span>
+    <span class="chip"><span class="ci">🔐</span>Cybersecurity</span>
+    <span class="chip"><span class="ci">🖨️</span>3D Printing</span>
+    <span class="chip"><span class="ci">🔌</span>Electronics &amp; Arduino</span>
+    <span class="chip"><span class="ci">📱</span>App Development</span>
+    <span class="chip"><span class="ci">🚀</span>Aerospace Engineering</span>
+    <span class="chip"><span class="ci">🌐</span>IoT</span>
+    <span class="chip"><span class="ci">🎮</span>Game Design</span>
+    <span class="chip"><span class="ci">⚙️</span>Automation / PLC</span>
   </div>
+  <p class="chip-note">New programs roll out through the year. Get on the list and we'll tell you first.</p>
 </section>
 
 <section style="background:var(--navy);color:#fff;padding:36px 24px;text-align:center;">
