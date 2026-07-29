@@ -70,7 +70,7 @@
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; }
   .section-title { font-size: clamp(22px, 4vw, 30px); font-weight: 800; color: var(--navy); margin-bottom: 8px; }
   .section-sub { font-size: 15px; color: var(--muted); margin-bottom: 40px; }
-  .program-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 940px; margin: 0 auto; }
+  .program-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 820px; margin: 0 auto; }
   @media (max-width: 720px) { .program-grid { grid-template-columns: repeat(2, 1fr); } }
   .coming-tag { display: inline-block; background: #FFF3E0; color: #E65100; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #FFB74D; }
   .program-card.coming { border-top-style: dashed; opacity: 0.82; }
@@ -181,9 +181,8 @@
   <p class="section-sub">Every program is hands-on, competition-ready, and built for K-12 students.</p>
   <div class="program-grid">
     <div class="program-card"><span class="program-icon">🤖</span><div class="program-name">Robotics</div><div class="program-desc">Design, build & code robots from the ground up</div></div>
-    <div class="program-card"><span class="program-icon">🏆</span><div class="program-name">FTC</div><div class="program-desc">First Tech Challenge — high-school competition teams</div></div>
-    <div class="program-card"><span class="program-icon">🥇</span><div class="program-name">FLL</div><div class="program-desc">First Lego League — elementary & middle school teams</div></div>
-    <div class="program-card"><span class="program-icon">🧩</span><div class="program-name">Lego Education CS &amp; AI</div><div class="program-desc">Hands-on CS &amp; AI with LEGO Education's K-8 platform</div></div>
+    <div class="program-card"><span class="program-icon">🏆</span><div class="program-name">FTC</div><div class="program-desc">FIRST Tech Challenge — high-school competition teams</div></div>
+    <div class="program-card"><span class="program-icon">🥇</span><div class="program-name">FLL</div><div class="program-desc">FIRST LEGO League — elementary & middle school teams</div></div>
     <div class="program-card"><span class="program-icon" style="font-size:0"><svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="white"/></svg></span><div class="program-name">Drone</div><div class="program-desc">Pilot, program &amp; race drones with real UAV hardware</div></div>
   </div>
   <p class="upcoming-label">Upcoming Programs</p>
@@ -219,8 +218,7 @@
           <label class="checkbox-item"><input type="checkbox" name="programs" value="Robotics"/> 🤖 Robotics</label>
           <label class="checkbox-item"><input type="checkbox" name="programs" value="FTC"/> 🏆 FTC</label>
           <label class="checkbox-item"><input type="checkbox" name="programs" value="FLL"/> ⭐ FLL</label>
-          <label class="checkbox-item"><input type="checkbox" name="programs" value="Lego"/> 🧱 Lego</label>
-          <label class="checkbox-item"><input type="checkbox" name="programs" value="Drone"/> 🚁 Drone</label>
+          <label class="checkbox-item"><input type="checkbox" name="programs" value="Drone"/> <svg width="17" height="17" viewBox="0 0 44 44" fill="none" style="vertical-align:-3px"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="white"/></svg> Drone</label>
         </div>
       </div>
       <div class="form-group"><label>Anything else?</label><textarea name="message" placeholder="e.g. my daughter loves building things, any after-school slots?"></textarea></div>
