@@ -117,7 +117,7 @@
     <a href="pricing.html" class="nav-link">Pricing</a>
     <a href="contact.html" class="nav-link">Contact</a>
   </div>
-  <a href="#reserve" class="nav-cta">Join Waitlist</a>
+  <a href="waitlist.html" class="nav-cta">Join Waitlist</a>
   <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
 </nav>
 
@@ -125,7 +125,7 @@
   <div class="hero-badge"><span class="dot"></span>Opening August 2026<span class="dot"></span></div>
   <h1>FIRST LEGO League <span>Challenge</span></h1>
   <p class="lede">Robotics for grades 4–8. Build and code a LEGO SPIKE robot, solve a real-world research challenge, and compete across Virginia and Washington, DC.</p>
-  <a href="#reserve" class="hero-cta">Get your builder on a team →</a>
+  <a href="waitlist.html" class="hero-cta">Get your builder on a team →</a>
 </section>
 
 <div class="facts">
@@ -187,24 +187,6 @@
   </div>
 </section>
 
-<section class="form-section" id="reserve">
-  <div class="form-wrap">
-    <h2 class="form-title">Reserve your FLL team spot</h2>
-    <p class="form-subtitle">Pricing and season dates are coming soon. Teams are small and forming now for 2026–27 — join the waitlist and you'll be first to know.</p>
-    <form id="fllForm" action="https://formspree.io/f/xykagpyw" method="POST">
-      <input type="hidden" name="interest" value="FLL Team"/>
-      <div class="form-group"><label>Parent / Guardian Name</label><input type="text" name="parent_name" placeholder="Jane Smith" required/></div>
-      <div class="form-group"><label>Email Address</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
-      <div class="form-group"><label>Student's Grade (2026–27)</label><select name="grade" required><option value="" disabled selected>Select grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option></select></div>
-      <button type="submit" class="submit-btn">Join the FLL Waitlist →</button>
-      <p class="priv">We respect your privacy. No spam — ever.</p>
-    </form>
-    <div class="success-msg" id="successMsg">
-      <h3>You're on the FLL list!</h3>
-      <p>Thanks — we'll reach out as soon as team-building opens for the 2026–27 season.</p>
-    </div>
-  </div>
-</section>
 
 <section class="areas">
   <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
@@ -220,17 +202,5 @@
   <p>© 2026 STEM<span style="color:var(--orange);">4</span>U Corp. · Northern Virginia · K-12 STEM Programs</p>
 </footer>
 
-<script>
-  var f=document.getElementById('fllForm');
-  f.addEventListener('submit',async function(e){
-    e.preventDefault();
-    var btn=f.querySelector('.submit-btn'); btn.textContent='Submitting…'; btn.disabled=true;
-    try{
-      var res=await fetch(f.action,{method:'POST',body:new FormData(f),headers:{'Accept':'application/json'}});
-      if(res.ok){ f.style.display='none'; document.getElementById('successMsg').style.display='block'; }
-      else{ btn.textContent='Something went wrong — try again'; btn.disabled=false; }
-    }catch{ btn.textContent='Network error — try again'; btn.disabled=false; }
-  });
-</script>
 </body>
 </html>
