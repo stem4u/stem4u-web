@@ -82,7 +82,7 @@
   .program-card:nth-child(odd) { border-top-color: var(--orange); }
   .program-icon { font-size: 34px; margin-bottom: 10px; display: block; }
   .program-name { font-size: 14px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 1px; }
-  .program-desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+  .program-desc { font-size: 15px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
   /* ── FORM ── */
   .form-section { background: var(--white); padding: 64px 24px; text-align: center; }
@@ -145,6 +145,7 @@
     <a href="about.html" class="nav-link">About</a>
     <a href="pricing.html" class="nav-link">Pricing</a>
     <a href="contact.html" class="nav-link">Contact</a>
+    <a href="waitlist.html" class="nav-link">Waitlist</a>
   </div>
   <a href="#interest-form" class="nav-cta">Join Waitlist</a>
   <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
@@ -176,27 +177,14 @@
 </section>
 
 <section class="programs" id="programs">
-  <p class="section-label">What We Offer</p>
+  <p class="section-label" style="font-size:14px;">What We Offer</p>
   <h2 class="section-title">Multiple Programs. One Mission.</h2>
   <p class="section-sub">Every program is hands-on, competition-ready, and built for K-12 students.</p>
   <div class="program-grid">
-    <div class="program-card"><span class="program-icon">🤖</span><div class="program-name">Robotics</div><div class="program-desc">Design, build & code robots from the ground up</div></div>
-    <div class="program-card"><span class="program-icon">🏆</span><div class="program-name">FTC</div><div class="program-desc">FIRST Tech Challenge — high-school competition teams</div></div>
-    <div class="program-card"><span class="program-icon">🥇</span><div class="program-name">FLL</div><div class="program-desc">FIRST LEGO League — elementary & middle school teams</div></div>
-    <div class="program-card"><span class="program-icon" style="font-size:0"><svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="white"/></svg></span><div class="program-name">Drone</div><div class="program-desc">Pilot, program &amp; race drones with real UAV hardware</div></div>
-  </div>
-  <p class="upcoming-label">Upcoming Programs</p>
-  <div class="program-grid upcoming">
-    <div class="program-card"><span class="program-icon">📐</span><div class="program-name">CAD</div><div class="program-desc">Computer-Aided Design — turn ideas into 3D models</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🧠</span><div class="program-name">AI & Machine Learning</div><div class="program-desc">Python, Teachable Machine & ML for K-12 students</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🔐</span><div class="program-name">Cybersecurity</div><div class="program-desc">CyberPatriot competition & ethical hacking basics</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon" style="font-size:0"><svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><rect x="3" y="3" width="38" height="6" rx="2" fill="#2d3748"/><line x1="5" y1="9" x2="5" y2="40" stroke="#2d3748" stroke-width="2.8" stroke-linecap="round"/><line x1="39" y1="9" x2="39" y2="40" stroke="#2d3748" stroke-width="2.8" stroke-linecap="round"/><rect x="3" y="38" width="38" height="4" rx="2" fill="#2d3748"/><line x1="5" y1="15" x2="39" y2="15" stroke="#2d3748" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="15" x2="22" y2="22" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><path d="M19,22 L25,22 L22,26 Z" fill="#2d3748"/><polygon points="22,27 28,30 28,37 22,34" fill="none" stroke="#2d3748" stroke-width="1.6" stroke-linejoin="round"/><polygon points="22,27 16,30 16,37 22,34" fill="none" stroke="#2d3748" stroke-width="1.6" stroke-linejoin="round"/><polygon points="22,27 28,30 22,34 16,30" fill="none" stroke="#2d3748" stroke-width="1.6" stroke-linejoin="round"/></svg></span><div class="program-name">3D Printing</div><div class="program-desc">Additive manufacturing — print your CAD designs in real material</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon" style="font-size:0"><svg width="42" height="23" viewBox="0 0 80 44" fill="#2d3748" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><circle cx="22" cy="22" r="20"/><circle cx="58" cy="22" r="20"/><rect x="11" y="20" width="22" height="4" rx="1.5" fill="white"/><rect x="47" y="20" width="22" height="4" rx="1.5" fill="white"/><rect x="56" y="11" width="4" height="22" rx="1.5" fill="white"/></svg></span><div class="program-name">Electronics &amp; Arduino</div><div class="program-desc">Circuits, sensors &amp; microcontrollers — build real things</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">📱</span><div class="program-name">App Development</div><div class="program-desc">Build real apps — App Challenge competitions & beyond</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🚀</span><div class="program-name">Aerospace Engineering</div><div class="program-desc">Rocketry, flight simulation & real aerospace design</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">🌐</span><div class="program-name">IoT</div><div class="program-desc">Smart home projects, sensors & connected devices</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon" style="font-size:0"><svg width="38" height="38" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><rect x="4" y="9" width="36" height="24" rx="3" stroke="#2d3748" stroke-width="2.4"/><line x1="16" y1="37" x2="28" y2="37" stroke="#2d3748" stroke-width="2.4" stroke-linecap="round"/><line x1="20" y1="33" x2="18.5" y2="37" stroke="#2d3748" stroke-width="2.2" stroke-linecap="round"/><line x1="24" y1="33" x2="25.5" y2="37" stroke="#2d3748" stroke-width="2.2" stroke-linecap="round"/><rect x="17" y="14" width="16" height="9" rx="4.5" stroke="#2d3748" stroke-width="2"/><line x1="21" y1="18.5" x2="24" y2="18.5" stroke="#2d3748" stroke-width="1.6" stroke-linecap="round"/><line x1="22.5" y1="17" x2="22.5" y2="20" stroke="#2d3748" stroke-width="1.6" stroke-linecap="round"/><circle cx="29" cy="18.5" r="1.3" fill="#2d3748"/><path d="M8 26 L14 14 L17 16 L11 28 Z" stroke="#2d3748" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="M8 26 L11 28 L8.5 29 Z" fill="#2d3748"/><path d="M31 27 L37 30 L33 31 L34 35 Z" fill="#2d3748"/></svg></span><div class="program-name">Game Design</div><div class="program-desc">Build your own games with Unity, Godot & Scratch</div></div>
-    <div class="program-card coming"><span class="coming-tag">Coming Soon</span><span class="program-icon">⚙️</span><div class="program-name">Automation / PLC</div><div class="program-desc">Industrial automation concepts for the NoVA tech corridor</div></div>
+    <a href="robotics.html" style="text-decoration:none;color:inherit;display:block;"><div class="program-card"><span class="program-icon">🤖</span><div class="program-name">Robotics</div><div class="program-desc">Design, build & code robots from the ground up</div></div></a>
+    <a href="ftc.html" style="text-decoration:none;color:inherit;display:block;"><div class="program-card"><span class="program-icon">🏆</span><div class="program-name">FTC</div><div class="program-desc">FIRST Tech Challenge — high-school competition teams</div></div></a>
+    <a href="fll.html" style="text-decoration:none;color:inherit;display:block;"><div class="program-card"><span class="program-icon">🥇</span><div class="program-name">FLL</div><div class="program-desc">FIRST LEGO League — elementary & middle school teams</div></div></a>
+    <a href="drone.html" style="text-decoration:none;color:inherit;display:block;"><div class="program-card"><span class="program-icon" style="font-size:0"><svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="white"/></svg></span><div class="program-name">Drone</div><div class="program-desc">Pilot, program &amp; race drones with real UAV hardware</div></div></a>
   </div>
 </section>
 
@@ -246,7 +234,7 @@
 </section>
 
 <section class="why-section">
-  <p class="section-label" style="color:var(--orange);">Why STEM4U</p>
+  <p class="section-label" style="color:var(--orange);font-size:14px;">Why STEM4U</p>
   <h2 class="section-title">Built for Northern Virginia Families</h2>
   <p class="section-sub" style="color:rgba(255,255,255,.65);margin-bottom:36px;">Enrollment opens soon — get on the list.</p>
   <div class="why-grid">
@@ -267,7 +255,7 @@
 <div class="location-bar">📍 Opening in Northern Virginia &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
 <footer>
   <div class="footer-links"><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
-  <p>© 2026 STEM<span style="color:var(--orange);">4</span>U Corp. · Northern Virginia · K-12 STEM Programs</p>
+  <p>© 2026 STEM4U Corp. · Northern Virginia · K-12 STEM Programs</p>
 </footer>
 
 <script>
