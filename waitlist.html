@@ -89,6 +89,12 @@
   .choose-card .cdesc { font-size: 14px; color: var(--muted); line-height: 1.55; margin-bottom: 18px; }
   .submit-btn.secondary-btn { background: var(--blue); }
   .submit-btn.secondary-btn:hover { background: #1550c0; }
+  .next-steps { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .next-steps a { font-size: 14px; font-weight: 800; text-decoration: none; padding: 10px 20px; border-radius: 6px; transition: .15s; }
+  .next-steps a.primary { background: var(--orange); color: #fff; }
+  .next-steps a.primary:hover { background: var(--orange-lt); }
+  .next-steps a.ghost { background: transparent; color: var(--navy); border: 1.5px solid #C7D2E8; }
+  .next-steps a.ghost:hover { border-color: var(--blue); }
 
   /* ── LOCATION + FOOTER ── */
   .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; }
@@ -158,7 +164,7 @@
         <button type="submit" class="submit-btn">Reserve your child's spot &rarr;</button>
         <p class="form-note">We respect your privacy. No spam &mdash; ever.</p>
       </form>
-      <div class="success-msg"><h3>You're on the list! 🎉</h3><p>Thanks! We'll reach out as soon as enrollment opens.</p></div>
+      <div class="success-msg"><h3>You're on the list! 🎉</h3><p>Thanks! We'll reach out as soon as enrollment opens.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
     </div>
 
     <div class="choose-card secondary">
@@ -178,7 +184,7 @@
         <button type="submit" class="submit-btn secondary-btn">Speak with a coach &rarr;</button>
         <p class="form-note">We'll reach out personally &mdash; no spam, ever.</p>
       </form>
-      <div class="success-msg"><h3>Got it! 📞</h3><p>Thanks &mdash; a coach will reach out at the number you gave us.</p></div>
+      <div class="success-msg"><h3>Got it! 📞</h3><p>Thanks &mdash; a coach will reach out at the number you gave us.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
     </div>
 
   </div>
