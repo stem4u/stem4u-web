@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>FTC Robotics Team in Loudoun County & Northern Virginia | STEM4U</title>
-<meta name="description" content="Join a FIRST Tech Challenge (FTC) competition robotics team in Northern Virginia. Grades 7–12 design, build & code real robots. Serving Loudoun, Fairfax & Prince William. Opening August 2026."/>
+<title>Robotics Classes for Kids in Loudoun County & Northern Virginia | STEM4U</title>
+<meta name="description" content="Year-round robotics classes for kids in Northern Virginia. Grades K–12 learn to build & code robots — the hands-on foundation for coding, AI, engineering, and competition teams. Serving Loudoun, Fairfax & Prince William. Opening August 2026."/>
 <link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,14 +37,14 @@
   .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); }
   .page-hero h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; line-height: 1.12; }
   .page-hero h1 span { color: var(--orange); }
-  .page-hero .lede { font-size: 17px; color: rgba(255,255,255,.8); max-width: 600px; margin: 14px auto 24px; line-height: 1.6; }
+  .page-hero .lede { font-size: 17px; color: rgba(255,255,255,.8); max-width: 620px; margin: 14px auto 24px; line-height: 1.6; }
   .hero-cta { display:inline-block; background:var(--orange); color:#fff; font-size:15px; font-weight:800; padding:14px 34px; border-radius:6px; text-decoration:none; box-shadow:0 4px 20px rgba(255,85,0,.4); }
   .hero-cta:hover { background:var(--orange-lt); }
 
   .facts { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; max-width:900px; margin:-28px auto 0; padding:0 24px; position:relative; z-index:2; }
   @media (max-width:720px){ .facts { grid-template-columns:repeat(2,1fr); } }
   .fact { background:#fff; border-radius:10px; padding:18px 14px; text-align:center; box-shadow:0 4px 20px rgba(13,43,122,.1); border-top:3px solid var(--orange); }
-  .fact .n { font-size:20px; font-weight:900; color:var(--navy); line-height:1.1; }
+  .fact .n { font-size:18px; font-weight:900; color:var(--navy); line-height:1.15; }
   .fact .l { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-top:6px; }
 
   .prose { max-width: 720px; margin: 44px auto 0; text-align: left; background: var(--white); border-radius: 12px; padding: 36px 40px; box-shadow: 0 2px 18px rgba(13,43,122,.07); }
@@ -56,9 +56,23 @@
   .prose li::before { content: '▸'; position: absolute; left: 4px; color: var(--orange); font-weight: 900; }
   @media (max-width: 500px) { .prose { padding: 28px 22px; } }
 
-  .path { max-width:720px; margin:20px auto 0; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; }
-  .path .step { background:#fff; border:1.5px solid var(--line,#E2E8F5); border-radius:20px; padding:8px 16px; font-size:13px; font-weight:700; color:var(--navy); box-shadow:0 2px 10px rgba(13,43,122,.06); }
-  .path .arrow { color:var(--orange); font-weight:900; }
+  .ladder { max-width:720px; margin:20px auto 0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  @media (max-width:600px){ .ladder { grid-template-columns:1fr; } }
+  .rung { border-radius:10px; padding:14px 16px; text-align:left; text-decoration:none; display:block; }
+  .rung.here { background:#F4F7FF; border:1.5px solid var(--orange); }
+  .rung.next { background:#fff; border:1.5px solid #E2E8F5; box-shadow:0 2px 12px rgba(13,43,122,.07); transition:transform .15s; }
+  .rung.next:hover { transform:translateY(-3px); }
+  .rung .tag { font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--orange); }
+  .rung .nm { font-size:16px; font-weight:900; color:var(--navy); margin:3px 0 2px; }
+  .rung .dt { font-size:12.5px; color:var(--muted); line-height:1.4; }
+  .tracks { max-width:720px; margin:20px auto 0; display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media(max-width:600px){ .tracks { grid-template-columns:1fr; } }
+  .track { background:var(--light); border-radius:12px; padding:20px 22px; border-top:3px solid var(--orange); }
+  .track .ttag { font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--orange); }
+  .track h4 { font-size:17px; font-weight:900; color:var(--navy); margin:5px 0 8px; }
+  .track p { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:12px; }
+  .track a.tlink { font-size:13px; font-weight:800; color:var(--blue); text-decoration:none; margin-right:14px; }
+  .track a.tlink:hover { text-decoration:underline; }
 
   .form-section { background: var(--navy); padding: 56px 24px; text-align: center; margin-top:52px; position:relative; }
   .form-section::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--orange); }
@@ -69,7 +83,6 @@
   .form-group label { display:block; font-size:12px; font-weight:700; color:rgba(255,255,255,.85); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
   .form-group input, .form-group select { width:100%; padding:12px 14px; border:1px solid rgba(255,255,255,.2); border-radius:8px; font-size:15px; background:rgba(255,255,255,.06); color:#fff; }
   .form-group input::placeholder { color:rgba(255,255,255,.4); }
-  .form-group select { color:#fff; }
   .form-group select option { color:#000; }
   .submit-btn { width:100%; background:var(--orange); color:#fff; font-size:16px; font-weight:800; padding:15px; border:none; border-radius:8px; cursor:pointer; margin-top:8px; transition:background .15s; }
   .submit-btn:hover { background:var(--orange-lt); }
@@ -91,17 +104,17 @@
   .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
   .areas { background:var(--navy); color:#fff; padding:36px 24px; text-align:center; }
 </style>
-<link rel="canonical" href="https://stem4u.com/ftc.html"/>
-<meta property="og:title" content="FTC Robotics Team in Loudoun County & Northern Virginia | STEM4U"/>
-<meta property="og:description" content="Join a FIRST Tech Challenge (FTC) competition robotics team in Northern Virginia. Grades 7–12 design, build & code real robots. Opening August 2026."/>
+<link rel="canonical" href="https://stem4u.com/robotics.html"/>
+<meta property="og:title" content="Robotics Classes for Kids in Loudoun County & Northern Virginia | STEM4U"/>
+<meta property="og:description" content="Year-round robotics classes for kids in Northern Virginia. Grades K–12 learn to build & code robots — the foundation that leads to FLL & FTC teams. Opening August 2026."/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="https://stem4u.com/ftc.html"/>
+<meta property="og:url" content="https://stem4u.com/robotics.html"/>
 <meta property="og:image" content="https://stem4u.com/STEM4U-Logo-V3-clean.png"/>
 <meta name="geo.region" content="US-VA"/>
 <meta name="geo.placename" content="Loudoun County, Northern Virginia"/>
-<meta name="keywords" content="FTC, FIRST Tech Challenge, FTC team, robotics competition team, robotics, robotics classes, robotics for kids, STEM, STEM classes, STEM education, FIRST Tech Challenge, FTC, FIRST LEGO League, FLL, drone classes, drone camp, CAD, coding for kids, robotics team, robotics camp, robotics competition, Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Gainesville, Haymarket, Loudoun County, Fairfax County, Prince William County, Northern Virginia, NoVA, Virginia, VA, robotics near me, STEM near me"/>
+<meta name="keywords" content="robotics classes for kids, robotics Ashburn, robotics for kids Loudoun County, kids robotics Northern Virginia, beginner robotics, robotics classes near me, STEM robotics, LEGO robotics, robotics Aldie, robotics Leesburg, robotics Sterling, robotics South Riding, robotics Chantilly, robotics Fairfax, robotics Prince William County, STEM, Northern Virginia, Virginia, VA, robotics near me"/>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Course","name":"FIRST Tech Challenge (FTC) Robotics Team","description":"Competition robotics for students in grades 7–12 in Northern Virginia. Teams design, build, and program a real robot and compete through FIRST Chesapeake qualifiers and championships.","provider":{"@type":"EducationalOrganization","name":"STEM4U","url":"https://stem4u.com"},"educationalLevel":"Grades 7-12","about":"FIRST Tech Challenge","areaServed":["Loudoun County, Virginia","Fairfax County, Virginia","Prince William County, Virginia","Northern Virginia"]}
+{"@context":"https://schema.org","@type":"Course","name":"Robotics Classes for Kids","description":"Year-round, hands-on robotics classes for students in grades K–12 in Northern Virginia. Students learn to build and code robots at their own pace — the foundation that leads into FIRST LEGO League and FIRST Tech Challenge teams.","provider":{"@type":"EducationalOrganization","name":"STEM4U","url":"https://stem4u.com"},"educationalLevel":"Grades K-12","about":"Robotics","areaServed":["Loudoun County, Virginia","Fairfax County, Virginia","Prince William County, Virginia","Northern Virginia"]}
 </script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":["EducationalOrganization","LocalBusiness"],"name":"STEM4U","legalName":"STEM4U LLC","url":"https://stem4u.com","email":"contact@stem4u.com","image":"https://stem4u.com/STEM4U-Logo-V3-clean.png","logo":"https://stem4u.com/STEM4U-Logo-V3-clean.png","description":"K-12 STEM enrichment center offering robotics, drone, CAD, and FLL & FTC competition teams in Northern Virginia. Opening August 2026.","slogan":"Where kids discover their superpower","foundingDate":"2026","address":{"@type":"PostalAddress","addressLocality":"Aldie","addressRegion":"VA","addressCountry":"US"},"areaServed":[{"@type":"AdministrativeArea","name":"Loudoun County, Virginia"},{"@type":"AdministrativeArea","name":"Fairfax County, Virginia"},{"@type":"AdministrativeArea","name":"Prince William County, Virginia"},{"@type":"AdministrativeArea","name":"Fauquier County, Virginia"},{"@type":"AdministrativeArea","name":"Arlington County, Virginia"}],"knowsAbout":["Robotics","FIRST Tech Challenge (FTC)","FIRST LEGO League (FLL)","Drone Programming","CAD","STEM Education"]}
@@ -114,7 +127,6 @@
   <div class="nav-links" id="navLinks">
     <a href="index.html" class="nav-link">Home</a>
     <a href="programs.html" class="nav-link active">Programs</a>
-    <a href="teams.html" class="nav-link">Teams</a>
     <a href="about.html" class="nav-link">About</a>
     <a href="pricing.html" class="nav-link">Pricing</a>
     <a href="contact.html" class="nav-link">Contact</a>
@@ -126,55 +138,58 @@
 
 <section class="page-hero">
   <div class="hero-badge"><span class="dot"></span>Opening August 2026<span class="dot"></span></div>
-  <h1>FIRST Tech Challenge <span>(FTC)</span></h1>
-  <p class="lede">Competition robotics for grades 7–12. Design, build, and code a real robot — then take it to the field against teams across Virginia, Maryland, and DC.</p>
-  <a href="waitlist.html" class="hero-cta">Get your builder on a team →</a>
+  <h1>Robotics</h1>
+  <p class="lede">The hands-on foundation for grades K–12. Learn to build and code real robots — then branch into CS and AI, drones, CAD, or competition teams, exploring at your own pace.</p>
+  <a href="waitlist.html" class="hero-cta">Get your builder started →</a>
 </section>
 
 <div class="facts">
-  <div class="fact"><div class="n">7–12</div><div class="l">Grades</div></div>
-  <div class="fact"><div class="n">10–12</div><div class="l">Per team</div></div>
-  <div class="fact"><div class="n">4 hrs</div><div class="l">Per week</div></div>
-  <div class="fact"><div class="n">Sep–Feb</div><div class="l">Season</div></div>
-  <div class="fact"><div class="n">Worlds</div><div class="l">Competition path</div></div>
+  <div class="fact"><div class="n">K–12</div><div class="l">Grades</div></div>
+  <div class="fact"><div class="n">Year-round</div><div class="l">Rolling enrollment</div></div>
+  <div class="fact"><div class="n">Weekly</div><div class="l">Classes</div></div>
+  <div class="fact"><div class="n">All levels</div><div class="l">No experience needed</div></div>
+  <div class="fact"><div class="n">Many paths</div><div class="l">CS, AI, compete &amp; more</div></div>
 </div>
 
 <div class="prose">
-  <h3>What is FTC?</h3>
-  <p>FIRST Tech Challenge is the premier robotics competition for middle and high school students. Each season, teams design, build, and program a robot to take on a brand-new game challenge — then compete head-to-head in alliances (teams paired up for each match) through the FIRST Chesapeake region. It's as close to real engineering as it gets: a deadline, a budget, a team, and a machine that has to actually work.</p>
+  <h3>Where every builder starts</h3>
+  <p>Robotics is our foundational, year-round program — the on-ramp to everything else we do. Students learn to design, build, wire, and code real robots in a hands-on workshop, at their own pace and without the pressure of a competition season. It's where curiosity turns into capability.</p>
 
   <h3>Who it's for</h3>
-  <p>FTC is built for students in grades 7–12 who are ready for a serious, hands-on engineering challenge. Newer builders are welcome — we meet students at their level and grow their skills across the season, from first wiring to autonomous code.</p>
+  <p>Robotics is built for students in grades K–12, at any experience level. Complete beginners start with the fundamentals of building and block-based coding; returning students take on harder builds, sensors, and autonomous programming. Our youngest builders start with simple, age-appropriate kits and grow from there. No prior experience — and no team commitment — required.</p>
 
   <h3>What your student will do</h3>
   <ul>
-    <li>Build a competition robot from metal, motors, gears, and sensors</li>
-    <li>Program autonomous routines and driver-controlled operation in Java</li>
-    <li>Keep an engineering notebook that documents the whole design process</li>
-    <li>Compete in alliances, scout opponents, and refine strategy between matches</li>
-    <li>Present their work to judges and earn awards beyond the playing field</li>
+    <li>Build working robots with motors, gears, and sensors</li>
+    <li>Learn to code — from block-based programming toward real text code</li>
+    <li>Solve hands-on engineering challenges and debug when things break</li>
+    <li>Work through projects at their own pace, guided by real mentors</li>
+    <li>Build the skills and confidence to join a competition team when ready</li>
   </ul>
 
-  <h3>The season</h3>
-  <p>Our FTC season runs September through February — roughly four hours a week, in teams of 10 to 12 students. Teams build through the fall, then compete through qualifiers and championships in the winter. Coaching is hands-on and mentor-led; students own the robot, we guide the engineering.</p>
-
-  <h3>The path to the World Championship</h3>
-  <div class="path">
-    <span class="step">FIRST Chesapeake Regional Qualifier</span><span class="arrow">→</span>
-    <span class="step">FIRST Chesapeake Championship</span><span class="arrow">→</span>
-    <span class="step">FIRST World Championship</span>
+  <h3>Where robotics can lead</h3>
+  <p>Robotics is the starting point, not the finish line. From here, students branch in whatever direction excites them — and many explore more than one.</p>
+  <div class="tracks">
+    <div class="track">
+      <div class="ttag">Track 1 · Build &amp; Explore</div>
+      <h4>CS, AI &amp; Beyond</h4>
+      <p>Keep building and go deeper — coding and AI, drones, CAD, and hands-on engineering, at your own pace. Robotics is the on-ramp to everything else we teach.</p>
+      <a class="tlink" href="programs.html">See all programs →</a>
+    </div>
+    <div class="track">
+      <div class="ttag">Track 2 · Compete</div>
+      <h4>Competition Teams</h4>
+      <p>Want to compete? Robotics also prepares students for FIRST LEGO League Challenge (grades 4–8) and FIRST Tech Challenge (grades 7–12) — real robots, real tournaments.</p>
+      <a class="tlink" href="fll.html">FLL Challenge →</a><a class="tlink" href="ftc.html">FTC →</a>
+    </div>
   </div>
-  <p style="margin-top:18px;">Every season is a real shot at advancing. Teams earn their way up through performance on the field and recognition from judges — the same FIRST Chesapeake pathway that sends Virginia, Maryland, and DC teams to the world championship each year.</p>
-
-  <h3>Why FTC matters</h3>
-  <p>FTC students build far more than robots. They gain real engineering and coding skills, learn to work under a deadline as a team, and come away with a standout story for high school and college applications. FIRST alumni pursue engineering, computer science, and STEM careers at high rates — and the FIRST community awards millions in college scholarships each year.</p>
 </div>
 
 <section class="related">
   <p class="section-label">Explore More Programs</p>
   <div class="related-grid">
-    <a href="fll.html">🥇 FLL — younger builders</a>
-    <a href="robotics.html">🤖 Robotics</a>
+    <a href="fll.html">🥇 FLL Challenge</a>
+    <a href="ftc.html">🏆 FTC</a>
     <a href="drone.html">Drone</a>
     <a href="programs.html">All programs →</a>
   </div>
@@ -194,9 +209,9 @@
 
 <section class="areas">
   <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
-  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">FTC Robotics across Northern Virginia</h2>
+  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">Robotics classes across Northern Virginia</h2>
   <p style="max-width:760px;margin:0 auto;font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);">
-    STEM4U runs FIRST Tech Challenge teams for families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Herndon, Reston, Gainesville, Haymarket, Bristow, Manassas and surrounding Northern Virginia communities.
+    STEM4U runs year-round robotics classes for families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Herndon, Reston, Gainesville, Haymarket, Bristow, Manassas and surrounding Northern Virginia communities.
   </p>
 </section>
 
