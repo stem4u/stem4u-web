@@ -11,4 +11,6 @@
   <url><loc>https://stem4u.com/fll.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://stem4u.com/robotics.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://stem4u.com/drone.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://stem4u.com/privacy.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://stem4u.com/terms.html</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
