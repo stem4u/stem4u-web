@@ -76,12 +76,12 @@ module.exports = async (req, res) => {
       const isCoach = /coach/i.test(data.type);
       const childPart = data.child_first_name ? ` for ${escapeHtml(data.child_first_name)}` : '';
       const progPart = data.programs ? ` (interested in ${escapeHtml(data.programs)})` : '';
-      const subject = isCoach ? 'Thanks for reaching out to STEM4U' : "You're on the STEM4U waitlist 🎉";
+      const subject = isCoach ? 'Thanks for reaching out to STEM4U' : "You're on the STEM4U waitlist";
       const lead = isCoach
         ? `Thanks for reaching out to <b>STEM4U</b>${childPart}. One of our coaches will contact you soon to help you find the right fit.`
         : `Thanks for reserving a spot${childPart} at <b>STEM4U</b> — you're on our priority list${progPart}. We'll reach out personally as soon as enrollment opens.`;
       const chtml = `<div style="font-family:Arial,sans-serif;color:#0A1E52;max-width:540px;line-height:1.6">
-        <h2 style="color:#0D2B7A;margin:0 0 8px">${isCoach ? 'Thanks — we\'ll be in touch! 📞' : "You're on the list! 🎉"}</h2>
+        <h2 style="color:#0D2B7A;margin:0 0 8px">${isCoach ? 'Thanks — we\'ll be in touch' : "You're on the list"}</h2>
         <p>Hi ${first},</p>
         <p>${lead}</p>
         <p>If you have any questions in the meantime, just reply to this email or write to <a href="mailto:contact@stem4u.com">contact@stem4u.com</a>.</p>
