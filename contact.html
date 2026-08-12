@@ -121,7 +121,7 @@
       <p>Our exact location and hours are coming soon. Join the waitlist or send us a message and we'll keep you posted on opening details.</p>
     </div>
     <div class="contact-card">
-      <form id="contactForm" action="https://formspree.io/f/xykagpyw" method="POST">
+      <form id="contactForm" action="/api/lead" method="POST">
         <div class="form-group">
           <label>Name *</label>
           <input type="text" name="name" placeholder="Your name" required/>
@@ -135,6 +135,7 @@
           <textarea name="message" placeholder="How can we help?"></textarea>
         </div>
         <input type="hidden" name="_subject" value="New STEM4U Contact Message"/>
+        <input type="hidden" name="type" value="Contact"/>
         <input type="text" name="_gotcha" style="display:none"/>
         <button type="submit" class="submit-btn">Send Message →</button>
         <p class="form-note">We respect your privacy. No spam — ever.</p>
@@ -160,7 +161,7 @@
 
 <script>
   const form=document.getElementById('contactForm');
-  form.addEventListener('submit',async function(e){e.preventDefault();const btn=form.querySelector('.submit-btn');btn.textContent='Sending…';btn.disabled=true;try{const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});if(res.ok){form.style.display='none';document.getElementById('successMsg').style.display='block';}else{btn.textContent='Something went wrong — try again';btn.disabled=false;}}catch{btn.textContent='Network error — try again';btn.disabled=false;}});
+  form.addEventListener('submit',async function(e){e.preventDefault();const btn=form.querySelector('.submit-btn');btn.textContent='Sending…';btn.disabled=true;try{const fd=new FormData(form);const data={};for(const [k,v] of fd.entries()){data[k]=v;}const res=await fetch(form.action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(res.ok){form.style.display='none';document.getElementById('successMsg').style.display='block';}else{btn.textContent='Something went wrong — try again';btn.disabled=false;}}catch{btn.textContent='Network error — try again';btn.disabled=false;}});
 </script>
 </body>
 </html>

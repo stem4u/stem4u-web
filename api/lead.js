@@ -59,6 +59,7 @@ module.exports = async (req, res) => {
     const arr = (v) => (Array.isArray(v) ? v.slice(0, 12).map((x) => cap(x, 60)).join(', ') : cap(v, 200));
     const data = {
       type: cap(b.type || 'Lead', 40),
+      name: cap(b.name, 120),
       parent_first_name: cap(b.parent_first_name, 80),
       parent_last_name: cap(b.parent_last_name, 80),
       child_first_name: cap(b.child_first_name, 80),
@@ -80,7 +81,7 @@ module.exports = async (req, res) => {
       const rows = Object.entries(data)
         .map(([k, v]) => `<tr><td style="padding:5px 12px;color:#555;text-transform:capitalize">${k.replace(/_/g, ' ')}</td><td style="padding:5px 12px"><b>${escapeHtml(v) || '—'}</b></td></tr>`)
         .join('');
-      const parentName = `${data.parent_first_name} ${data.parent_last_name}`.trim() || 'Unknown';
+      const parentName = `${data.parent_first_name} ${data.parent_last_name}`.trim() || data.name || 'Unknown';
       const subj = `New ${data.type}: ${parentName}${data.programs ? ' — ' + data.programs : ''}`;
       const payload = {
         from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
@@ -101,16 +102,16 @@ module.exports = async (req, res) => {
 
     // 1b) Friendly confirmation email to the parent (auto-reply) — only to a valid address
     if (process.env.RESEND_API_KEY && isEmail(data.email)) {
-      const first = escapeHtml(data.parent_first_name) || 'there';
-      const isCoach = /coach/i.test(data.type);
+      const first = escapeHtml(data.parent_first_name || data.name) || 'there';
+      const isGeneric = /coach|contact/i.test(data.type);   // coach requests + contact messages
       const childPart = data.child_first_name ? ` for ${escapeHtml(data.child_first_name)}` : '';
       const progPart = data.programs ? ` (interested in ${escapeHtml(data.programs)})` : '';
-      const subject = isCoach ? 'Thanks for reaching out to STEM4U' : "You're on the STEM4U waitlist";
-      const lead = isCoach
-        ? `Thanks for reaching out to <b>STEM4U</b>${childPart}. One of our coaches will contact you soon to help you find the right fit.`
+      const subject = isGeneric ? 'Thanks for reaching out to STEM4U' : "You're on the STEM4U waitlist";
+      const lead = isGeneric
+        ? `Thanks for reaching out to <b>STEM4U</b>${childPart}. We've received your message and someone from our team will get back to you soon.`
         : `Thanks for reserving a spot${childPart} at <b>STEM4U</b> — you're on our priority list${progPart}. We'll reach out personally as soon as enrollment opens.`;
       const chtml = `<div style="font-family:Arial,sans-serif;color:#0A1E52;max-width:540px;line-height:1.6">
-        <h2 style="color:#0D2B7A;margin:0 0 8px">${isCoach ? 'Thanks — we\'ll be in touch' : "You're on the list"}</h2>
+        <h2 style="color:#0D2B7A;margin:0 0 8px">${isGeneric ? 'Thanks — we got your message' : "You're on the list"}</h2>
         <p>Hi ${first},</p>
         <p>${lead}</p>
         <p>If you have any questions in the meantime, just reply to this email or write to <a href="mailto:contact@stem4u.com">contact@stem4u.com</a>.</p>
