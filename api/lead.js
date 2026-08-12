@@ -8,13 +8,41 @@ function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
+// --- abuse controls -------------------------------------------------------
+const ALLOWED_HOSTS = ['stem4u.com', 'www.stem4u.com'];
+const ALLOWED_ORIGIN = 'https://stem4u.com';
+function hostOf(u) { try { return new URL(u).host.toLowerCase(); } catch { return ''; } }
+function originOk(req) {
+  const oh = hostOf(req.headers.origin || '');
+  const rh = hostOf(req.headers.referer || '');
+  if (oh) return ALLOWED_HOSTS.includes(oh);        // browsers always send Origin on POST
+  if (rh) return ALLOWED_HOSTS.includes(rh);
+  return true;                                       // no Origin/Referer (rare) → let rate limit + honeypot handle
+}
+const RL = new Map(); // ip -> [timestamps] (best-effort, per warm instance)
+function rateLimited(ip, max = 6, windowMs = 10 * 60 * 1000) {
+  const now = Date.now();
+  const arr = (RL.get(ip) || []).filter((t) => now - t < windowMs);
+  arr.push(now); RL.set(ip, arr);
+  if (RL.size > 5000) RL.clear();
+  return arr.length > max;
+}
+function clientIp(req) {
+  return (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.headers['x-real-ip'] || 'unknown';
+}
+const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || ''));
+const cap = (s, n) => String(s == null ? '' : s).slice(0, n);
+
 module.exports = async (req, res) => {
-  // CORS (same-origin in practice; permissive here so the test page works from anywhere)
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  // CORS: only our own origin (blocks cross-site browser abuse; scripted abuse is caught by rate limit)
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.status(204).end(); return; }
   if (req.method !== 'POST') { res.status(405).json({ error: 'POST only' }); return; }
+  if (!originOk(req)) { res.status(403).json({ error: 'Forbidden origin' }); return; }
+  if (rateLimited(clientIp(req))) { res.status(429).json({ error: 'Too many requests — please try again later.' }); return; }
 
   try {
     let b = req.body;
@@ -27,20 +55,21 @@ module.exports = async (req, res) => {
     // Honeypot: if the hidden field is filled, it's a bot. Pretend success, do nothing.
     if (b._gotcha) { res.status(200).json({ ok: true, bot: true }); return; }
 
-    const arr = (v) => (Array.isArray(v) ? v.join(', ') : (v || ''));
+    // Normalize + cap lengths (prevents oversized-payload / injection abuse)
+    const arr = (v) => (Array.isArray(v) ? v.slice(0, 12).map((x) => cap(x, 60)).join(', ') : cap(v, 200));
     const data = {
-      type: b.type || 'Lead',
-      parent_first_name: b.parent_first_name || '',
-      parent_last_name: b.parent_last_name || '',
-      child_first_name: b.child_first_name || '',
-      child_last_name: b.child_last_name || '',
-      email: b.email || '',
-      phone: b.phone || '',
-      grade: b.grade || '',
+      type: cap(b.type || 'Lead', 40),
+      parent_first_name: cap(b.parent_first_name, 80),
+      parent_last_name: cap(b.parent_last_name, 80),
+      child_first_name: cap(b.child_first_name, 80),
+      child_last_name: cap(b.child_last_name, 80),
+      email: cap(b.email, 200),
+      phone: cap(b.phone, 40),
+      grade: cap(b.grade, 40),
       programs: arr(b.programs),
       schedule: arr(b.schedule),
-      best_time: b.best_time || '',
-      message: b.message || '',
+      best_time: cap(b.best_time, 120),
+      message: cap(b.message, 2000),
       submitted_at: new Date().toISOString(),
     };
 
@@ -70,8 +99,8 @@ module.exports = async (req, res) => {
       results.email = 'skipped (no RESEND_API_KEY)';
     }
 
-    // 1b) Friendly confirmation email to the parent (auto-reply)
-    if (process.env.RESEND_API_KEY && data.email) {
+    // 1b) Friendly confirmation email to the parent (auto-reply) — only to a valid address
+    if (process.env.RESEND_API_KEY && isEmail(data.email)) {
       const first = escapeHtml(data.parent_first_name) || 'there';
       const isCoach = /coach/i.test(data.type);
       const childPart = data.child_first_name ? ` for ${escapeHtml(data.child_first_name)}` : '';
@@ -122,6 +151,6 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ ok: true, results });
   } catch (e) {
-    res.status(500).json({ error: 'Lead handler failed', detail: String(e) });
+    res.status(500).json({ error: 'Lead handler failed' });
   }
 };
