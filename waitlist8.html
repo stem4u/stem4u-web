@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Join the Waitlist — STEM4U Robotics & STEM in Loudoun County & Northern Virginia</title>
+<meta name="description" content="Join the STEM4U waitlist. Reserve your child's spot for K-12 robotics, drone, FTC & FLL programs in Ashburn, Aldie, Loudoun, Fairfax & Prince William County, Virginia. Opening August 2026."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:      #0D2B7A;
+    --blue:      #1A5CD8;
+    --orange:    #FF5500;
+    --orange-lt: #FF7733;
+    --light:     #F4F7FF;
+    --white:     #FFFFFF;
+    --text:      #0A1E52;
+    --muted:     #4A5A80;
+    --card:      #FFFFFF;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── NAV ── */
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav .nav-logo span { color: var(--orange); }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
+
+  /* ── HERO ── */
+  .page-hero { background: var(--navy); color: var(--white); padding: 46px 24px 40px; text-align: center; position: relative; }
+  .page-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
+  .hero-badge { display:inline-flex; align-items:center; gap:10px; color:#F5C518; font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; }
+  .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); }
+  .page-hero h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; line-height: 1.15; }
+  .page-hero h1 span { color: var(--orange); }
+  .page-hero p { font-size: 17px; color: rgba(255,255,255,.82); max-width: 580px; margin: 14px auto 0; line-height: 1.6; }
+
+  /* ── FORM ── */
+  .form-wrap-section { padding: 44px 24px 56px; display: flex; justify-content: center; }
+  .form-card { background: var(--card); border-radius: 12px; padding: 34px 34px 30px; box-shadow: 0 4px 24px rgba(13,43,122,.10); border-top: 4px solid var(--orange); max-width: 620px; width: 100%; }
+  .form-card h2 { font-size: 22px; font-weight: 900; color: var(--navy); text-align: center; margin-bottom: 4px; }
+  .form-card .card-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 26px; line-height: 1.5; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; gap: 0; } }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #D0D8EE; border-radius: 6px; font-size: 15px; font-family: inherit; color: var(--text); background: var(--light); outline: none; transition: border-color .15s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue); background: var(--white); }
+  .form-group textarea { resize: vertical; min-height: 96px; }
+  .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 420px) { .checkbox-group { grid-template-columns: 1fr; } }
+  .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--text); cursor: pointer; background: var(--light); border: 1.5px solid #D0D8EE; border-radius: 6px; padding: 10px 12px; transition: border-color .15s, background .15s; }
+  .checkbox-item:hover { border-color: var(--blue); }
+  .checkbox-item input { width: 16px; height: 16px; accent-color: var(--orange); }
+  .submit-btn { width: 100%; padding: 15px; background: var(--orange); color: var(--white); border: none; border-radius: 6px; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 8px; transition: background .15s; letter-spacing: .02em; }
+  .submit-btn:hover { background: var(--orange-lt); }
+  .form-note { font-size: 12px; color: var(--muted); text-align: center; margin-top: 14px; line-height: 1.5; }
+  .success-msg { display: none; background: #EEF3FF; border: 1.5px solid var(--blue); border-radius: 8px; padding: 30px; text-align: center; color: var(--navy); }
+  .success-msg h3 { font-size: 20px; margin-bottom: 8px; }
+  .success-msg p { font-size: 15px; color: var(--text); }
+
+  /* ── CHOOSE NEXT STEP ── */
+  .choose-wrap { max-width: 980px; margin: 0 auto; padding: 40px 24px 56px; }
+  .choose-title { font-size: clamp(22px,3.5vw,28px); font-weight: 900; color: var(--navy); text-align: center; margin-bottom: 8px; }
+  .choose-sub { font-size: 15px; color: var(--muted); text-align: center; max-width: 620px; margin: 0 auto 30px; line-height: 1.55; }
+  .choose-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .choose-grid { grid-template-columns: 1fr; } }
+  .choose-card { background: var(--card); border-radius: 14px; border: 0.5px solid #E2E8F5; padding: 26px 26px 24px; box-shadow: 0 4px 24px rgba(13,43,122,.08); }
+  .choose-card.primary { border-top: 4px solid var(--orange); }
+  .choose-card.secondary { border-top: 4px solid var(--blue); }
+  .card-eyebrow { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; margin-bottom: 12px; }
+  .card-eyebrow.primary { background: #FFF0E8; color: #C2410C; }
+  .card-eyebrow.secondary { background: #EAF1FF; color: #1A5CD8; }
+  .choose-card h3 { font-size: 21px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
+  .choose-card .cdesc { font-size: 14px; color: var(--muted); line-height: 1.55; margin-bottom: 18px; }
+  .submit-btn.secondary-btn { background: var(--blue); }
+  .submit-btn.secondary-btn:hover { background: #1550c0; }
+  .next-steps { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+  .next-steps a { font-size: 14px; font-weight: 800; text-decoration: none; padding: 10px 20px; border-radius: 6px; transition: .15s; }
+  .next-steps a.primary { background: var(--orange); color: #fff; }
+  .next-steps a.primary:hover { background: var(--orange-lt); }
+  .next-steps a.ghost { background: transparent; color: var(--navy); border: 1.5px solid #C7D2E8; }
+  .next-steps a.ghost:hover { border-color: var(--blue); }
+
+  /* ── LOCATION + FOOTER ── */
+  .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; }
+  .location-bar a { color: var(--white); text-decoration: underline; }
+  footer { background: #070F2B; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  footer a { color: var(--orange); text-decoration: none; }
+  .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
+</style>
+<link rel="canonical" href="https://stem4u.com/waitlist.html"/>
+<meta property="og:title" content="Join the Waitlist — STEM4U Robotics & STEM in Northern Virginia"/>
+<meta property="og:description" content="Reserve your child's spot for K-12 robotics, drone, FTC & FLL programs in Loudoun, Fairfax & Prince William County, Virginia. Opening August 2026."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://stem4u.com/waitlist.html"/>
+<meta property="og:image" content="https://stem4u.com/STEM4U-Logo-V3-clean.png"/>
+<meta name="geo.region" content="US-VA"/>
+<meta name="geo.placename" content="Loudoun County, Northern Virginia"/>
+<meta name="keywords" content="join waitlist, STEM waitlist, robotics classes, robotics for kids, STEM, FIRST Tech Challenge, FTC, FIRST LEGO League, FLL, drone classes, robotics team, Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Gainesville, Haymarket, Loudoun County, Fairfax County, Prince William County, Northern Virginia, NoVA, Virginia, VA"/>
+</head>
+<body>
+<div style="background:#8A3D00;color:#fff;text-align:center;padding:8px 14px;font-size:13px;font-weight:700;font-family:-apple-system,Arial,sans-serif">⚠ STAGING TEST PAGE — posts to the new /api/lead pipeline, not the live waitlist. Do not share publicly.</div>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programs.html" class="nav-link">Programs</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="pricing.html" class="nav-link">Pricing</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="waitlist.html" class="nav-link active">Waitlist</a>
+  </div>
+  <a href="waitlist.html" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<section class="page-hero">
+  <div class="hero-badge"><span class="dot"></span>Opening August 2026</div>
+  <h1>Join the STEM<span>4</span>U Waitlist</h1>
+  <p>Be first to know when enrollment opens. Tell us a little about your child and we'll match them to the right program.</p>
+</section>
+
+<section class="choose-wrap">
+  <h2 class="choose-title">Choose your next step</h2>
+  <p class="choose-sub">Reserve a spot in an upcoming session, or talk with a coach before deciding which program is right for your child.</p>
+  <div class="choose-grid">
+
+    <div class="choose-card primary">
+      <span class="card-eyebrow primary">Priority enrollment</span>
+      <h3>Reserve a spot</h3>
+      <p class="cdesc">Join the priority list for Robotics, FTC, FLL, or Drone. Small teams &mdash; spots are limited.</p>
+      <form class="ajax-form" action="/api/lead" method="POST">
+        <div class="form-group"><label>Parent / Guardian Name *</label><input type="text" name="parent_name" placeholder="Jane Smith" required/></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
+        <div class="form-group"><label>Phone *</label><input type="tel" name="phone" placeholder="(571) 000-0000" required/></div>
+        <div class="form-group"><label>Child's Grade *</label><select name="grade" required><option value="" disabled selected>Select grade</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option><option>9th Grade</option><option>10th Grade</option><option>11th Grade</option><option>12th Grade</option></select></div>
+        <div class="form-group"><label>Programs of Interest *</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" name="programs" value="Robotics"/> 🤖 Robotics</label>
+            <label class="checkbox-item"><input type="checkbox" name="programs" value="FTC"/> 🏆 FTC</label>
+            <label class="checkbox-item"><input type="checkbox" name="programs" value="FLL"/> ⭐ FLL</label>
+            <label class="checkbox-item"><input type="checkbox" name="programs" value="Drone"/> <svg width="17" height="17" viewBox="0 0 44 44" fill="none" style="vertical-align:-3px"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="white"/></svg> Drone</label>
+          </div>
+        </div>
+        <div class="form-group"><label>Schedule Preference</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" name="schedule" value="Saturday"/> Saturday</label>
+            <label class="checkbox-item"><input type="checkbox" name="schedule" value="Sunday"/> Sunday</label>
+            <label class="checkbox-item"><input type="checkbox" name="schedule" value="Weekday evenings"/> Weekday evenings</label>
+            <label class="checkbox-item"><input type="checkbox" name="schedule" value="Flexible"/> Flexible / any</label>
+          </div>
+          <p class="form-note" style="margin-top:8px;text-align:left">FLL &amp; Robotics meet about 2 hrs/week; FTC about 4 hrs/week — some teams meet twice a week. If your child can only attend one day a week, tell us in the box below and we'll match accordingly.</p>
+        </div>
+        <div class="form-group"><label>Anything else?</label><textarea name="message" placeholder="e.g. my daughter loves building things, any after-school slots?"></textarea></div>
+        <input type="hidden" name="type" value="Reserve"/>
+        <input type="hidden" name="_subject" value="STEM4U — Reserve a spot"/>
+        <input type="text" name="_gotcha" style="display:none"/>
+        <button type="submit" class="submit-btn">Reserve your child's spot &rarr;</button>
+        <p class="form-note">We respect your privacy. No spam &mdash; ever.</p>
+      </form>
+      <div class="success-msg"><h3>You're on the list! 🎉</h3><p>Thanks! We'll reach out as soon as enrollment opens.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
+    </div>
+
+    <div class="choose-card secondary" id="coach">
+      <span class="card-eyebrow secondary">Personal guidance</span>
+      <h3>Talk with a coach</h3>
+      <p class="cdesc">Not sure what fits? Get help with program fit, age eligibility, team commitment, or competition pathways before you enroll.</p>
+      <form class="ajax-form" action="/api/lead" method="POST">
+        <div class="form-group"><label>Parent / Guardian Name *</label><input type="text" name="parent_name" placeholder="Jane Smith" required/></div>
+        <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
+        <div class="form-group"><label>Phone *</label><input type="tel" name="phone" placeholder="(571) 000-0000" required/></div>
+        <div class="form-group"><label>Best time to reach you</label><input type="text" name="best_time" placeholder="e.g. weekday evenings"/></div>
+        <div class="form-group"><label>Child's Grade</label><select name="grade"><option value="" disabled selected>Select grade</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option><option>9th Grade</option><option>10th Grade</option><option>11th Grade</option><option>12th Grade</option></select></div>
+        <div class="form-group"><label>What would you like help with?</label><textarea name="message" placeholder="e.g. is my 4th grader ready for FLL? how big is the time commitment?"></textarea></div>
+        <input type="hidden" name="type" value="Coach request"/>
+        <input type="hidden" name="_subject" value="STEM4U — Coach request"/>
+        <input type="text" name="_gotcha" style="display:none"/>
+        <button type="submit" class="submit-btn secondary-btn">Speak with a coach &rarr;</button>
+        <p class="form-note">We'll reach out personally &mdash; no spam, ever.</p>
+      </form>
+      <div class="success-msg"><h3>Got it! 📞</h3><p>Thanks &mdash; a coach will reach out at the number you gave us.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
+    </div>
+
+  </div>
+</section>
+
+<section style="background:var(--navy);color:#fff;padding:36px 24px;text-align:center;">
+  <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
+  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">STEM &amp; Robotics across Northern Virginia</h2>
+  <p style="max-width:760px;margin:0 auto;font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);">
+    STEM4U proudly serves K-12 families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Purcellville, Chantilly, Centreville, Fairfax, Herndon, Reston, Vienna, Gainesville, Haymarket, Bristow, Manassas, Warrenton, Arlington and surrounding Northern Virginia communities.
+  </p>
+</section>
+<div class="location-bar">📍 Opening in Northern Virginia &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+<footer>
+  <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
+  <p>© 2026 STEM4U LLC. · Northern Virginia · K-12 STEM Programs</p>
+  <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;">STEM4U is the brand of Stem for You.</p>
+</footer>
+
+<script>
+  document.querySelectorAll('form.ajax-form').forEach(function(form){
+    form.addEventListener('submit',async function(e){
+      e.preventDefault();
+      const btn=form.querySelector('.submit-btn');
+      const success=form.parentElement.querySelector('.success-msg');
+      const label=btn.textContent;
+      btn.textContent='Sending…';btn.disabled=true;
+      try{
+        const fd=new FormData(form); const data={};
+        for(const [k,v] of fd.entries()){ if(k==='programs'||k==='schedule'){(data[k]=data[k]||[]).push(v);} else {data[k]=v;} }
+        const res=await fetch(form.action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        if(res.ok){form.style.display='none';if(success)success.style.display='block';}
+        else{btn.textContent='Something went wrong — try again';btn.disabled=false;}
+      }catch{btn.textContent='Network error — try again';btn.disabled=false;}
+    });
+  });
+</script>
+</body>
+</html>

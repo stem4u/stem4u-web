@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Lead Pipeline — Test Harness (internal)</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Arial, sans-serif; background:#F4F7FF; color:#0A1E52; max-width:640px; margin:0 auto; padding:28px 20px 60px; }
+  h1 { font-size:22px; color:#0D2B7A; margin:0 0 4px; }
+  .warn { background:#FFF3E0; border:1px solid #FFB74D; color:#8A3D00; font-size:13px; padding:10px 14px; border-radius:8px; margin:12px 0 22px; line-height:1.5; }
+  label { display:block; font-size:12px; font-weight:700; color:#0A1E52; margin:14px 0 5px; text-transform:uppercase; letter-spacing:.04em; }
+  input, select, textarea { width:100%; padding:10px 12px; border:1px solid #d8deea; border-radius:8px; font-size:14px; background:#fff; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; }
+  .row label.chk { display:flex; align-items:center; gap:6px; font-size:13px; text-transform:none; letter-spacing:0; font-weight:600; border:1px solid #d8deea; border-radius:8px; padding:8px 12px; margin:0; background:#fff; cursor:pointer; }
+  .row label.chk input { width:auto; }
+  button { margin-top:20px; background:#FF5500; color:#fff; font-size:15px; font-weight:800; padding:13px 22px; border:none; border-radius:8px; cursor:pointer; }
+  button:hover { background:#FF7733; }
+  pre { background:#0D2B7A; color:#CFE0FF; padding:16px; border-radius:10px; font-size:13px; white-space:pre-wrap; word-break:break-word; margin-top:22px; min-height:40px; }
+  .hp { position:absolute; left:-9999px; }
+</style>
+</head>
+<body>
+  <h1>Lead pipeline — test harness</h1>
+  <div class="warn"><b>Internal / not linked.</b> This page posts to <code>/api/lead</code> (the new Resend + Google Sheet pipeline). It does <b>not</b> touch the live Formspree waitlist. Safe to delete after testing. Marked noindex.</div>
+
+  <form id="tf">
+    <label>Submission type</label>
+    <select name="type"><option>Reserve (test)</option><option>Coach question (test)</option></select>
+
+    <label>Parent / Guardian Name</label>
+    <input name="parent_name" value="Test Parent"/>
+
+    <label>Email</label>
+    <input name="email" type="email" value="you@example.com"/>
+
+    <label>Phone</label>
+    <input name="phone" value="(571) 000-0000"/>
+
+    <label>Child's Grade</label>
+    <select name="grade"><option>4th Grade</option><option>8th Grade</option><option>Kindergarten</option></select>
+
+    <label>Programs of Interest</label>
+    <div class="row">
+      <label class="chk"><input type="checkbox" name="programs" value="Robotics"/> Robotics</label>
+      <label class="chk"><input type="checkbox" name="programs" value="FTC"/> FTC</label>
+      <label class="chk"><input type="checkbox" name="programs" value="FLL" checked/> FLL</label>
+      <label class="chk"><input type="checkbox" name="programs" value="Drone"/> Drone</label>
+    </div>
+
+    <label>Schedule Preference</label>
+    <div class="row">
+      <label class="chk"><input type="checkbox" name="schedule" value="Saturday" checked/> Saturday</label>
+      <label class="chk"><input type="checkbox" name="schedule" value="Sunday"/> Sunday</label>
+      <label class="chk"><input type="checkbox" name="schedule" value="Weekday evenings"/> Weekday evenings</label>
+      <label class="chk"><input type="checkbox" name="schedule" value="Flexible"/> Flexible / any</label>
+    </div>
+
+    <label>Message</label>
+    <textarea name="message" rows="3">This is a test submission from test-lead.html</textarea>
+
+    <input class="hp" type="text" name="_gotcha" autocomplete="off" tabindex="-1"/>
+
+    <button type="submit">Send test submission →</button>
+  </form>
+
+  <pre id="out">Response will appear here…</pre>
+
+<script>
+  const f = document.getElementById('tf'), out = document.getElementById('out');
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    out.textContent = 'Sending…';
+    const fd = new FormData(f);
+    const data = {};
+    for (const [k, v] of fd.entries()) {
+      if (k === 'programs' || k === 'schedule') { (data[k] = data[k] || []).push(v); }
+      else { data[k] = v; }
+    }
+    try {
+      const r = await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const j = await r.json();
+      out.textContent = 'HTTP ' + r.status + '\n\n' + JSON.stringify(j, null, 2);
+    } catch (err) {
+      out.textContent = 'Request failed: ' + err;
+    }
+  });
+</script>
+</body>
+</html>
