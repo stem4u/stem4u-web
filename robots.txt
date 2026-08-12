@@ -1,7 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /index8.html
-Disallow: /waitlist8.html
-Disallow: /test-lead.html
 
 Sitemap: https://stem4u.com/sitemap.xml

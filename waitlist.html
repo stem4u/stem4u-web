@@ -144,7 +144,7 @@
       <span class="card-eyebrow primary">Priority enrollment</span>
       <h3>Reserve a spot</h3>
       <p class="cdesc">Join the priority list for Robotics, FTC, FLL, or Drone. Small teams &mdash; spots are limited.</p>
-      <form class="ajax-form" action="https://formspree.io/f/xykagpyw" method="POST">
+      <form class="ajax-form" action="/api/lead" method="POST">
         <div class="form-group"><label>Parent / Guardian First Name *</label><input type="text" name="parent_first_name" placeholder="Jane" required/></div>
         <div class="form-group"><label>Parent / Guardian Last Name *</label><input type="text" name="parent_last_name" placeholder="Smith" required/></div>
         <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
@@ -176,14 +176,14 @@
         <button type="submit" class="submit-btn">Reserve your child's spot &rarr;</button>
         <p class="form-note">We use this only to contact you about STEM4U programs — the parent's and child's name, contact details, and grade. No spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p>
       </form>
-      <div class="success-msg"><h3>You're on the list! 🎉</h3><p>Thanks for reserving your child's spot — you're on the STEM4U priority list. We'll reach out personally as soon as enrollment opens.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
+      <div class="success-msg"><h3>You're on the list! 🎉</h3><p>Thanks for reserving your child's spot — you're on the STEM4U priority list. We'll reach out personally as soon as enrollment opens. (Watch your inbox for a confirmation.)</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
     </div>
 
     <div class="choose-card secondary" id="coach">
       <span class="card-eyebrow secondary">Personal guidance</span>
       <h3>Talk with a coach</h3>
       <p class="cdesc">Not sure what fits? Get help with program fit, age eligibility, team commitment, or competition pathways before you enroll.</p>
-      <form class="ajax-form" action="https://formspree.io/f/xykagpyw" method="POST">
+      <form class="ajax-form" action="/api/lead" method="POST">
         <div class="form-group"><label>Parent / Guardian First Name *</label><input type="text" name="parent_first_name" placeholder="Jane" required/></div>
         <div class="form-group"><label>Parent / Guardian Last Name *</label><input type="text" name="parent_last_name" placeholder="Smith" required/></div>
         <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
@@ -226,7 +226,9 @@
       const label=btn.textContent;
       btn.textContent='Sending…';btn.disabled=true;
       try{
-        const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+        const fd=new FormData(form); const data={};
+        for(const [k,v] of fd.entries()){ if(k==='programs'||k==='schedule'){(data[k]=data[k]||[]).push(v);} else {data[k]=v;} }
+        const res=await fetch(form.action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
         if(res.ok){form.style.display='none';if(success)success.style.display='block';}
         else{btn.textContent='Something went wrong — try again';btn.disabled=false;}
       }catch{btn.textContent='Network error — try again';btn.disabled=false;}
