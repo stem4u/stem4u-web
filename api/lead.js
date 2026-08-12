@@ -31,6 +31,7 @@ module.exports = async (req, res) => {
     const data = {
       type: b.type || 'Lead',
       parent_name: b.parent_name || '',
+      child_first_name: b.child_first_name || '',
       email: b.email || '',
       phone: b.phone || '',
       grade: b.grade || '',
