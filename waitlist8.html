@@ -147,10 +147,12 @@
       <h3>Reserve a spot</h3>
       <p class="cdesc">Join the priority list for Robotics, FTC, FLL, or Drone. Small teams &mdash; spots are limited.</p>
       <form class="ajax-form" action="/api/lead" method="POST">
-        <div class="form-group"><label>Parent / Guardian Name *</label><input type="text" name="parent_name" placeholder="Jane Smith" required/></div>
+        <div class="form-group"><label>Parent / Guardian First Name *</label><input type="text" name="parent_first_name" placeholder="Jane" required/></div>
+        <div class="form-group"><label>Parent / Guardian Last Name *</label><input type="text" name="parent_last_name" placeholder="Smith" required/></div>
         <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
         <div class="form-group"><label>Phone *</label><input type="tel" name="phone" placeholder="(571) 000-0000" required/></div>
         <div class="form-group"><label>Child's First Name *</label><input type="text" name="child_first_name" placeholder="First name only" required/></div>
+        <div class="form-group"><label>Child's Last Name *</label><input type="text" name="child_last_name" placeholder="Last name" required/></div>
         <div class="form-group"><label>Child's Grade *</label><select name="grade" required><option value="" disabled selected>Select grade</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option><option>9th Grade</option><option>10th Grade</option><option>11th Grade</option><option>12th Grade</option></select></div>
         <div class="form-group"><label>Programs of Interest *</label>
           <div class="checkbox-group">
@@ -174,9 +176,9 @@
         <input type="hidden" name="_subject" value="STEM4U — Reserve a spot"/>
         <input type="text" name="_gotcha" style="display:none"/>
         <button type="submit" class="submit-btn">Reserve your child's spot &rarr;</button>
-        <p class="form-note">We use this only to contact you about STEM4U programs — the parent's contact details plus your child's first name and grade. No spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p>
+        <p class="form-note">We use this only to contact you about STEM4U programs — the parent's and child's name, contact details, and grade. No spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p>
       </form>
-      <div class="success-msg"><h3>You're on the list! 🎉</h3><p>Thanks! We'll reach out as soon as enrollment opens.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
+      <div class="success-msg"><h3>You're on the list! 🎉</h3><p>Thanks for reserving your child's spot — you're on the STEM4U priority list. We'll reach out personally as soon as enrollment opens. (Watch your inbox for a confirmation.)</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
     </div>
 
     <div class="choose-card secondary" id="coach">
@@ -184,7 +186,8 @@
       <h3>Talk with a coach</h3>
       <p class="cdesc">Not sure what fits? Get help with program fit, age eligibility, team commitment, or competition pathways before you enroll.</p>
       <form class="ajax-form" action="/api/lead" method="POST">
-        <div class="form-group"><label>Parent / Guardian Name *</label><input type="text" name="parent_name" placeholder="Jane Smith" required/></div>
+        <div class="form-group"><label>Parent / Guardian First Name *</label><input type="text" name="parent_first_name" placeholder="Jane" required/></div>
+        <div class="form-group"><label>Parent / Guardian Last Name *</label><input type="text" name="parent_last_name" placeholder="Smith" required/></div>
         <div class="form-group"><label>Email Address *</label><input type="email" name="email" placeholder="jane@example.com" required/></div>
         <div class="form-group"><label>Phone *</label><input type="tel" name="phone" placeholder="(571) 000-0000" required/></div>
         <div class="form-group"><label>Best time to reach you</label><input type="text" name="best_time" placeholder="e.g. weekday evenings"/></div>
@@ -196,7 +199,7 @@
         <button type="submit" class="submit-btn secondary-btn">Speak with a coach &rarr;</button>
         <p class="form-note">We'll reach out personally &mdash; no spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p>
       </form>
-      <div class="success-msg"><h3>Got it! 📞</h3><p>Thanks &mdash; a coach will reach out at the number you gave us.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
+      <div class="success-msg"><h3>Got it! 📞</h3><p>Thanks — one of our coaches will reach out at the number you gave us to help you find the right fit.</p><div class="next-steps"><a class="primary" href="programs.html">Explore programs →</a><a class="ghost" href="index.html">Back to home</a></div></div>
     </div>
 
   </div>
