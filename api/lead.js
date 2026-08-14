@@ -151,6 +151,43 @@ module.exports = async (req, res) => {
       results.sheet = 'skipped (no SHEETS_WEBHOOK_URL)';
     }
 
+    // 3) Insert into Supabase `leads` table (server-side service role only)
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+      try {
+        const row = {
+          submitted_at: data.submitted_at,
+          type: data.type,
+          parent_first_name: data.parent_first_name,
+          parent_last_name: data.parent_last_name,
+          child_first_name: data.child_first_name,
+          child_last_name: data.child_last_name,
+          email: data.email ? data.email.toLowerCase() : '',
+          phone: data.phone,
+          grade: data.grade,
+          programs: data.programs,
+          schedule: data.schedule,
+          friend_request: data.friend_request,
+          best_time: data.best_time,
+          message: data.message,
+        };
+        const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
+          method: 'POST',
+          headers: {
+            apikey: process.env.SUPABASE_SERVICE_KEY,
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=minimal',
+          },
+          body: JSON.stringify(row),
+        });
+        results.db = rdb.ok ? 'inserted' : `error: ${rdb.status} ${await rdb.text()}`;
+      } catch (e) {
+        results.db = `error: ${String(e)}`;
+      }
+    } else {
+      results.db = 'skipped (no SUPABASE env)';
+    }
+
     res.status(200).json({ ok: true, results });
   } catch (e) {
     res.status(500).json({ error: 'Lead handler failed' });
