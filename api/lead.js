@@ -69,6 +69,7 @@ module.exports = async (req, res) => {
       grade: cap(b.grade, 40),
       programs: arr(b.programs),
       schedule: arr(b.schedule),
+      friend_request: cap(b.friend_request, 200),
       best_time: cap(b.best_time, 120),
       message: cap(b.message, 2000),
       submitted_at: new Date().toISOString(),
