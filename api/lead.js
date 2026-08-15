@@ -152,7 +152,8 @@ module.exports = async (req, res) => {
     }
 
     // 3) Insert into Supabase `leads` table (server-side service role only)
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+    const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
+    if (process.env.SUPABASE_URL && SUPA_KEY) {
       try {
         const row = {
           submitted_at: data.submitted_at,
@@ -173,8 +174,8 @@ module.exports = async (req, res) => {
         const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
           method: 'POST',
           headers: {
-            apikey: process.env.SUPABASE_SERVICE_KEY,
-            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+            apikey: SUPA_KEY,
+            Authorization: `Bearer ${SUPA_KEY}`,
             'Content-Type': 'application/json',
             Prefer: 'return=minimal',
           },
