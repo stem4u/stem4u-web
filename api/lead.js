@@ -12,12 +12,18 @@ function escapeHtml(s) {
 const ALLOWED_HOSTS = ['stem4u.com', 'www.stem4u.com'];
 const ALLOWED_ORIGIN = 'https://stem4u.com';
 function hostOf(u) { try { return new URL(u).host.toLowerCase(); } catch { return ''; } }
+function pathOf(u) { try { return new URL(u).pathname; } catch { return ''; } }
 function originOk(req) {
   const oh = hostOf(req.headers.origin || '');
-  const rh = hostOf(req.headers.referer || '');
-  if (oh) return ALLOWED_HOSTS.includes(oh);        // browsers always send Origin on POST
-  if (rh) return ALLOWED_HOSTS.includes(rh);
-  return true;                                       // no Origin/Referer (rare) → let rate limit + honeypot handle
+  const ref = req.headers.referer || '';
+  const rh = hostOf(ref);
+  if (oh) return ALLOWED_HOSTS.includes(oh);        // browsers send Origin on POST
+  if (rh) {
+    if (!ALLOWED_HOSTS.includes(rh)) return false;
+    if (pathOf(ref).startsWith('/api/')) return false; // self-referer = bot tell; a real form never refers from /api/*
+    return true;
+  }
+  return true;                                       // no Origin/Referer (rare) → rate limit + honeypot + content guard handle
 }
 const RL = new Map(); // ip -> [timestamps] (best-effort, per warm instance)
 function rateLimited(ip, max = 6, windowMs = 10 * 60 * 1000) {
@@ -74,6 +80,12 @@ module.exports = async (req, res) => {
       message: cap(b.message, 2000),
       submitted_at: new Date().toISOString(),
     };
+
+    // Ignore empty / bot submissions: require at least one real piece of contact info.
+    // Prevents blank rows from endpoint probes/crawlers. Pretend success, store nothing.
+    const hasContent = data.email || data.phone || data.parent_first_name ||
+      data.parent_last_name || data.child_first_name || data.child_last_name || data.name;
+    if (!hasContent) { res.status(200).json({ ok: true, empty: true }); return; }
 
     const results = { email: null, sheet: null };
 
