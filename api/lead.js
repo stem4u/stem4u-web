@@ -39,6 +39,29 @@ function clientIp(req) {
 const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || ''));
 const cap = (s, n) => String(s == null ? '' : s).slice(0, n);
 
+// --- spam scoring -----------------------------------------------------------
+// A real parent form never has a link in the name, a phone in the message, or
+// SEO/marketing pitch language. Score the tells; 3+ = spam. Spam is not emailed
+// to the team and lands in the DB as status 'archived' (source 'Spam (auto)'),
+// so it's captured for audit but stays out of the active pipeline.
+function spamScore(d) {
+  const name = `${d.parent_first_name || ''} ${d.parent_last_name || ''} ${d.child_first_name || ''} ${d.name || ''}`;
+  const msg = d.message || '';
+  const hay = `${name} ${msg}`.toLowerCase();
+  const linkRe = /(https?:\/\/|www\.|t\.me\/|wa\.me\/|\btelegram\b|\bwhatsapp\b|\bbit\.ly\b|\bskype\b)/i;
+  const pitchRe = /(free demo|back ?link|\bseo\b|search engine|website (owners|traffic)|contact pages?|rank(ing)? higher|boost your|marketing (platform|service)|grow your business|crypto|casino|\bloan\b|viagra|\bnft\b|investment opportunity)/i;
+  const cyrillic = /[Ѐ-ӿ]/;
+  let s = 0;
+  if (linkRe.test(name)) s += 3;               // link in a name field = definitely a bot
+  if (linkRe.test(msg)) s += 2;                // link in the message
+  if (pitchRe.test(hay)) s += 3;               // sales/SEO vocabulary — no real parent writes this
+  if (cyrillic.test(hay)) s += 2;              // non-Latin script
+  if (/\+?\d[\d\s().-]{9,}/.test(msg)) s += 1; // a phone number buried in the message
+  if (/contact/i.test(d.type) && !d.phone && !d.grade && !d.child_first_name && linkRe.test(msg)) s += 2;
+  return s;
+}
+const looksSpammy = (d) => spamScore(d) >= 3;
+
 module.exports = async (req, res) => {
   // CORS: only our own origin (blocks cross-site browser abuse; scripted abuse is caught by rate limit)
   res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
@@ -87,10 +110,13 @@ module.exports = async (req, res) => {
       data.parent_last_name || data.child_first_name || data.child_last_name || data.name;
     if (!hasContent) { res.status(200).json({ ok: true, empty: true }); return; }
 
-    const results = { email: null, sheet: null };
+    // Spam: capture it in the DB as archived, but never email the team or the "parent".
+    const spam = looksSpammy(data);
+
+    const results = { email: null, sheet: null, spam };
 
     // 1) Email via Resend (sends from your own domain → no spam-folder problem)
-    if (process.env.RESEND_API_KEY) {
+    if (process.env.RESEND_API_KEY && !spam) {
       const rows = Object.entries(data)
         .map(([k, v]) => `<tr><td style="padding:5px 12px;color:#555;text-transform:capitalize">${k.replace(/_/g, ' ')}</td><td style="padding:5px 12px"><b>${escapeHtml(v) || '—'}</b></td></tr>`)
         .join('');
@@ -110,11 +136,11 @@ module.exports = async (req, res) => {
       });
       results.email = r.ok ? 'sent' : `error: ${await r.text()}`;
     } else {
-      results.email = 'skipped (no RESEND_API_KEY)';
+      results.email = spam ? 'skipped (spam)' : 'skipped (no RESEND_API_KEY)';
     }
 
-    // 1b) Friendly confirmation email to the parent (auto-reply) — only to a valid address
-    if (process.env.RESEND_API_KEY && isEmail(data.email)) {
+    // 1b) Friendly confirmation email to the parent (auto-reply) — only to a valid address, never for spam
+    if (process.env.RESEND_API_KEY && isEmail(data.email) && !spam) {
       const first = escapeHtml(data.parent_first_name || data.name) || 'there';
       const isGeneric = /coach|contact/i.test(data.type);   // coach requests + contact messages
       const childPart = data.child_first_name ? ` for ${escapeHtml(data.child_first_name)}` : '';
@@ -170,7 +196,7 @@ module.exports = async (req, res) => {
         const row = {
           submitted_at: data.submitted_at,
           type: data.type,
-          source: 'Website form',
+          source: spam ? 'Spam (auto)' : 'Website form',
           parent_first_name: data.parent_first_name,
           parent_last_name: data.parent_last_name,
           child_first_name: data.child_first_name,
@@ -183,6 +209,8 @@ module.exports = async (req, res) => {
           friend_request: data.friend_request,
           best_time: data.best_time,
           message: data.message,
+          // spam is archived on arrival + tagged, so it stays out of the active pipeline
+          ...(spam ? { status: 'archived', tags: ['spam'], notes: 'Auto-flagged as spam by /api/lead' } : {}),
         };
         const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
           method: 'POST',
