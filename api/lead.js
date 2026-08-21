@@ -40,10 +40,24 @@ const isEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || ''));
 const cap = (s, n) => String(s == null ? '' : s).slice(0, n);
 
 // --- spam scoring -----------------------------------------------------------
-// A real parent form never has a link in the name, a phone in the message, or
-// SEO/marketing pitch language. Score the tells; 3+ = spam. Spam is not emailed
-// to the team and lands in the DB as status 'archived' (source 'Spam (auto)'),
-// so it's captured for audit but stays out of the active pipeline.
+// A real parent form never has a link in the name, a phone in the message,
+// SEO/marketing pitch language, or keyboard-mash gibberish. Score the tells;
+// 3+ = spam. Spam is dropped (not emailed, not stored).
+//
+// Gibberish detector: counts "words" that look like keyboard mash — a 7+ char
+// run with 5+ consecutive consonants, or almost no vowels. Real names (incl.
+// long transliterated ones like "Krishnachandran") stay under the bar because
+// they don't chain 5+ consonants and keep a normal vowel ratio.
+function gibberishHits(text) {
+  const words = String(text || '').toLowerCase().match(/[a-z]{7,}/g) || [];
+  let hits = 0;
+  for (const w of words) {
+    const run = /[bcdfghjklmnpqrstvwxyz]{5,}/.test(w);
+    const vr = (w.match(/[aeiou]/g) || []).length / w.length;
+    if (run || vr < 0.18) hits++;
+  }
+  return hits;
+}
 function spamScore(d) {
   const name = `${d.parent_first_name || ''} ${d.parent_last_name || ''} ${d.child_first_name || ''} ${d.name || ''}`;
   const msg = d.message || '';
@@ -57,6 +71,9 @@ function spamScore(d) {
   if (pitchRe.test(hay)) s += 3;               // sales/SEO vocabulary — no real parent writes this
   if (cyrillic.test(hay)) s += 2;              // non-Latin script
   if (/\+?\d[\d\s().-]{9,}/.test(msg)) s += 1; // a phone number buried in the message
+  if (gibberishHits(msg) >= 2) s += 3;         // keyboard-mash message (e.g. "fkmdkdwdwkdwjj")
+  if (gibberishHits(name) >= 1) s += 3;        // gibberish in a name field
+  if (/\bstem4u\b/i.test(msg)) s += 2;         // echoing our own domain back = scraper/bot tell
   if (/contact/i.test(d.type) && !d.phone && !d.grade && !d.child_first_name && linkRe.test(msg)) s += 2;
   return s;
 }
@@ -110,13 +127,14 @@ module.exports = async (req, res) => {
       data.parent_last_name || data.child_first_name || data.child_last_name || data.name;
     if (!hasContent) { res.status(200).json({ ok: true, empty: true }); return; }
 
-    // Spam: capture it in the DB as archived, but never email the team or the "parent".
-    const spam = looksSpammy(data);
+    // Spam / gibberish: REJECT it outright — no email, no sheet, no DB row.
+    // Pretend success (200) so bots don't learn they were filtered.
+    if (looksSpammy(data)) { res.status(200).json({ ok: true, rejected: true }); return; }
 
-    const results = { email: null, sheet: null, spam };
+    const results = { email: null, sheet: null };
 
     // 1) Email via Resend (sends from your own domain → no spam-folder problem)
-    if (process.env.RESEND_API_KEY && !spam) {
+    if (process.env.RESEND_API_KEY) {
       const rows = Object.entries(data)
         .map(([k, v]) => `<tr><td style="padding:5px 12px;color:#555;text-transform:capitalize">${k.replace(/_/g, ' ')}</td><td style="padding:5px 12px"><b>${escapeHtml(v) || '—'}</b></td></tr>`)
         .join('');
@@ -136,11 +154,11 @@ module.exports = async (req, res) => {
       });
       results.email = r.ok ? 'sent' : `error: ${await r.text()}`;
     } else {
-      results.email = spam ? 'skipped (spam)' : 'skipped (no RESEND_API_KEY)';
+      results.email = 'skipped (no RESEND_API_KEY)';
     }
 
-    // 1b) Friendly confirmation email to the parent (auto-reply) — only to a valid address, never for spam
-    if (process.env.RESEND_API_KEY && isEmail(data.email) && !spam) {
+    // 1b) Friendly confirmation email to the parent (auto-reply) — only to a valid address
+    if (process.env.RESEND_API_KEY && isEmail(data.email)) {
       const first = escapeHtml(data.parent_first_name || data.name) || 'there';
       const isGeneric = /coach|contact/i.test(data.type);   // coach requests + contact messages
       const childPart = data.child_first_name ? ` for ${escapeHtml(data.child_first_name)}` : '';
@@ -196,7 +214,7 @@ module.exports = async (req, res) => {
         const row = {
           submitted_at: data.submitted_at,
           type: data.type,
-          source: spam ? 'Spam (auto)' : 'Website form',
+          source: 'Website form',
           parent_first_name: data.parent_first_name,
           parent_last_name: data.parent_last_name,
           child_first_name: data.child_first_name,
@@ -209,8 +227,6 @@ module.exports = async (req, res) => {
           friend_request: data.friend_request,
           best_time: data.best_time,
           message: data.message,
-          // spam is archived on arrival + tagged, so it stays out of the active pipeline
-          ...(spam ? { status: 'archived', tags: ['spam'], notes: 'Auto-flagged as spam by /api/lead' } : {}),
         };
         const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
           method: 'POST',
