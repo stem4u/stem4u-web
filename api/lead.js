@@ -111,6 +111,7 @@ module.exports = async (req, res) => {
       child_first_name: cap(b.child_first_name, 80),
       child_last_name: cap(b.child_last_name, 80),
       email: cap(b.email, 200),
+      parent2_email: cap(b.parent2_email, 200),
       phone: cap(b.phone, 40),
       grade: cap(b.grade, 40),
       programs: arr(b.programs),
@@ -126,6 +127,13 @@ module.exports = async (req, res) => {
     const hasContent = data.email || data.phone || data.parent_first_name ||
       data.parent_last_name || data.child_first_name || data.child_last_name || data.name;
     if (!hasContent) { res.status(200).json({ ok: true, empty: true }); return; }
+
+    // Phone is mandatory for registrations (Reserve / Coach request), but not for the
+    // Contact form (which has no phone field). Server-side backstop to the required attr.
+    const isContact = /contact/i.test(data.type);
+    if (!isContact && !data.phone) {
+      res.status(400).json({ ok: false, error: 'Phone number is required.' }); return;
+    }
 
     // Spam / gibberish: REJECT it outright — no email, no sheet, no DB row.
     // Pretend success (200) so bots don't learn they were filtered.
@@ -220,6 +228,7 @@ module.exports = async (req, res) => {
           child_first_name: data.child_first_name,
           child_last_name: data.child_last_name,
           email: data.email ? data.email.toLowerCase() : '',
+          parent2_email: data.parent2_email ? data.parent2_email.toLowerCase() : '',
           phone: data.phone,
           grade: data.grade,
           programs: data.programs,
