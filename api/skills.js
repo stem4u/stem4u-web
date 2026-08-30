@@ -41,7 +41,7 @@ module.exports = async (req, res) => {
 
   const who = cap(data.who, 80).trim();
   let skills = Array.isArray(data.skills) ? data.skills : (data.skills ? [data.skills] : []);
-  skills = skills.map((s) => cap(s, 60).trim()).filter(Boolean).slice(0, 4);
+  skills = skills.map((s) => cap(s, 60).trim()).filter(Boolean).slice(0, 8);   // ranked order preserved
   const extra = cap(data.extra, 200).trim();
 
   if (!who || skills.length === 0) {
@@ -49,12 +49,14 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const subject = 'New FTC skill pick — ' + who;
+  const subject = 'New FTC skill ranking — ' + who;
+  const ranked = skills.map((s, i) => `<tr><td style="padding:2px 8px 2px 0;color:#E8651A;font-weight:700">${i + 1}.</td><td style="padding:2px 0">${escapeHtml(s)}</td></tr>`).join('');
   const html = `<div style="font-family:Inter,Arial,sans-serif;color:#2E2E2E">
-      <h2 style="color:#1B2A4A;margin:0 0 10px">FTC Skills Pick</h2>
+      <h2 style="color:#1B2A4A;margin:0 0 10px">FTC Skills Ranking</h2>
       <p><b>Student:</b> ${escapeHtml(who)}</p>
-      <p><b>Skills chosen:</b> ${skills.map(escapeHtml).join(', ')}</p>
-      ${extra ? `<p><b>Also excited to try:</b> ${escapeHtml(extra)}</p>` : ''}
+      <p style="margin:0 0 4px"><b>Ranked (most &rarr; least interested):</b></p>
+      <table style="border-collapse:collapse;font-size:14px">${ranked}</table>
+      ${extra ? `<p style="margin-top:10px"><b>Also excited to try:</b> ${escapeHtml(extra)}</p>` : ''}
       <p style="color:#5A6472;font-size:12px;margin-top:14px">STEM4U · FTC 2026&ndash;27 skills survey</p>
     </div>`;
 
