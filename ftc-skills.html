@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>STEM4U — FTC Skills Pick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{ --navy:#1B2A4A; --navy2:#0D2B7A; --orange:#E8651A; --yellow:#F5C518; --chalk:#F2F0EB; --ink:#2E2E2E; --line:#d7dce4; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--chalk);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:640px;margin:0 auto;padding:22px 16px 60px}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .badge{width:46px;height:46px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#fff;font-size:15px}
+  .badge b{color:var(--orange)}
+  h1{font-family:'Space Grotesk';color:var(--navy);font-size:26px;margin:2px 0 2px}
+  .sub{color:#5A6472;font-size:14px;margin:0 0 4px}
+  .note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:10px;padding:12px 14px;margin:16px 0;font-size:14px}
+  label.fld{display:block;font-family:'Space Grotesk';font-weight:600;color:var(--navy);margin:18px 0 6px;font-size:15px}
+  input[type=text], select{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:#fff}
+  input[type=text]:focus, select:focus{outline:none;border-color:var(--orange)}
+  .hint{font-size:12.5px;color:#7a8496;margin-top:4px}
+  .picks{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  @media(max-width:480px){.picks{grid-template-columns:1fr}}
+  .pick{position:relative;border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:12px 12px 12px 12px;cursor:pointer;transition:.12s}
+  .pick:hover{border-color:#b9c2d2}
+  .pick input{position:absolute;top:12px;right:12px;width:20px;height:20px;accent-color:var(--orange)}
+  .pick .t{font-family:'Space Grotesk';font-weight:700;color:var(--navy);font-size:15px;padding-right:26px}
+  .pick .d{font-size:12.5px;color:#5A6472;margin-top:3px}
+  .pick.on{border-color:var(--orange);background:#fdf1ea;box-shadow:0 0 0 2px rgba(232,101,26,.15)}
+  .pick .em{font-size:17px;margin-right:5px}
+  button{margin-top:22px;width:100%;background:var(--orange);color:#fff;border:none;border-radius:12px;padding:15px;font-family:'Space Grotesk';font-weight:700;font-size:17px;cursor:pointer}
+  button:disabled{opacity:.6;cursor:default}
+  .err{color:#b02a2a;font-size:13.5px;margin-top:8px;min-height:18px}
+  .done{display:none;text-align:center;padding:40px 10px}
+  .done .big{font-size:52px}
+  .done h2{font-family:'Space Grotesk';color:var(--navy);font-size:24px;margin:8px 0 4px}
+  .foot{margin-top:26px;text-align:center;color:#8a94a6;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="formview">
+    <div class="head">
+      <div class="badge">S<b>4</b>U</div>
+      <div>
+        <h1>Pick Your FTC Skills</h1>
+        <p class="sub">STEM4U Robotics · FTC 2026–27</p>
+      </div>
+    </div>
+    <div class="note"><b>No wrong answers.</b> Every skill is taught this season — this is just about what <i>excites</i> you. Pick your top <b>1–2</b>.</div>
+
+    <form id="skillForm" action="/api/skills" method="POST">
+      <label class="fld">Your name</label>
+      <input type="text" name="who" id="who" placeholder="e.g. Aarav Sharma" required maxlength="60"/>
+      <div class="hint">Only your coach sees this — it's not shown to the other kids.</div>
+
+      <label class="fld">What are you most drawn to? <span style="font-weight:400;color:#7a8496">(pick 1–2)</span></label>
+      <div class="picks" id="picks"></div>
+
+      <label class="fld">Anything else you're excited to try? <span style="font-weight:400;color:#7a8496">(optional)</span></label>
+      <input type="text" name="extra" placeholder="Optional" maxlength="120"/>
+
+      <!-- spam honeypot -->
+      <input type="text" name="_gotcha" id="gotcha" style="display:none" tabindex="-1" autocomplete="off"/>
+
+      <div class="err" id="err"></div>
+      <button type="submit" id="btn">Send my picks →</button>
+    </form>
+  </div>
+
+  <div class="done" id="done">
+    <div class="big">🎉🛠️</div>
+    <h2>You're in!</h2>
+    <p>Your picks are with your coach. See you at the build table.</p>
+  </div>
+
+  <div class="foot">STEM4U · Real tools. Real teams. Real engineers.</div>
+</div>
+
+<script>
+  var TRACKS=[
+    ["🔧","Robot Build & Strategy","Mechanical build, drivetrain, mechanisms, wiring, game strategy."],
+    ["💻","Programming (Java)","Android Studio/OnBot, TeleOp, Autonomous, sensors."],
+    ["📐","CAD / Design","Onshape or Fusion — part & robot layout."],
+    ["📓","Engineering Notebook","Documenting the design story — writing & layout."],
+    ["🎮","Driver / Operator","Driving practice, controls, cycle-time."],
+    ["🤝","Outreach (Connect)","Community events, mentoring, meeting engineers."],
+    ["🗂️","PM / Biz","Timeline, tasks, sponsors & budget."],
+    ["🎬","Media","Photos/video, social, the team website."]
+  ];
+  var picks=document.getElementById('picks');
+  TRACKS.forEach(function(t,i){
+    var l=document.createElement('label'); l.className='pick';
+    l.innerHTML='<input type="checkbox" name="skills" value="'+t[1]+'"><div class="t"><span class="em">'+t[0]+'</span>'+t[1]+'</div><div class="d">'+t[2]+'</div>';
+    picks.appendChild(l);
+  });
+  var boxes=[].slice.call(document.querySelectorAll('input[name=skills]'));
+  function sync(){
+    var n=boxes.filter(function(b){return b.checked;}).length;
+    boxes.forEach(function(b){
+      b.parentNode.classList.toggle('on',b.checked);
+      b.disabled = (!b.checked && n>=2);   // cap at 2
+    });
+  }
+  boxes.forEach(function(b){b.addEventListener('change',sync);});
+
+  var form=document.getElementById('skillForm'), err=document.getElementById('err'), btn=document.getElementById('btn');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var n=boxes.filter(function(b){return b.checked;}).length;
+    if(n<1){ err.textContent='Pick at least one skill you like.'; return; }
+    err.textContent='';
+    btn.disabled=true; btn.textContent='Sending…';
+    var payload={
+      who: document.getElementById('who').value.trim(),
+      skills: boxes.filter(function(b){return b.checked;}).map(function(b){return b.value;}),
+      extra: (form.querySelector('input[name=extra]').value||'').trim(),
+      _gotcha: document.getElementById('gotcha').value||''
+    };
+    fetch('/api/skills',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){
+        if(r.ok){ document.getElementById('formview').style.display='none'; document.getElementById('done').style.display='block'; window.scrollTo(0,0); }
+        else{ return r.json().then(function(d){ throw new Error(d.error||'Something went wrong'); }); }
+      })
+      .catch(function(x){ err.textContent=x.message+' — try again.'; btn.disabled=false; btn.textContent='Send my picks →'; });
+  });
+</script>
+</body>
+</html>
