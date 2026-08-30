@@ -23,6 +23,8 @@
   label.fld{display:block;font-family:'Space Grotesk';font-weight:600;color:var(--navy);margin:18px 0 6px;font-size:15px}
   input[type=text], textarea{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;resize:vertical}
   input[type=text]:focus, textarea:focus{outline:none;border-color:var(--orange)}
+  .namerow{display:flex;gap:10px}
+  @media(max-width:420px){.namerow{flex-direction:column;gap:0}.namerow input{margin-bottom:0}}
   .hint{font-size:12.5px;color:#7a8496;margin-top:4px}
 
   ul.rank{list-style:none;margin:8px 0 0;padding:0}
@@ -62,10 +64,14 @@
 
     <form id="skillForm" action="/api/skills" method="POST">
       <label class="fld">Your name</label>
-      <input type="text" name="who" id="who" placeholder="e.g. Aarav Sharma" required maxlength="60"/>
+      <div class="namerow">
+        <input type="text" id="first" placeholder="First name" required maxlength="40"/>
+        <input type="text" id="last" placeholder="Last name" required maxlength="40"/>
+      </div>
       <div class="hint">Only your coach sees this — it's not shown to the other kids.</div>
 
       <label class="fld">Rank the skills — favorite at the top</label>
+      <div class="hint" style="margin:-2px 0 8px">Press and drag the <b style="color:var(--orange)">⠿</b> handle on the right to move a skill up or down.</div>
       <ul class="rank" id="ranklist"></ul>
 
       <label class="fld">Tell us about yourself <span style="font-weight:400;color:#7a8496">(optional)</span></label>
@@ -118,8 +124,9 @@
   var form=document.getElementById('skillForm'), err=document.getElementById('err'), btn=document.getElementById('btn');
   form.addEventListener('submit', function(e){
     e.preventDefault();
-    var who=document.getElementById('who').value.trim();
-    if(!who){ err.textContent='Please enter your name.'; return; }
+    var first=document.getElementById('first').value.trim(), last=document.getElementById('last').value.trim();
+    if(!first||!last){ err.textContent='Please enter your first and last name.'; return; }
+    var who=first+' '+last;
     err.textContent=''; btn.disabled=true; btn.textContent='Sending…';
     var ranked=[].map.call(list.children,function(li){ return li.getAttribute('data-val'); });
     var payload={ who:who, skills:ranked, extra:document.getElementById('extra').value.trim(), _gotcha:document.getElementById('gotcha').value||'' };
