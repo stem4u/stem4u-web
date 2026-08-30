@@ -18,6 +18,8 @@
   h1{font-family:'Space Grotesk';color:var(--navy);font-size:25px;margin:2px 0 2px}
   .sub{color:#5A6472;font-size:14px;margin:0 0 4px}
   .note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:10px;padding:12px 14px;margin:16px 0;font-size:14px}
+  .callout{background:#fdf6df;border:1.5px solid #F5C518;border-radius:10px;padding:12px 14px;margin:16px 0;font-size:13.5px;line-height:1.5}
+  .callout .lead{font-family:'Space Grotesk';font-weight:700;color:var(--navy);display:block;margin-bottom:2px}
   label.fld{display:block;font-family:'Space Grotesk';font-weight:600;color:var(--navy);margin:18px 0 6px;font-size:15px}
   input[type=text], textarea{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;resize:vertical}
   input[type=text]:focus, textarea:focus{outline:none;border-color:var(--orange)}
@@ -54,6 +56,8 @@
         <p class="sub">STEM4U Robotics · FTC 2026–27</p>
       </div>
     </div>
+    <div class="callout"><span class="lead">Just so you know 👍</span>This tells your coach what you're <b>most interested in</b> — it's <b>not a guarantee</b> of a specific role or team. Coaches build balanced teams so everyone gets to try a bit of everything.</div>
+
     <div class="note"><b>No wrong answers.</b> Every skill is taught this season. <b>Drag</b> to put what excites you <b>most at the top</b>, least at the bottom.</div>
 
     <form id="skillForm" action="/api/skills" method="POST">
@@ -68,8 +72,6 @@
       <textarea name="extra" id="extra" rows="3" maxlength="600" placeholder="Your skills, other activities, clubs, sports — and how busy a typical week is. Helps your coach get to know you."></textarea>
 
       <input type="text" name="_gotcha" id="gotcha" style="display:none" tabindex="-1" autocomplete="off"/>
-
-      <p class="hint" style="margin:16px 0 0">This just tells your coach what you're most interested in — it's <b>not a guarantee</b> of a specific role or team. Coaches build balanced teams so everyone gets to try a bit of everything.</p>
 
       <div class="err" id="err"></div>
       <button type="submit" class="send" id="btn">Send my ranking →</button>
