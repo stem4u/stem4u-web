@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
   const who = cap(data.who, 80).trim();
   let skills = Array.isArray(data.skills) ? data.skills : (data.skills ? [data.skills] : []);
   skills = skills.map((s) => cap(s, 60).trim()).filter(Boolean).slice(0, 8);   // ranked order preserved
-  const extra = cap(data.extra, 200).trim();
+  const extra = cap(data.extra, 600).trim();
 
   if (!who || skills.length === 0) {
     res.status(400).json({ ok: false, error: 'Name and at least one skill are required.' });
@@ -56,28 +56,55 @@ module.exports = async (req, res) => {
       <p><b>Student:</b> ${escapeHtml(who)}</p>
       <p style="margin:0 0 4px"><b>Ranked (most &rarr; least interested):</b></p>
       <table style="border-collapse:collapse;font-size:14px">${ranked}</table>
-      ${extra ? `<p style="margin-top:10px"><b>Also excited to try:</b> ${escapeHtml(extra)}</p>` : ''}
+      ${extra ? `<p style="margin-top:10px"><b>About the student:</b><br>${escapeHtml(extra).replace(/\n/g, '<br>')}</p>` : ''}
       <p style="color:#5A6472;font-size:12px;margin-top:14px">STEM4U · FTC 2026&ndash;27 skills survey</p>
     </div>`;
 
-  try {
-    if (!process.env.RESEND_API_KEY) {
-      res.status(500).json({ ok: false, error: 'Email not configured' });
-      return;
-    }
-    const r = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
-        to: (process.env.LEAD_TO || 'contact@stem4u.com').split(',').map((s) => s.trim()),
-        subject,
-        html,
-      }),
-    });
-    if (!r.ok) { res.status(502).json({ ok: false, error: 'Email failed' }); return; }
-    res.status(200).json({ ok: true });
-  } catch (e) {
-    res.status(500).json({ ok: false, error: 'Send failed' });
+  const results = {};
+
+  // 1) Persist to Supabase (primary — powers the skills dashboard)
+  const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (process.env.SUPABASE_URL && SUPA_KEY) {
+    try {
+      const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/ftc_skills`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPA_KEY,
+          Authorization: `Bearer ${SUPA_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({ student_name: who, ranking: skills, extra: extra || null }),
+      });
+      results.db = rdb.ok ? 'inserted' : `error ${rdb.status}`;
+    } catch (e) { results.db = 'error'; }
+  } else {
+    results.db = 'skipped (no SUPABASE env)';
+  }
+
+  // 2) Email the team (nice-to-have notification)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
+          to: (process.env.LEAD_TO || 'contact@stem4u.com').split(',').map((s) => s.trim()),
+          subject,
+          html,
+        }),
+      });
+      results.email = r.ok ? 'sent' : `error ${r.status}`;
+    } catch (e) { results.email = 'error'; }
+  } else {
+    results.email = 'skipped (no RESEND_API_KEY)';
+  }
+
+  // Success if the ranking was captured somewhere.
+  if (results.db === 'inserted' || results.email === 'sent') {
+    res.status(200).json({ ok: true, results });
+  } else {
+    res.status(502).json({ ok: false, error: 'Could not save your ranking. Please try again.', results });
   }
 };
