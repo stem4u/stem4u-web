@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>STEM4U — Season Resources</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTMiIGZpbGw9IiMxQjJBNEEiLz48dGV4dCB4PSIzMiIgeT0iNDMiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZm9udC13ZWlnaHQ9IjgwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRzcGFuIGZpbGw9IiNGMkYwRUIiPlM8L3RzcGFuPjx0c3BhbiBmaWxsPSIjRTg2NTFBIj40PC90c3Bhbj48dHNwYW4gZmlsbD0iI0YyRjBFQiI+VTwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{--navy:#1B2A4A;--orange:#E8651A;--yellow:#F5C518;--chalk:#F2F0EB;--ink:#2E2E2E;--line:#d7dce4;--gray:#5A6472}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--chalk);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:22px 18px 70px}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap}
+  .badge{width:44px;height:44px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#fff;font-size:15px}
+  .badge b{color:var(--orange)}
+  h1{font-family:'Space Grotesk';color:var(--navy);font-size:24px;margin:0}
+  .sub{color:var(--gray);font-size:13px;margin:0}
+  .search{position:sticky;top:0;background:var(--chalk);padding:14px 0 10px;z-index:5}
+  #q{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;background:#fff}
+  #q:focus{outline:none;border-color:var(--orange)}
+  .count{font-size:12px;color:var(--gray);margin-top:6px}
+  h2{font-family:'Space Grotesk';color:var(--navy);font-size:16px;margin:22px 0 4px;display:flex;align-items:center;gap:8px}
+  h2 .tag{font-size:11px;font-weight:600;color:#fff;background:#2E74B5;border-radius:999px;padding:2px 9px}
+  h2 .tag.off{background:#8a5a00}.tag.ftc{background:#1a7f57}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  a.res{display:block;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;text-decoration:none;color:inherit;transition:.12s}
+  a.res:hover{border-color:var(--orange);box-shadow:0 2px 8px rgba(0,0,0,.05);transform:translateY(-1px)}
+  a.res .t{font-family:'Space Grotesk';font-weight:700;color:var(--navy);font-size:14px}
+  a.res .d{font-size:12px;color:var(--gray);margin-top:2px}
+  a.res .u{font-size:10.5px;color:#9aa4b4;margin-top:3px;word-break:break-all}
+  .star{color:var(--orange)}
+  .empty{display:none;text-align:center;color:var(--gray);padding:40px;font-size:14px}
+  .foot{margin-top:30px;color:#8a94a6;font-size:11.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="badge">S<b>4</b>U</div>
+    <div><h1>STEM4U Season Resources</h1><p class="sub">FLL BIOGLOW &amp; FTC 2026&ndash;27 · type to filter · click to open</p></div>
+  </div>
+
+  <div class="search">
+    <input id="q" placeholder="Search… (e.g. missions video, rulebook, scoresheet, rubrics, register)" autofocus/>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div id="list"></div>
+  <div class="empty" id="empty">No matches — try a different word.</div>
+  <div class="foot">STEM4U · Real tools. Real teams. Real engineers.</div>
+</div>
+
+<script>
+  // [section, tag, title, desc, url]  (★ = most-used)
+  var R=[
+    ["FLL BIOGLOW — this season","fll","★ Robot Game Missions Video (Founders Ed.)","The one everyone asks for","https://www.youtube.com/watch?v=uhZZ8O1StiQ"],
+    ["FLL BIOGLOW — this season","fll","★ Robot Game Rulebook (RGR)","Missions, rules, scoring","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-rgr.pdf"],
+    ["FLL BIOGLOW — this season","fll","Challenge Updates & Clarifications","Supersedes the rulebook — check before events","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-updates.pdf"],
+    ["FLL BIOGLOW — this season","fll","Robot Game Scoresheet","Official scoresheet","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-software-scoresheet.pdf"],
+    ["FLL BIOGLOW — this season","fll","Score Calculator (online)","EventHub scoring tool","https://eventhub.firstinspires.org/scoresheet"],
+    ["FLL BIOGLOW — this season","fll","Rubrics (color)","Innovation / Robot Design / Core Values","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-rubrics-color.pdf"],
+    ["FLL BIOGLOW — this season","fll","Judging Session Flowchart","How judging runs","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-judging-session-flowchart.pdf"],
+    ["FLL BIOGLOW — this season","fll","Engineering Notebook","Official season notebook","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-en.pdf"],
+    ["FLL BIOGLOW — this season","fll","Team Meeting Guide","Session-by-session guide","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-tmg.pdf"],
+    ["FLL BIOGLOW — this season","fll","Participation Rules","Global standards","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-participation-rules.pdf"],
+    ["FLL BIOGLOW — this season","fll","Awards (challenge)","Award list","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-awards.pdf"],
+    ["FLL BIOGLOW — this season","fll","LEGO Education season materials","Building instructions, app, videos","https://education.lego.com/en-us/first-lego-league/season-materials/"],
+    ["FLL BIOGLOW — this season","fll","FIRST season resources","Season resources library","https://www.firstinspires.org/resources/library/fll/season-materials"],
+
+    ["VA-DC (tournament)","off","VA-DC Event Resources","Guidelines, judging, awards","https://va-dcfll.org/fll-c/event-resources/"],
+    ["VA-DC (tournament)","off","Register with VA-DC FLL","Team registration","https://va-dcfll.org/fll-c/event-resources/registration/"],
+    ["VA-DC (tournament)","off","Tournament schedule","Qualifier dates","https://va-dcfll.org/fll-c/event-resources/registration/#qt-schedule"],
+    ["VA-DC (tournament)","off","VA-DC Awards & Advancement","Award allocation","https://va-dcfll.org/app/uploads/2024/10/VADCFLL-Challenge-Awards.pdf"],
+    ["VA-DC (tournament)","off","Preparing for your Event (video)","Event prep","https://youtu.be/9TMFtLKYT6o"],
+
+    ["FTC — this season","ftc","FIRST Tech Challenge — game & season","Official FTC season page","https://www.firstinspires.org/robotics/ftc/game-and-season"],
+    ["FTC — this season","ftc","Youth registration (FIRST)","Consent & release","https://www.firstinspires.org/programs/youth-registration"]
+  ];
+
+  var list=document.getElementById('list'), q=document.getElementById('q'),
+      countEl=document.getElementById('count'), empty=document.getElementById('empty');
+  var TAGLABEL={fll:'FLL',ftc:'FTC',off:'OFFICIAL'};
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function render(filter){
+    filter=(filter||'').toLowerCase().trim();
+    var bySec={}, order=[];
+    R.forEach(function(r){
+      var hay=(r[2]+' '+r[3]+' '+r[0]+' '+r[4]).toLowerCase();
+      if(filter && hay.indexOf(filter)<0) return;
+      if(!bySec[r[0]]){bySec[r[0]]=[];order.push(r[0]);}
+      bySec[r[0]].push(r);
+    });
+    var html='', shown=0;
+    order.forEach(function(sec){
+      var tag=bySec[sec][0][1];
+      html+='<h2>'+esc(sec)+' <span class="tag '+tag+'">'+TAGLABEL[tag]+'</span></h2><div class="grid">';
+      bySec[sec].forEach(function(r){
+        shown++;
+        var title=r[2].replace('★','<span class="star">★</span>');
+        html+='<a class="res" href="'+esc(r[4])+'" target="_blank" rel="noopener">'
+          +'<div class="t">'+title+'</div><div class="d">'+esc(r[3])+'</div>'
+          +'<div class="u">'+esc(r[4])+'</div></a>';
+      });
+      html+='</div>';
+    });
+    list.innerHTML=html;
+    empty.style.display=shown?'none':'block';
+    countEl.textContent=shown+' of '+R.length+' resources'+(filter?' matching "'+esc(filter)+'"':'');
+  }
+  q.addEventListener('input',function(){render(q.value);});
+  render('');
+</script>
+</body>
+</html>
