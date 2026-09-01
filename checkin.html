@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>STEM4U — Check In</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTMiIGZpbGw9IiMxQjJBNEEiLz48dGV4dCB4PSIzMiIgeT0iNDMiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZm9udC13ZWlnaHQ9IjgwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRzcGFuIGZpbGw9IiNGMkYwRUIiPlM8L3RzcGFuPjx0c3BhbiBmaWxsPSIjRTg2NTFBIj40PC90c3Bhbj48dHNwYW4gZmlsbD0iI0YyRjBFQiI+VTwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{--navy:#1B2A4A;--orange:#E8651A;--chalk:#F2F0EB;--ink:#2E2E2E;--line:#d7dce4;--green:#1a7f57}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--chalk);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.4}
+  .wrap{max-width:640px;margin:0 auto;padding:22px 16px 60px}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .badge{width:48px;height:48px;border-radius:13px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#fff;font-size:16px}
+  .badge b{color:var(--orange)}
+  h1{font-family:'Space Grotesk';color:var(--navy);font-size:27px;margin:2px 0}
+  .sub{color:#5A6472;font-size:14px;margin:0}
+  .teamname{font-family:'Space Grotesk';font-weight:700;color:var(--orange);font-size:17px;margin:10px 0 2px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  @media(max-width:460px){.grid{grid-template-columns:1fr}}
+  .nbtn{background:#fff;border:2px solid var(--line);border-radius:16px;padding:20px 14px;font-family:'Space Grotesk';font-weight:700;font-size:19px;color:var(--navy);cursor:pointer;text-align:center;transition:.1s}
+  .nbtn:hover{border-color:var(--orange)} .nbtn:active{transform:scale(.98);background:#fff7f2}
+  .nbtn.done{background:#e9f6ef;border-color:var(--green);color:var(--green)}
+  .tbtn{display:block;width:100%;background:var(--navy);color:#fff;border:none;border-radius:14px;padding:18px;font-family:'Space Grotesk';font-weight:700;font-size:18px;margin-bottom:10px;cursor:pointer;text-decoration:none;text-align:center}
+  .tbtn:active{filter:brightness(1.1)}
+  .done{display:none;text-align:center;padding:50px 12px}
+  .done .big{font-size:70px}
+  .done h2{font-family:'Space Grotesk';color:var(--green);font-size:30px;margin:8px 0 6px}
+  .done .who{font-family:'Space Grotesk';color:var(--navy);font-size:22px}
+  .again{margin-top:26px;display:inline-block;background:var(--orange);color:#fff;border:none;border-radius:12px;padding:14px 22px;font-family:'Space Grotesk';font-weight:700;font-size:16px;cursor:pointer;text-decoration:none}
+  .msg{color:#5A6472;font-size:14px;margin-top:14px}
+  .err{color:#b02a2a}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="locked" style="display:none">
+    <div class="head"><div class="badge">S<b>4</b>U</div><div><h1>Check In</h1><p class="sub">Ask your coach</p></div></div>
+    <div class="msg" id="lmsg" style="margin-top:18px;font-size:16px">📷 Scan your team's <b>check-in QR code</b> to sign in for today.</div>
+  </div>
+
+  <div id="roster" style="display:none">
+    <div class="head"><div class="badge">S<b>4</b>U</div><div><h1>Tap your name</h1><p class="sub">Checking in for today</p></div></div>
+    <div class="teamname" id="rteam"></div>
+    <div class="grid" id="names"></div>
+    <div class="msg" id="rmsg"></div>
+  </div>
+
+  <div class="done" id="done">
+    <div class="big">✅</div>
+    <h2>You're checked in!</h2>
+    <div class="who" id="dwho"></div>
+    <a class="again" href="#" onclick="location.reload();return false">Check in someone else</a>
+  </div>
+</div>
+
+<script>
+  var TEAMS=["OtterBots","BadgerBots","WolfBots","TurtleBricks","OrcaBricks"];
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function qs(k){return new URLSearchParams(location.search).get(k);}
+  var team=qs('team'), code=qs('k');
+
+  function showLocked(msg){
+    if(msg) document.getElementById('lmsg').innerHTML=msg;
+    document.getElementById('locked').style.display='block';
+  }
+  async function showRoster(){
+    document.getElementById('roster').style.display='block';
+    document.getElementById('rteam').textContent=team;
+    var box=document.getElementById('names'); box.innerHTML='<div class="msg">Loading…</div>';
+    try{
+      var r=await fetch('/api/checkin?team='+encodeURIComponent(team)+'&k='+encodeURIComponent(code));
+      if(r.status===403){ document.getElementById('roster').style.display='none'; showLocked('⚠️ This check-in link isn\'t valid. Ask your coach for the current QR code.'); return; }
+      var d=await r.json();
+      if(!r.ok||!d.roster||!d.roster.length){ box.innerHTML='<div class="msg">No kids found for this team yet.</div>'; return; }
+      box.innerHTML=d.roster.map(function(k){return '<button class="nbtn" data-id="'+esc(k.id)+'" data-name="'+esc(k.name)+'" onclick="checkin(this)">'+esc(k.name)+'</button>';}).join('');
+    }catch(e){ box.innerHTML='<div class="msg err">Could not load names. Try again.</div>'; }
+  }
+  async function checkin(btn){
+    if(btn.classList.contains('done')) return;
+    var id=btn.getAttribute('data-id'), name=btn.getAttribute('data-name');
+    btn.textContent='…';
+    try{
+      var r=await fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({team:team,lead_id:id,name:name,k:code})});
+      if(!r.ok) throw new Error();
+      document.getElementById('roster').style.display='none';
+      document.getElementById('dwho').textContent=name;
+      document.getElementById('done').style.display='block';
+      window.scrollTo(0,0);
+    }catch(e){ btn.textContent=name; document.getElementById('rmsg').innerHTML='<span class="err">That didn\'t save — tap again.</span>'; }
+  }
+
+  if(team && code && TEAMS.indexOf(team)>=0) showRoster(); else showLocked();
+</script>
+</body>
+</html>
