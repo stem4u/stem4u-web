@@ -56,27 +56,67 @@
 
 <script>
   // [section, tag, title, desc, url]  (★ = most-used)
+  var BI='https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/';
   var R=[
-    ["FLL BIOGLOW — this season","fll","★ Robot Game Missions Video (Founders Ed.)","The one everyone asks for","https://www.youtube.com/watch?v=uhZZ8O1StiQ"],
-    ["FLL BIOGLOW — this season","fll","★ Robot Game Rulebook (RGR)","Missions, rules, scoring","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-rgr.pdf"],
-    ["FLL BIOGLOW — this season","fll","Challenge Updates & Clarifications","Supersedes the rulebook — check before events","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-updates.pdf"],
-    ["FLL BIOGLOW — this season","fll","Robot Game Scoresheet","Official scoresheet","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-software-scoresheet.pdf"],
-    ["FLL BIOGLOW — this season","fll","Score Calculator (online)","EventHub scoring tool","https://eventhub.firstinspires.org/scoresheet"],
-    ["FLL BIOGLOW — this season","fll","Rubrics (color)","Innovation / Robot Design / Core Values","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-rubrics-color.pdf"],
-    ["FLL BIOGLOW — this season","fll","Judging Session Flowchart","How judging runs","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-judging-session-flowchart.pdf"],
-    ["FLL BIOGLOW — this season","fll","Engineering Notebook","Official season notebook","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-en.pdf"],
-    ["FLL BIOGLOW — this season","fll","Team Meeting Guide","Session-by-session guide","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-tmg.pdf"],
-    ["FLL BIOGLOW — this season","fll","Participation Rules","Global standards","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-participation-rules.pdf"],
-    ["FLL BIOGLOW — this season","fll","Awards (challenge)","Award list","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-awards.pdf"],
-    ["FLL BIOGLOW — this season","fll","LEGO Education season materials","Building instructions, app, videos","https://education.lego.com/en-us/first-lego-league/season-materials/"],
-    ["FLL BIOGLOW — this season","fll","FIRST season resources","Season resources library","https://www.firstinspires.org/resources/library/fll/season-materials"],
+    // ---- Robot Game ----
+    ["FLL BIOGLOW · Robot Game","fll","★ Robot Game Missions Video (Founders Ed.)","The one everyone asks for","https://www.youtube.com/watch?v=uhZZ8O1StiQ"],
+    ["FLL BIOGLOW · Robot Game","fll","★ Robot Game Rulebook (RGR)","Missions, rules, scoring","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-rgr.pdf"],
+    ["FLL BIOGLOW · Robot Game","fll","Challenge Updates & Clarifications","Supersedes the rulebook — check before events","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-updates.pdf"],
+    ["FLL BIOGLOW · Robot Game","fll","Season Overview","Quick 1-pager of the season","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-season-overview.pdf"],
+    ["FLL BIOGLOW · Robot Game","fll","Mission Map (image)","One-glance field map","https://va-dcfll.org/app/uploads/2026/08/Bioglow-Mission-Map.png"],
+    ["FLL BIOGLOW · Robot Game","fll","Robot Game Scoresheet","Official scoresheet","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-software-scoresheet.pdf"],
+    ["FLL BIOGLOW · Robot Game","fll","Score Calculator (online)","EventHub scoring tool","https://eventhub.firstinspires.org/scoresheet"],
+    ["FLL BIOGLOW · Robot Game","fll","Field Setup — Reference Guide","How to lay out the field","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-field-setup-reference-guide.pdf"],
+    ["FLL BIOGLOW · Robot Game","fll","Field Setup — Video","Watch the setup","https://youtu.be/wDan0826cn0"],
 
+    // ---- Build the Mission Models (per mission, no click-through) ----
+    ["FLL BIOGLOW · Build the Mission Models","fll","★ How to build + Prepack Overview","Sort bags by number, then use each mission below","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-bi-nonverbal-prepack.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M1 · Drone Survey — Bags 1/2","Building instructions (book 01)",BI+"fll-challenge-bioglow-bi-enus-book-01.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M2 · Exploding Seeds — Bag 3","Building instructions (book 02)",BI+"fll-challenge-bioglow-bi-enus-book-02.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M3 · Flip the Rock — Bags 4/5","Building instructions (book 03)",BI+"fll-challenge-bioglow-bi-enus-book-03.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M4 · Lucky Leaves — Bag 6","Building instructions (book 04)",BI+"fll-challenge-bioglow-bi-enus-book-04.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M5 · Reaching Roots — Bag 7","Building instructions (book 05)",BI+"fll-challenge-bioglow-bi-enus-book-05.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M6 & M7 · Leafcutter Frenzy + Humongous Fungus — Bags 8/9/10","Building instructions (book 06)",BI+"fll-challenge-bioglow-bi-enus-book-06.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M8 & M9 · Tangled + Research Platform — Bags 11–15","Building instructions (book 07)",BI+"fll-challenge-bioglow-bi-enus-book-07.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M10 · Fragile Microhabitats — Bag 16","Building instructions (book 08)",BI+"fll-challenge-bioglow-bi-enus-book-08.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M11 · Window to the Past — Bag 17","Building instructions (book 09)",BI+"fll-challenge-bioglow-bi-enus-book-09.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M12 · Forest Elder — Bag 18","Building instructions (book 10)",BI+"fll-challenge-bioglow-bi-enus-book-10.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M13 · Keystone Species — Bag 19","Building instructions (book 11)",BI+"fll-challenge-bioglow-bi-enus-book-11.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M14 · Seeds of Renewal — Bag 21","Building instructions (book 12)",BI+"fll-challenge-bioglow-bi-enus-book-12.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","M15 · Biocentric Architecture — Bags 22–24","Building instructions (book 13)",BI+"fll-challenge-bioglow-bi-enus-book-13.pdf"],
+    ["FLL BIOGLOW · Build the Mission Models","fll","Element Overview (missing parts)","Identify + order replacement LEGO parts",BI+"fll-challenge-bioglow-bi-nonverbal-eop.pdf"],
+
+    // ---- Robot Design & Coding ----
+    ["FLL BIOGLOW · Robot Design & Coding","fll","Wireframe Grid","Plan attachments to scale",BI+"fll-challenge-bioglow-wireframe-grid.pdf"],
+    ["FLL BIOGLOW · Robot Design & Coding","fll","Guided Mission Code (M11)","Starter SPIKE program (.llsp3)",BI+"guided-mission-bioglow-11.llsp3"],
+    ["FLL BIOGLOW · Robot Design & Coding","fll","LEGO SPIKE coding platform","spike.legoeducation.com","https://spike.legoeducation.com/"],
+    ["FLL BIOGLOW · Robot Design & Coding","fll","SPIKE app download","Units → Competition Ready","https://education.lego.com/en-us/downloads/spike-app/software/"],
+    ["FLL BIOGLOW · Robot Design & Coding","fll","Robot Design Rubric","What judges look for","https://va-dcfll.org/app/uploads/2024/08/Robot-Design-Rubric-2024.pdf"],
+
+    // ---- Innovation Project ----
+    ["FLL BIOGLOW · Innovation Project","fll","BIOGLOW Project Prompt","The project brief","https://va-dcfll.org/app/uploads/2026/08/fll-c-bioglow-project-prompt.pdf"],
+    ["FLL BIOGLOW · Innovation Project","fll","Challenge Story","Season narrative","https://va-dcfll.org/app/uploads/2026/08/fll-c-bioglow-challenge-story.pdf"],
+    ["FLL BIOGLOW · Innovation Project","fll","Project Sparks","Idea starters","https://va-dcfll.org/app/uploads/2026/08/fll-c-bioglow-project-sparks.pdf"],
+    ["FLL BIOGLOW · Innovation Project","fll","Innovation Project Rubric","What judges look for","https://va-dcfll.org/app/uploads/2024/08/Innovation-Project-Rubric-2024.pdf"],
+
+    // ---- Team & Judging ----
+    ["FLL BIOGLOW · Team & Judging","fll","Team Meeting Guide","Session-by-session guide","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-tmg.pdf"],
+    ["FLL BIOGLOW · Team & Judging","fll","Engineering Notebook","Official season notebook","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-en.pdf"],
+    ["FLL BIOGLOW · Team & Judging","fll","Judging Session Flowchart","How judging runs","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-judging-session-flowchart.pdf"],
+    ["FLL BIOGLOW · Team & Judging","fll","Participation Rules","Global standards","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-participation-rules.pdf"],
+    ["FLL BIOGLOW · Team & Judging","fll","Multimedia Resources","Videos & extras","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-multimedia-resources.pdf"],
+    ["FLL BIOGLOW · Team & Judging","fll","LEGO Education season materials","Building instructions, app, videos","https://education.lego.com/en-us/first-lego-league/season-materials/"],
+
+    // ---- VA-DC tournament ----
+    ["VA-DC (tournament)","off","VA-DC Season Resources","The full VA-DC resource list","https://va-dcfll.org/fll-c/season-resources/"],
     ["VA-DC (tournament)","off","VA-DC Event Resources","Guidelines, judging, awards","https://va-dcfll.org/fll-c/event-resources/"],
     ["VA-DC (tournament)","off","Register with VA-DC FLL","Team registration","https://va-dcfll.org/fll-c/event-resources/registration/"],
     ["VA-DC (tournament)","off","Tournament schedule","Qualifier dates","https://va-dcfll.org/fll-c/event-resources/registration/#qt-schedule"],
     ["VA-DC (tournament)","off","VA-DC Awards & Advancement","Award allocation","https://va-dcfll.org/app/uploads/2024/10/VADCFLL-Challenge-Awards.pdf"],
     ["VA-DC (tournament)","off","Preparing for your Event (video)","Event prep","https://youtu.be/9TMFtLKYT6o"],
+    ["VA-DC (tournament)","off","Coaches Chats","Bi-weekly Q&A + recordings","https://va-dcfll.org/fll-c/season-resources/"],
 
+    // ---- FTC ----
     ["FTC — this season","ftc","FIRST Tech Challenge — game & season","Official FTC season page","https://www.firstinspires.org/robotics/ftc/game-and-season"],
     ["FTC — this season","ftc","Youth registration (FIRST)","Consent & release","https://www.firstinspires.org/programs/youth-registration"]
   ];
