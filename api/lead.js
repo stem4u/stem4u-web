@@ -63,7 +63,7 @@ function spamScore(d) {
   const msg = d.message || '';
   const hay = `${name} ${msg}`.toLowerCase();
   const linkRe = /(https?:\/\/|www\.|t\.me\/|wa\.me\/|\btelegram\b|\bwhatsapp\b|\bbit\.ly\b|\bskype\b)/i;
-  const pitchRe = /(free demo|back ?link|\bseo\b|search engine|website (owners|traffic)|contact pages?|rank(ing)? higher|boost your|marketing (platform|service)|grow your business|crypto|casino|\bloan\b|viagra|\bnft\b|investment opportunity)/i;
+  const pitchRe = /(free demo|back ?link|\bseo\b|search engine|website (owners|traffic)|contact pages?|rank(ing)? higher|boost your|marketing (platform|service)|grow your business|crypto|casino|\bloan\b|viagra|\bnft\b|investment opportunity|add me (for|to)|product news|news about product|for news about)/i;
   const cyrillic = /[Ѐ-ӿ]/;
   let s = 0;
   if (linkRe.test(name)) s += 3;               // link in a name field = definitely a bot
@@ -72,12 +72,28 @@ function spamScore(d) {
   if (cyrillic.test(hay)) s += 2;              // non-Latin script
   if (/\+?\d[\d\s().-]{9,}/.test(msg)) s += 1; // a phone number buried in the message
   if (gibberishHits(msg) >= 2) s += 3;         // keyboard-mash message (e.g. "fkmdkdwdwkdwjj")
+  // Single spaceless mash token, e.g. "StdfINUISdmIIidWQLmbUL" — a real sentence has spaces & vowels.
+  const m1 = msg.trim();
+  if (m1.length >= 10 && !/\s/.test(m1) && /^[a-z]+$/i.test(m1) && (m1.match(/[aeiou]/gi) || []).length / m1.length < 0.34) s += 3;
   if (gibberishHits(name) >= 1) s += 3;        // gibberish in a name field
   if (/\bstem4u\b/i.test(msg)) s += 2;         // echoing our own domain back = scraper/bot tell
   if (/contact/i.test(d.type) && !d.phone && !d.grade && !d.child_first_name && linkRe.test(msg)) s += 2;
   return s;
 }
 const looksSpammy = (d) => spamScore(d) >= 3;
+
+async function verifyTurnstile(token, ip) {
+  if (!token) return false;
+  try {
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret: process.env.TURNSTILE_SECRET, response: token, remoteip: ip || '' }),
+    });
+    const d = await r.json();
+    return !!(d && d.success);
+  } catch { return false; }
+}
 
 module.exports = async (req, res) => {
   // CORS: only our own origin (blocks cross-site browser abuse; scripted abuse is caught by rate limit)
@@ -100,6 +116,16 @@ module.exports = async (req, res) => {
 
     // Honeypot: if the hidden field is filled, it's a bot. Pretend success, do nothing.
     if (b._gotcha) { res.status(200).json({ ok: true, bot: true }); return; }
+
+    // Cloudflare Turnstile (CAPTCHA). Only enforced once TURNSTILE_SECRET is set,
+    // so the form keeps working before you finish configuring it.
+    if (process.env.TURNSTILE_SECRET) {
+      const token = b['cf-turnstile-response'] || b.turnstile || '';
+      if (!(await verifyTurnstile(token, clientIp(req)))) {
+        res.status(403).json({ ok: false, error: 'Verification failed — please try the form again.' });
+        return;
+      }
+    }
 
     // Normalize + cap lengths (prevents oversized-payload / injection abuse)
     const arr = (v) => (Array.isArray(v) ? v.slice(0, 12).map((x) => cap(x, 60)).join(', ') : cap(v, 200));
