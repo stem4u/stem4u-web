@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Enrollment Consent & Agreement | STEM4U</title>
+<meta name="description" content="STEM4U enrollment agreement — review and sign the waivers, consents, and emergency information for your child in one short form."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --navy:#0D2B7A; --blue:#1A5CD8; --orange:#FF5500; --orange-lt:#FF7733;
+    --light:#F4F7FF; --white:#FFFFFF; --text:#0A1E52; --muted:#4A5A80; --card:#FFFFFF; --line:#D0D8EE;
+  }
+  html{scroll-behavior:smooth;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--light);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+  .site-nav{position:sticky;top:0;z-index:50;background:var(--navy);display:flex;align-items:center;gap:26px;padding:10px 30px;border-bottom:3px solid var(--orange);}
+  .site-nav .nav-logo{display:flex;}
+  .site-nav .nav-links{display:flex;align-items:center;gap:24px;margin-left:auto;}
+  .site-nav a.nav-link{color:rgba(255,255,255,.8);font-size:14px;font-weight:600;text-decoration:none;}
+  .site-nav a.nav-link:hover{color:#fff;}
+  @media(max-width:720px){.site-nav .nav-links{display:none;}}
+
+  .page-hero{background:var(--navy);color:#fff;padding:40px 24px 30px;text-align:center;position:relative;}
+  .page-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--orange);}
+  .page-hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;}
+  .page-hero p{font-size:16px;color:rgba(255,255,255,.82);max-width:620px;margin:10px auto 0;line-height:1.6;}
+
+  .wrap{max-width:760px;margin:0 auto;padding:30px 20px 60px;width:100%;}
+  .intro{background:#EEF3FF;border:1px solid #cdd9f7;border-left:4px solid var(--blue);border-radius:10px;padding:16px 18px;font-size:14.5px;line-height:1.6;color:var(--navy);margin-bottom:26px;}
+  .intro a{color:var(--blue);font-weight:700;}
+
+  .sec{background:var(--card);border-radius:12px;padding:22px 22px 20px;box-shadow:0 2px 16px rgba(13,43,122,.07);border-top:4px solid var(--orange);margin-bottom:20px;}
+  .sec:nth-child(even){border-top-color:var(--blue);}
+  .sec h2{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+  .sec .hint{font-size:12.5px;color:var(--muted);margin-bottom:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .fg{margin-bottom:14px;}
+  .fg.full{grid-column:1/-1;}
+  label.lbl{display:block;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .req{color:var(--orange);}
+  input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea{
+    width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:7px;font-size:14px;font-family:inherit;color:var(--text);background:var(--light);outline:none;transition:border-color .15s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;}
+  textarea{resize:vertical;min-height:60px;}
+
+  .check{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--light);margin-bottom:10px;cursor:pointer;}
+  .check input{margin-top:3px;width:17px;height:17px;flex-shrink:0;accent-color:var(--orange);}
+  .check span{font-size:13.5px;line-height:1.5;color:var(--text);}
+  .check a{color:var(--blue);font-weight:700;}
+  .choice{display:flex;flex-direction:column;gap:9px;}
+  .choice label{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;background:var(--light);}
+  .choice input{margin-top:2px;accent-color:var(--orange);}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+
+  .sign-name{font-family:"Brush Script MT","Segoe Script",cursive;font-size:22px !important;color:var(--navy);}
+  .legal{font-size:12px;color:var(--muted);line-height:1.55;margin:6px 0 14px;}
+
+  .submit-btn{width:100%;padding:15px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.02em;transition:background .15s;}
+  .submit-btn:hover{background:var(--orange-lt);}
+  .submit-btn:disabled{opacity:.6;cursor:default;}
+  .form-err{display:none;background:#FDEBEB;border:1.5px solid #E58A8A;color:#8A1F1F;border-radius:8px;padding:12px 14px;font-size:14px;margin-bottom:14px;}
+  .done{display:none;background:#EAF7EF;border:1.5px solid #6FBF8F;border-radius:12px;padding:34px 24px;text-align:center;color:var(--navy);}
+  .done .big{font-size:56px;}
+  .done h2{font-size:24px;margin:6px 0 8px;color:#1a7f57;}
+  .done p{font-size:15px;color:var(--text);max-width:460px;margin:0 auto;line-height:1.6;}
+  .done a{display:inline-block;margin-top:20px;background:var(--orange);color:#fff;text-decoration:none;font-weight:800;padding:12px 26px;border-radius:8px;}
+
+  footer{background:#070F2B;color:rgba(255,255,255,.5);text-align:center;padding:26px 24px;font-size:13px;margin-top:auto;}
+  footer a{color:var(--orange);text-decoration:none;margin:0 8px;}
+</style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:50px;width:auto;display:block;border-radius:50%;"/></a>
+  <div class="nav-links">
+    <a href="programs.html" class="nav-link">Programs</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <h1>Enrollment Consent &amp; Agreement</h1>
+  <p>One short form to review and sign — the agreements, consents, and emergency info STEM4U needs for your child. No account needed.</p>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    This single form covers everything. The full policy documents are linked next to each item if you'd like to read them —
+    <a href="policies/master-enrollment-agreement.pdf" target="_blank" rel="noopener">view all policies</a>.
+    By signing, you agree to them together, as allowed under Virginia's electronic-signature law.
+  </div>
+
+  <div class="form-err" id="formErr"></div>
+
+  <form id="consentForm" autocomplete="on">
+    <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+
+    <!-- A. Child + parent -->
+    <div class="sec">
+      <h2>1 · Child &amp; parent</h2>
+      <div class="grid2">
+        <div class="fg"><label class="lbl">Child's full name <span class="req">*</span></label><input type="text" name="child_name" required/></div>
+        <div class="fg"><label class="lbl">Child's date of birth</label><input type="text" name="child_dob" placeholder="MM/DD/YYYY"/></div>
+        <div class="fg full">
+          <label class="lbl">Program(s) enrolling in</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13.5px;">
+            <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="programs" value="FLL"/> FLL</label>
+            <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="programs" value="FTC"/> FTC</label>
+            <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="programs" value="Robotics"/> Robotics</label>
+            <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="programs" value="Python"/> Python</label>
+            <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="programs" value="Drone"/> Drone</label>
+          </div>
+        </div>
+        <div class="fg"><label class="lbl">Parent / Guardian name <span class="req">*</span></label><input type="text" name="parent_name" required/></div>
+        <div class="fg"><label class="lbl">Email <span class="req">*</span></label><input type="email" name="parent_email" required/></div>
+        <div class="fg"><label class="lbl">Phone</label><input type="tel" name="parent_phone"/></div>
+        <div class="fg"><label class="lbl">2nd contact — name</label><input type="text" name="contact2_name"/></div>
+        <div class="fg"><label class="lbl">2nd contact — phone</label><input type="tel" name="contact2_phone"/></div>
+      </div>
+    </div>
+
+    <!-- B. Agreements -->
+    <div class="sec">
+      <h2>2 · Agreements</h2>
+      <div class="hint">Tap a policy name to read the full text. Checking the box means you've read and agree.</div>
+      <label class="check">
+        <input type="checkbox" name="agree_policies" required/>
+        <span>I have read and agree to STEM4U's
+          <a href="policies/assumption-of-risk.pdf" target="_blank" rel="noopener">Assumption of Risk</a>,
+          <a href="policies/release-of-liability.pdf" target="_blank" rel="noopener">Release &amp; Waiver</a>,
+          <a href="policies/code-of-conduct.pdf" target="_blank" rel="noopener">Code of Conduct</a>,
+          <a href="policies/child-safety.pdf" target="_blank" rel="noopener">Child Safety Policy</a>, and
+          <a href="policies/authorized-pickup.pdf" target="_blank" rel="noopener">Pick-Up policy</a>. <span class="req">*</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="agree_medical" required/>
+        <span>I authorize STEM4U staff to give basic first aid and, in an emergency, to call 911 and obtain emergency treatment for my child (per the
+          <a href="policies/emergency-medical.pdf" target="_blank" rel="noopener">Emergency Medical Authorization</a>). <span class="req">*</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="agree_payment" required/>
+        <span>I authorize recurring monthly tuition billing to my payment method on file, per the
+          <a href="policies/payment-policies.pdf" target="_blank" rel="noopener">Payment Policies</a> (billed on the 1st; cancel by the 25th to stop the next month). <span class="req">*</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="agree_esign" required/>
+        <span>I consent to electronic records and signatures — a typed name here is my legal signature, under Virginia UETA / the federal E-SIGN Act
+          (<a href="policies/electronic-signatures.pdf" target="_blank" rel="noopener">details</a>). <span class="req">*</span></span>
+      </label>
+    </div>
+
+    <!-- C. Emergency medical -->
+    <div class="sec">
+      <h2>3 · Emergency &amp; medical info</h2>
+      <div class="hint">So we can respond quickly. Leave blank anything that doesn't apply.</div>
+      <div class="grid2">
+        <div class="fg full"><label class="lbl">Allergies (food, medication, environmental)</label><input type="text" name="allergies"/></div>
+        <div class="fg"><label class="lbl">Medical conditions (asthma, epilepsy, etc.)</label><input type="text" name="conditions"/></div>
+        <div class="fg"><label class="lbl">Current medications</label><input type="text" name="medications"/></div>
+        <div class="fg"><label class="lbl">Primary physician — name &amp; phone</label><input type="text" name="physician"/></div>
+        <div class="fg"><label class="lbl">Preferred hospital (optional)</label><input type="text" name="hospital"/></div>
+        <div class="fg full"><label class="lbl">Health insurance — provider &amp; policy # (optional)</label><input type="text" name="insurance"/></div>
+      </div>
+      <div style="margin-top:6px;padding-top:12px;border-top:1px dashed var(--line);">
+        <label class="lbl">Emergency medication (e.g. inhaler / EpiPen) — only if applicable</label>
+        <div class="grid2">
+          <div class="fg"><input type="text" name="emerg_med" placeholder="Medication name"/></div>
+          <div class="fg"><input type="text" name="emerg_med_use" placeholder="When / how to use (trigger, dose)"/></div>
+          <div class="fg full"><input type="text" name="emerg_med_where" placeholder="Where it's kept (e.g. in my child's bag)"/></div>
+        </div>
+        <label class="check"><input type="checkbox" name="emerg_self_carry"/><span>My child is old enough and permitted to carry and self-administer this medication.</span></label>
+        <label class="check"><input type="checkbox" name="emerg_staff_help"/><span>I authorize designated STEM4U staff to help my child use this emergency medication as described, and to call 911.</span></label>
+      </div>
+    </div>
+
+    <!-- D. Authorized pickup -->
+    <div class="sec">
+      <h2>4 · Authorized pick-up</h2>
+      <div class="hint">Adults (besides you) allowed to pick up your child. Staff may ask for photo ID.</div>
+      <div class="grid2">
+        <div class="fg full"><label class="lbl">Authorized adult 1 — name, relationship, phone</label><input type="text" name="pickup1"/></div>
+        <div class="fg full"><label class="lbl">Authorized adult 2 — name, relationship, phone</label><input type="text" name="pickup2"/></div>
+        <div class="fg"><label class="lbl">May your child (13+) sign out and leave on their own?</label>
+          <select name="self_signout"><option value="">— select —</option><option value="no">No</option><option value="yes">Yes</option></select></div>
+      </div>
+    </div>
+
+    <!-- E. Photo choice -->
+    <div class="sec">
+      <h2>5 · Photo &amp; video</h2>
+      <div class="hint">Your choice does not affect enrollment. (<a href="policies/photo-video-release.pdf" target="_blank" rel="noopener">full release</a>)</div>
+      <div class="choice">
+        <label><input type="radio" name="photo_choice" value="yes" required/> <span><b>Yes</b> — STEM4U may use my child's image to promote and document its programs.</span></label>
+        <label><input type="radio" name="photo_choice" value="limited"/> <span><b>Limited</b> — internal use only (private class recaps, program review). No public marketing or social media.</span></label>
+        <label><input type="radio" name="photo_choice" value="no"/> <span><b>No</b> — please don't use my child's image in any STEM4U materials.</span></label>
+      </div>
+    </div>
+
+    <!-- F. Signature -->
+    <div class="sec">
+      <h2>6 · Signature</h2>
+      <p class="legal">By typing my name below I confirm I am the parent/legal guardian of the child named (or, if the participant is 18+, that I am the participant), that the information is accurate, and that I agree to all the STEM4U enrollment documents referenced above. This agreement is governed by the laws of the Commonwealth of Virginia.</p>
+      <div class="grid2">
+        <div class="fg"><label class="lbl">Type your full name (this is your signature) <span class="req">*</span></label><input type="text" name="signature_name" class="sign-name" required autocomplete="name"/></div>
+        <div class="fg"><label class="lbl">I am the…</label>
+          <select name="signature_relation"><option value="parent">Parent</option><option value="guardian">Legal guardian</option><option value="adult">Adult participant (18+)</option></select></div>
+        <div class="fg"><label class="lbl">Date</label><input type="date" name="signed_date"/></div>
+      </div>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAElTfPsKirO6gQZd" style="margin:6px 0 16px"></div>
+      <button type="submit" class="submit-btn">Sign &amp; submit</button>
+    </div>
+  </form>
+
+  <div class="done" id="done">
+    <div class="big">✅</div>
+    <h2>Thank you — your agreement is signed.</h2>
+    <p>We've recorded your signed STEM4U enrollment agreement. If you need a copy or have any questions, email <a href="mailto:contact@stem4u.com" style="color:var(--blue);text-decoration:none;font-weight:700">contact@stem4u.com</a>.</p>
+    <a href="index.html">Back to home</a>
+  </div>
+</div>
+
+<footer>
+  <div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+  <p style="margin-top:8px;">© 2026 STEM4U LLC. · 21690 Red Rum Dr #182, Ashburn, VA 20147</p>
+  <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px;">STEM4U is the brand of Stem for You LLC.</p>
+</footer>
+
+<script>
+(function(){
+  var form=document.getElementById('consentForm');
+  var err=document.getElementById('formErr');
+  // default the date to today
+  var dt=form.querySelector('input[name="signed_date"]');
+  if(dt){ dt.value=new Date().toISOString().slice(0,10); }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    err.style.display='none';
+    var fd=new FormData(form);
+    var data=Object.fromEntries(fd.entries());
+    // multi-checkbox programs
+    data.programs=[].slice.call(form.querySelectorAll('input[name="programs"]:checked')).map(function(x){return x.value;}).join(', ');
+    // normalize checkbox booleans
+    ['agree_policies','agree_medical','agree_payment','agree_esign','emerg_self_carry','emerg_staff_help'].forEach(function(k){
+      var el=form.querySelector('[name="'+k+'"]'); data[k]= el ? !!el.checked : false;
+    });
+    if(!data.signed_date){ data.signed_date=new Date().toISOString().slice(0,10); }
+
+    var btn=form.querySelector('button[type=submit]');
+    var bt=btn.textContent; btn.disabled=true; btn.textContent='Submitting…';
+    try{
+      var res=await fetch('/api/consent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      var j={}; try{ j=await res.json(); }catch(_){}
+      if(res.ok && j.ok){
+        form.style.display='none';
+        document.getElementById('done').style.display='block';
+        window.scrollTo(0,0);
+      } else {
+        err.textContent=(j&&j.error)||'Something went wrong. Please check the form and try again.';
+        err.style.display='block';
+        btn.disabled=false; btn.textContent=bt;
+        if(window.turnstile){ try{ turnstile.reset(); }catch(_){} }
+        window.scrollTo(0,0);
+      }
+    }catch(_){
+      err.textContent='Network error — please try again.';
+      err.style.display='block';
+      btn.disabled=false; btn.textContent=bt;
+    }
+  });
+})();
+</script>
+</body>
+</html>
