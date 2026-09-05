@@ -8,6 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTMiIGZpbGw9IiMxQjJBNEEiLz48dGV4dCB4PSIzMiIgeT0iNDMiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZm9udC13ZWlnaHQ9IjgwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRzcGFuIGZpbGw9IiNGMkYwRUIiPlM8L3RzcGFuPjx0c3BhbiBmaWxsPSIjRTg2NTFBIj40PC90c3Bhbj48dHNwYW4gZmlsbD0iI0YyRjBFQiI+VTwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
   :root{--navy:#1B2A4A;--orange:#E8651A;--chalk:#F2F0EB;--ink:#2E2E2E;--line:#d7dce4;--green:#1a7f57;--muted:#5A6472}
   *{box-sizing:border-box}
@@ -56,6 +57,7 @@
     <p class="hint" style="margin-bottom:12px">Use your personal link if you have it. Otherwise sign in with your first name and PIN.</p>
     <label class="fld">First name<input type="text" id="lg_first" autocomplete="off" autocapitalize="words" placeholder="e.g. John"></label>
     <label class="fld">PIN<input type="password" id="lg_pin" inputmode="numeric" autocomplete="off" placeholder="4-digit PIN" onkeydown="if(event.key==='Enter')doLogin()"></label>
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAElTfPsKirO6gQZd" style="margin:2px 0 14px"></div>
     <button class="savebtn" id="lg_btn" onclick="doLogin()">Sign in</button>
     <div class="msg" id="lg_msg"></div>
   </div>
@@ -115,13 +117,14 @@
     var first=document.getElementById('lg_first').value.trim(), pin=document.getElementById('lg_pin').value.trim();
     var msg=document.getElementById('lg_msg'), btn=document.getElementById('lg_btn');
     if(!first||!pin){ msg.innerHTML='<span class="err">Enter your first name and PIN.</span>'; return; }
+    var cf=(window.turnstile&&document.querySelector('.cf-turnstile'))?turnstile.getResponse():'';
     btn.disabled=true; msg.textContent='Signing in…';
     try{
-      var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',first:first,pin:pin})});
+      var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',first:first,pin:pin,'cf-turnstile-response':cf})});
       var d=await r.json();
       if(!r.ok||!d.code) throw new Error(d.error||'Sign-in failed');
       location.href='/i/'+encodeURIComponent(d.code);
-    }catch(e){ msg.innerHTML='<span class="err">'+esc(e.message)+'</span>'; btn.disabled=false; }
+    }catch(e){ msg.innerHTML='<span class="err">'+esc(e.message)+'</span>'; btn.disabled=false; if(window.turnstile){try{turnstile.reset();}catch(_){}} }
   }
   function show(v){ ['home','att','hrs'].forEach(function(x){document.getElementById(x).style.display=(x===v?'block':'none');}); window.scrollTo(0,0);
     if(v==='hrs'){ if(!document.getElementById('hdate').value) document.getElementById('hdate').value=todayET(); loadHours(); } }

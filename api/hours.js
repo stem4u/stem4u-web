@@ -39,6 +39,16 @@ const RL = new Map();
 const clientIp = (req) => (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
 function rateLimited(ip, max = 120, win = 10 * 60 * 1000) { const now = Date.now(); const arr = (RL.get(ip) || []).filter(t => now - t < win); arr.push(now); RL.set(ip, arr); if (RL.size > 5000) RL.clear(); return arr.length > max; }
 
+async function verifyTurnstile(token, ip) {
+  if (!token) return false;
+  try {
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret: process.env.TURNSTILE_SECRET, response: token, remoteip: ip || '' }),
+    });
+    const j = await r.json(); return !!(j && j.success);
+  } catch { return false; }
+}
 async function teamsForInstructor(url, H, tutorId) {
   // If this instructor is set as coach on any active team, show ONLY those teams.
   // Otherwise fall back to every team that has kids (backward compatible).
@@ -95,6 +105,10 @@ module.exports = async (req, res) => {
       if (cap(b.action, 20) === 'login') {
         const first = cap(b.first, 40).toLowerCase(), pin = cap(b.pin, 12);
         if (!first || !pin) { res.status(400).json({ ok: false, error: 'Enter your first name and PIN.' }); return; }
+        if (process.env.TURNSTILE_SECRET) {   // CAPTCHA (only enforced once the secret is set)
+          const token = b['cf-turnstile-response'] || b.turnstile || '';
+          if (!(await verifyTurnstile(token, clientIp(req)))) { res.status(403).json({ ok: false, error: 'Please complete the “I’m not a robot” check and try again.' }); return; }
+        }
         const r = await fetch(`${url}/rest/v1/tutors?select=name,pin,portal_code,active&active=eq.true`, { headers: H });
         const rows = r.ok ? await r.json() : [];
         const norm = (s) => String(s || '').trim().split(/\s+/)[0].toLowerCase();
