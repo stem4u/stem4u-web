@@ -92,16 +92,21 @@
 <script>
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function qs(k){return new URLSearchParams(location.search).get(k);}
-  var I=qs('i'), K=qs('k'), TEAMS=[];
+  // Auth: short code from /i/CODE path or ?c=CODE; legacy ?i=&k= still supported.
+  var pathCode=(location.pathname.match(/^\/i\/([^\/?#]+)/)||[])[1]||'';
+  var C=pathCode||qs('c')||'', I=qs('i'), K=qs('k'), TEAMS=[];
+  function auth(){ return C?('c='+encodeURIComponent(C)):('i='+encodeURIComponent(I||'')+'&k='+encodeURIComponent(K||'')); }
+  function authBody(){ return C?{c:C}:{i:I,k:K}; }
+  var HAVE=C||(I&&K);
   function todayET(){ try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});}catch(e){return new Date().toISOString().slice(0,10);} }
   function lock(html){ ['home','att','hrs'].forEach(function(v){document.getElementById(v).style.display='none';}); var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
   function show(v){ ['home','att','hrs'].forEach(function(x){document.getElementById(x).style.display=(x===v?'block':'none');}); window.scrollTo(0,0);
     if(v==='hrs'){ if(!document.getElementById('hdate').value) document.getElementById('hdate').value=todayET(); loadHours(); } }
 
   async function boot(){
-    if(!I||!K){ document.getElementById('hello').textContent='Instructor'; lock('🔒 Open your personal instructor link to take attendance and log hours. Ask your coordinator for it.'); return; }
+    if(!HAVE){ document.getElementById('hello').textContent='Instructor'; lock('🔒 Open your personal instructor link to take attendance and log hours. Ask your coordinator for it.'); return; }
     try{
-      var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K));
+      var r=await fetch('/api/hours?'+auth());
       var d=await r.json();
       if(r.status===403){ lock('⚠️ This link isn\'t valid anymore. Ask your coordinator for your current instructor link.'); return; }
       if(!r.ok){ lock('Something went wrong loading your portal. Try again in a moment.'); return; }
@@ -121,7 +126,7 @@
     if(!team){ box.innerHTML='<div class="msg">Pick a team.</div>'; return; }
     box.innerHTML='<div class="msg">Loading…</div>';
     try{
-      var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K)+'&team='+encodeURIComponent(team)+'&date='+encodeURIComponent(date));
+      var r=await fetch('/api/hours?'+auth()+'&team='+encodeURIComponent(team)+'&date='+encodeURIComponent(date));
       var d=await r.json();
       if(!r.ok||!d.roster){ box.innerHTML='<div class="msg err">Could not load roster.</div>'; return; }
       if(!d.roster.length){ box.innerHTML='<div class="msg">No students on this team yet.</div>'; }
@@ -139,7 +144,7 @@
     var prevTxt=btn.textContent; btn.textContent='…';
     try{
       var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({i:I,k:K,action:'attendance',team:team,date:date,lead_id:id,name:name,present:next})});
+        body:JSON.stringify(Object.assign(authBody(),{action:'attendance',team:team,date:date,lead_id:id,name:name,present:next}))});
       if(!r.ok) throw new Error();
       btn.setAttribute('data-on',next?'1':'0');
       btn.className='toggle'+(next?' on':''); btn.textContent=next?'✓ Present':'Absent';
@@ -150,7 +155,7 @@
     var date=document.getElementById('hdate').value||todayET();
     var box=document.getElementById('hmsg'); document.getElementById('hours').value='';
     try{
-      var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K)+'&date='+encodeURIComponent(date));
+      var r=await fetch('/api/hours?'+auth()+'&date='+encodeURIComponent(date));
       var d=await r.json();
       if(r.ok && d.hours!=null) document.getElementById('hours').value=d.hours;
       box.textContent='';
@@ -164,7 +169,7 @@
     btn.disabled=true; msg.textContent='Saving…';
     try{
       var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({i:I,k:K,action:'hours',date:date,hours:+hours})});
+        body:JSON.stringify(Object.assign(authBody(),{action:'hours',date:date,hours:+hours}))});
       if(!r.ok) throw new Error();
       msg.innerHTML='<span class="ok">✓ Saved '+(+hours)+' hrs for '+date+'</span>';
     }catch(e){ msg.innerHTML='<span class="err">That didn\'t save — try again.</span>'; }
