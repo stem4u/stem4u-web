@@ -39,7 +39,13 @@ const RL = new Map();
 const clientIp = (req) => (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
 function rateLimited(ip, max = 120, win = 10 * 60 * 1000) { const now = Date.now(); const arr = (RL.get(ip) || []).filter(t => now - t < win); arr.push(now); RL.set(ip, arr); if (RL.size > 5000) RL.clear(); return arr.length > max; }
 
-async function teamsWithKids(url, H) {
+async function teamsForInstructor(url, H, tutorId) {
+  // If this instructor is set as coach on any active team, show ONLY those teams.
+  // Otherwise fall back to every team that has kids (backward compatible).
+  try {
+    const cr = await fetch(`${url}/rest/v1/teams?select=name&active=eq.true&coach_tutor_id=eq.${encodeURIComponent(tutorId)}&order=sort`, { headers: H });
+    if (cr.ok) { const rows = await cr.json(); const mine = rows.map(t => (t.name || '').trim()).filter(Boolean); if (mine.length) return mine; }
+  } catch (e) { /* teams table may not exist yet → fall back */ }
   const lr = await fetch(`${url}/rest/v1/leads?select=assigned_team&deleted_at=is.null&assigned_team=not.is.null`, { headers: H });
   const lrows = lr.ok ? await lr.json() : [];
   return [...new Set(lrows.map(l => (l.assigned_team || '').trim()).filter(Boolean))].sort();
@@ -62,7 +68,7 @@ module.exports = async (req, res) => {
       if (a.error) { res.status(a.status).json({ ok: false, error: a.error }); return; }
       const team = cap(sp.get('team'), 40), date = cap(sp.get('date'), 10) || todayET();
       if (!team) {
-        const teams = await teamsWithKids(url, H);
+        const teams = await teamsForInstructor(url, H, a.id);
         res.status(200).json({ ok: true, name: a.name, teams, hours: await hoursFor(url, H, a.id, date) });
         return;
       }
