@@ -20,6 +20,11 @@
   .sub{color:var(--muted);font-size:14px;margin:0}
   .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:16px}
   .card h2{font-family:'Space Grotesk';color:var(--navy);font-size:17px;margin:0 0 12px}
+  .choice{display:block;width:100%;background:#fff;border:2px solid var(--line);border-radius:18px;padding:22px 18px;margin-top:16px;text-align:left;cursor:pointer;transition:.1s;font-family:inherit}
+  .choice:hover{border-color:var(--orange);background:#fff7f2} .choice:active{transform:scale(.99)}
+  .choice .big{font-family:'Space Grotesk';font-weight:700;color:var(--navy);font-size:20px}
+  .choice .lil{color:var(--muted);font-size:13.5px;margin-top:3px}
+  .back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--orange);font-family:'Space Grotesk';font-weight:700;font-size:15px;cursor:pointer;padding:6px 0;margin-top:6px}
   label.fld{display:block;font-size:12px;color:var(--muted);margin-bottom:12px}
   select,input[type=date],input[type=number]{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;margin-top:4px;background:#fff;color:var(--ink)}
   .row{display:flex;gap:10px}
@@ -45,19 +50,38 @@
 
   <div id="locked" class="locked" style="display:none"></div>
 
-  <div id="portal" style="display:none">
+  <!-- HOME: pick what to do -->
+  <div id="home" style="display:none">
+    <button class="choice" onclick="show('att')">
+      <div class="big">📋 Take attendance</div>
+      <div class="lil">Mark your team present or absent for the day.</div>
+    </button>
+    <button class="choice" onclick="show('hrs')">
+      <div class="big">⏱ Enter my hours</div>
+      <div class="lil">Log the hours you worked on a day.</div>
+    </button>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div id="att" style="display:none">
+    <button class="back" onclick="show('home')">‹ Back</button>
     <div class="card">
+      <h2 style="margin-top:0">📋 Take attendance</h2>
       <div class="row">
         <label class="fld">Team<select id="team" onchange="loadRoster()"></select></label>
-        <label class="fld">Date<input type="date" id="date" onchange="loadRoster()"></label>
+        <label class="fld">Date<input type="date" id="adate" onchange="loadRoster()"></label>
       </div>
-      <h2 style="margin-top:4px">📋 Team attendance</h2>
       <p class="hint">Tap each student to mark <b>Present</b> or <b>Absent</b>. Saved instantly.</p>
       <div id="roster"><div class="msg">Pick a team.</div></div>
     </div>
+  </div>
 
+  <!-- HOURS -->
+  <div id="hrs" style="display:none">
+    <button class="back" onclick="show('home')">‹ Back</button>
     <div class="card">
-      <h2>⏱ My hours <span style="font-weight:400;color:var(--muted);font-size:13px" id="hdate"></span></h2>
+      <h2 style="margin-top:0">⏱ Enter my hours</h2>
+      <label class="fld">Date<input type="date" id="hdate" onchange="loadHours()"></label>
       <label class="fld">Hours worked this day<input type="number" id="hours" min="0" max="24" step="0.25" placeholder="e.g. 2.5" inputmode="decimal"></label>
       <button class="savebtn" id="hbtn" onclick="saveHours()">Save my hours</button>
       <div class="msg" id="hmsg"></div>
@@ -68,31 +92,33 @@
 <script>
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function qs(k){return new URLSearchParams(location.search).get(k);}
-  var I=qs('i'), K=qs('k');
+  var I=qs('i'), K=qs('k'), TEAMS=[];
   function todayET(){ try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});}catch(e){return new Date().toISOString().slice(0,10);} }
-  function lock(html){ document.getElementById('portal').style.display='none'; var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
+  function lock(html){ ['home','att','hrs'].forEach(function(v){document.getElementById(v).style.display='none';}); var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
+  function show(v){ ['home','att','hrs'].forEach(function(x){document.getElementById(x).style.display=(x===v?'block':'none');}); window.scrollTo(0,0);
+    if(v==='hrs'){ if(!document.getElementById('hdate').value) document.getElementById('hdate').value=todayET(); loadHours(); } }
 
   async function boot(){
-    if(!I||!K){ document.getElementById('hello').textContent='Instructor'; lock('🔒 Open your personal instructor link to log attendance and hours. Ask your coordinator for it.'); return; }
+    if(!I||!K){ document.getElementById('hello').textContent='Instructor'; lock('🔒 Open your personal instructor link to take attendance and log hours. Ask your coordinator for it.'); return; }
     try{
       var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K));
       var d=await r.json();
       if(r.status===403){ lock('⚠️ This link isn\'t valid anymore. Ask your coordinator for your current instructor link.'); return; }
       if(!r.ok){ lock('Something went wrong loading your portal. Try again in a moment.'); return; }
       document.getElementById('hello').textContent='Hi, '+esc((d.name||'').split(' ')[0]||'Instructor');
-      document.getElementById('subline').textContent='Mark attendance & log your hours';
+      document.getElementById('subline').textContent='What would you like to do?';
+      TEAMS=d.teams||[];
       var sel=document.getElementById('team');
-      sel.innerHTML='<option value="">Select team…</option>'+(d.teams||[]).map(function(t){return '<option value="'+esc(t)+'">'+esc(t)+'</option>';}).join('');
-      document.getElementById('date').value=todayET();
-      document.getElementById('portal').style.display='block';
+      sel.innerHTML='<option value="">Select team…</option>'+TEAMS.map(function(t){return '<option value="'+esc(t)+'">'+esc(t)+'</option>';}).join('');
+      document.getElementById('adate').value=todayET();
+      show('home');
     }catch(e){ lock('Could not reach the server. Check your connection and reload.'); }
   }
 
   async function loadRoster(){
-    var team=document.getElementById('team').value, date=document.getElementById('date').value||todayET();
-    document.getElementById('hdate').textContent='· '+date;
+    var team=document.getElementById('team').value, date=document.getElementById('adate').value||todayET();
     var box=document.getElementById('roster');
-    if(!team){ box.innerHTML='<div class="msg">Pick a team.</div>'; document.getElementById('hours').value=''; return; }
+    if(!team){ box.innerHTML='<div class="msg">Pick a team.</div>'; return; }
     box.innerHTML='<div class="msg">Loading…</div>';
     try{
       var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K)+'&team='+encodeURIComponent(team)+'&date='+encodeURIComponent(date));
@@ -103,12 +129,11 @@
         return '<div class="kid"><span class="nm">'+esc(k.name)+'</span>'
           +'<button class="toggle'+(k.present?' on':'')+'" data-id="'+esc(k.id)+'" data-name="'+esc(k.name)+'" data-on="'+(k.present?1:0)+'" onclick="toggle(this)">'+(k.present?'✓ Present':'Absent')+'</button></div>';
       }).join('');
-      document.getElementById('hours').value=(d.hours==null?'':d.hours);
     }catch(e){ box.innerHTML='<div class="msg err">Could not load roster.</div>'; }
   }
 
   async function toggle(btn){
-    var team=document.getElementById('team').value, date=document.getElementById('date').value||todayET();
+    var team=document.getElementById('team').value, date=document.getElementById('adate').value||todayET();
     var on=btn.getAttribute('data-on')==='1'; var next=!on;
     var id=btn.getAttribute('data-id'), name=btn.getAttribute('data-name');
     var prevTxt=btn.textContent; btn.textContent='…';
@@ -121,8 +146,19 @@
     }catch(e){ btn.textContent=prevTxt; }
   }
 
+  async function loadHours(){
+    var date=document.getElementById('hdate').value||todayET();
+    var box=document.getElementById('hmsg'); document.getElementById('hours').value='';
+    try{
+      var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K)+'&date='+encodeURIComponent(date));
+      var d=await r.json();
+      if(r.ok && d.hours!=null) document.getElementById('hours').value=d.hours;
+      box.textContent='';
+    }catch(e){ box.textContent=''; }
+  }
+
   async function saveHours(){
-    var date=document.getElementById('date').value||todayET(), hours=document.getElementById('hours').value;
+    var date=document.getElementById('hdate').value||todayET(), hours=document.getElementById('hours').value;
     var msg=document.getElementById('hmsg'), btn=document.getElementById('hbtn');
     if(hours===''||isNaN(+hours)||+hours<0||+hours>24){ msg.innerHTML='<span class="err">Enter hours between 0 and 24.</span>'; return; }
     btn.disabled=true; msg.textContent='Saving…';

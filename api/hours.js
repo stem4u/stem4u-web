@@ -53,11 +53,13 @@ module.exports = async (req, res) => {
 
       const team = cap(sp.get('team'), 40), date = cap(sp.get('date'), 10) || todayET();
       if (!team) {
-        // link validation — return name + list of teams that have kids
+        // link validation / hours screen — return name + teams + this instructor's hours for the date
         const lr = await fetch(`${url}/rest/v1/leads?select=assigned_team&deleted_at=is.null&assigned_team=not.is.null`, { headers: H });
         const lrows = lr.ok ? await lr.json() : [];
         const teams = [...new Set(lrows.map(l => (l.assigned_team || '').trim()).filter(Boolean))].sort();
-        res.status(200).json({ ok: true, name: trows[0].name, teams });
+        const hr = await fetch(`${url}/rest/v1/tutor_sessions?select=hours&tutor_id=eq.${encodeURIComponent(i)}&session_date=eq.${encodeURIComponent(date)}&team=eq.`, { headers: H });
+        const hrows = hr.ok ? await hr.json() : [];
+        res.status(200).json({ ok: true, name: trows[0].name, teams, hours: hrows[0] ? hrows[0].hours : null });
         return;
       }
       // roster for a team + present flags for the date + this instructor's hours for the date
