@@ -90,6 +90,20 @@ module.exports = async (req, res) => {
       if (!originOk(req)) { res.status(403).json({ ok: false, error: 'Bad origin' }); return; }
       if (rateLimited(clientIp(req))) { res.status(429).json({ ok: false, error: 'Too many updates — wait a moment.' }); return; }
       let b = req.body; if (typeof b === 'string') { try { b = JSON.parse(b || '{}'); } catch { b = {}; } } b = b || {};
+
+      // Fallback login: FIRST NAME + PIN -> resolve to the instructor's short code (pins never leave the server).
+      if (cap(b.action, 20) === 'login') {
+        const first = cap(b.first, 40).toLowerCase(), pin = cap(b.pin, 12);
+        if (!first || !pin) { res.status(400).json({ ok: false, error: 'Enter your first name and PIN.' }); return; }
+        const r = await fetch(`${url}/rest/v1/tutors?select=name,pin,portal_code,active&active=eq.true`, { headers: H });
+        const rows = r.ok ? await r.json() : [];
+        const norm = (s) => String(s || '').trim().split(/\s+/)[0].toLowerCase();
+        const hit = rows.filter(t => norm(t.name) === first && String(t.pin || '') === pin && t.portal_code);
+        if (hit.length !== 1) { res.status(401).json({ ok: false, error: 'Wrong name or PIN — or ask your coordinator for your link.' }); return; }
+        res.status(200).json({ ok: true, code: hit[0].portal_code });
+        return;
+      }
+
       const a = await authInstructor(url, H, { c: cap(b.c, 40), i: cap(b.i, 60), k: cap(b.k, 32) });
       if (a.error) { res.status(a.status).json({ ok: false, error: a.error }); return; }
       const action = cap(b.action, 20), date = cap(b.date, 10) || todayET();

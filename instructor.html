@@ -50,6 +50,16 @@
 
   <div id="locked" class="locked" style="display:none"></div>
 
+  <!-- LOGIN (fallback when no personal link) -->
+  <div id="login" class="card" style="display:none">
+    <h2 style="margin-top:0">Sign in</h2>
+    <p class="hint" style="margin-bottom:12px">Use your personal link if you have it. Otherwise sign in with your first name and PIN.</p>
+    <label class="fld">First name<input type="text" id="lg_first" autocomplete="off" autocapitalize="words" placeholder="e.g. Nivedita"></label>
+    <label class="fld">PIN<input type="password" id="lg_pin" inputmode="numeric" autocomplete="off" placeholder="4-digit PIN" onkeydown="if(event.key==='Enter')doLogin()"></label>
+    <button class="savebtn" id="lg_btn" onclick="doLogin()">Sign in</button>
+    <div class="msg" id="lg_msg"></div>
+  </div>
+
   <!-- HOME: pick what to do -->
   <div id="home" style="display:none">
     <button class="choice" onclick="show('att')">
@@ -99,12 +109,25 @@
   function authBody(){ return C?{c:C}:{i:I,k:K}; }
   var HAVE=C||(I&&K);
   function todayET(){ try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});}catch(e){return new Date().toISOString().slice(0,10);} }
-  function lock(html){ ['home','att','hrs'].forEach(function(v){document.getElementById(v).style.display='none';}); var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
+  function lock(html){ ['home','att','hrs','login'].forEach(function(v){var e=document.getElementById(v);if(e)e.style.display='none';}); var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
+  function showLogin(){ ['home','att','hrs','locked'].forEach(function(v){var e=document.getElementById(v);if(e)e.style.display='none';}); document.getElementById('login').style.display='block'; document.getElementById('hello').textContent='Instructor'; document.getElementById('subline').textContent='Sign in to log attendance & hours'; }
+  async function doLogin(){
+    var first=document.getElementById('lg_first').value.trim(), pin=document.getElementById('lg_pin').value.trim();
+    var msg=document.getElementById('lg_msg'), btn=document.getElementById('lg_btn');
+    if(!first||!pin){ msg.innerHTML='<span class="err">Enter your first name and PIN.</span>'; return; }
+    btn.disabled=true; msg.textContent='Signing in…';
+    try{
+      var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',first:first,pin:pin})});
+      var d=await r.json();
+      if(!r.ok||!d.code) throw new Error(d.error||'Sign-in failed');
+      location.href='/i/'+encodeURIComponent(d.code);
+    }catch(e){ msg.innerHTML='<span class="err">'+esc(e.message)+'</span>'; btn.disabled=false; }
+  }
   function show(v){ ['home','att','hrs'].forEach(function(x){document.getElementById(x).style.display=(x===v?'block':'none');}); window.scrollTo(0,0);
     if(v==='hrs'){ if(!document.getElementById('hdate').value) document.getElementById('hdate').value=todayET(); loadHours(); } }
 
   async function boot(){
-    if(!HAVE){ document.getElementById('hello').textContent='Instructor'; lock('🔒 Open your personal instructor link to take attendance and log hours. Ask your coordinator for it.'); return; }
+    if(!HAVE){ showLogin(); return; }
     try{
       var r=await fetch('/api/hours?'+auth());
       var d=await r.json();
