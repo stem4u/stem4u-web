@@ -91,7 +91,7 @@ module.exports = async (req, res) => {
       if (action === 'hours') {
         const hours = (b.hours === '' || b.hours == null) ? null : Number(b.hours);
         if (hours == null || !isFinite(hours) || hours < 0 || hours > 24) { res.status(400).json({ ok: false, error: 'Enter hours between 0 and 24.' }); return; }
-        const row = { session_date: date, team: '', tutor_id: i, hours, updated_at: new Date().toISOString() };
+        const row = { session_date: date, team: '', tutor_id: i, hours };
         const r = await fetch(`${url}/rest/v1/tutor_sessions?on_conflict=session_date,team,tutor_id`, {
           method: 'POST', headers: { ...H, Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(row),
         });
