@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>STEM4U — Instructor</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTMiIGZpbGw9IiMxQjJBNEEiLz48dGV4dCB4PSIzMiIgeT0iNDMiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZm9udC13ZWlnaHQ9IjgwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRzcGFuIGZpbGw9IiNGMkYwRUIiPlM8L3RzcGFuPjx0c3BhbiBmaWxsPSIjRTg2NTFBIj40PC90c3Bhbj48dHNwYW4gZmlsbD0iI0YyRjBFQiI+VTwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{--navy:#1B2A4A;--orange:#E8651A;--chalk:#F2F0EB;--ink:#2E2E2E;--line:#d7dce4;--green:#1a7f57;--muted:#5A6472}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--chalk);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.4}
+  .wrap{max-width:640px;margin:0 auto;padding:22px 16px 70px}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .badge{width:48px;height:48px;border-radius:13px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#fff;font-size:16px;flex:none}
+  .badge b{color:var(--orange)}
+  h1{font-family:'Space Grotesk';color:var(--navy);font-size:25px;margin:2px 0}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:16px}
+  .card h2{font-family:'Space Grotesk';color:var(--navy);font-size:17px;margin:0 0 12px}
+  label.fld{display:block;font-size:12px;color:var(--muted);margin-bottom:12px}
+  select,input[type=date],input[type=number]{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;margin-top:4px;background:#fff;color:var(--ink)}
+  .row{display:flex;gap:10px}
+  .row>label{flex:1}
+  .kid{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:11px 4px;border-bottom:1px solid #eef0f4}
+  .kid:last-child{border-bottom:none}
+  .kid .nm{font-weight:600;font-size:16px}
+  .toggle{border:2px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 16px;font-family:'Space Grotesk';font-weight:700;font-size:14px;min-width:104px;cursor:pointer;transition:.1s}
+  .toggle.on{background:#e9f6ef;border-color:var(--green);color:var(--green)}
+  .toggle:active{transform:scale(.97)}
+  .savebtn{display:block;width:100%;background:var(--navy);color:#fff;border:none;border-radius:14px;padding:15px;font-family:'Space Grotesk';font-weight:700;font-size:17px;margin-top:12px;cursor:pointer}
+  .savebtn:active{filter:brightness(1.12)} .savebtn[disabled]{opacity:.5}
+  .hint{color:var(--muted);font-size:12.5px;margin:2px 0 0}
+  .msg{color:var(--muted);font-size:14px;margin-top:10px}
+  .err{color:#b02a2a}
+  .ok{color:var(--green);font-weight:600}
+  .locked{margin-top:20px;font-size:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><div class="badge">S<b>4</b>U</div><div><h1 id="hello">Instructor</h1><p class="sub" id="subline">Loading…</p></div></div>
+
+  <div id="locked" class="locked" style="display:none"></div>
+
+  <div id="portal" style="display:none">
+    <div class="card">
+      <div class="row">
+        <label class="fld">Team<select id="team" onchange="loadRoster()"></select></label>
+        <label class="fld">Date<input type="date" id="date" onchange="loadRoster()"></label>
+      </div>
+      <h2 style="margin-top:4px">📋 Team attendance</h2>
+      <p class="hint">Tap each student to mark <b>Present</b> or <b>Absent</b>. Saved instantly.</p>
+      <div id="roster"><div class="msg">Pick a team.</div></div>
+    </div>
+
+    <div class="card">
+      <h2>⏱ My hours <span style="font-weight:400;color:var(--muted);font-size:13px" id="hdate"></span></h2>
+      <label class="fld">Hours worked this day<input type="number" id="hours" min="0" max="24" step="0.25" placeholder="e.g. 2.5" inputmode="decimal"></label>
+      <button class="savebtn" id="hbtn" onclick="saveHours()">Save my hours</button>
+      <div class="msg" id="hmsg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function qs(k){return new URLSearchParams(location.search).get(k);}
+  var I=qs('i'), K=qs('k');
+  function todayET(){ try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});}catch(e){return new Date().toISOString().slice(0,10);} }
+  function lock(html){ document.getElementById('portal').style.display='none'; var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
+
+  async function boot(){
+    if(!I||!K){ document.getElementById('hello').textContent='Instructor'; lock('🔒 Open your personal instructor link to log attendance and hours. Ask your coordinator for it.'); return; }
+    try{
+      var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K));
+      var d=await r.json();
+      if(r.status===403){ lock('⚠️ This link isn\'t valid anymore. Ask your coordinator for your current instructor link.'); return; }
+      if(!r.ok){ lock('Something went wrong loading your portal. Try again in a moment.'); return; }
+      document.getElementById('hello').textContent='Hi, '+esc((d.name||'').split(' ')[0]||'Instructor');
+      document.getElementById('subline').textContent='Mark attendance & log your hours';
+      var sel=document.getElementById('team');
+      sel.innerHTML='<option value="">Select team…</option>'+(d.teams||[]).map(function(t){return '<option value="'+esc(t)+'">'+esc(t)+'</option>';}).join('');
+      document.getElementById('date').value=todayET();
+      document.getElementById('portal').style.display='block';
+    }catch(e){ lock('Could not reach the server. Check your connection and reload.'); }
+  }
+
+  async function loadRoster(){
+    var team=document.getElementById('team').value, date=document.getElementById('date').value||todayET();
+    document.getElementById('hdate').textContent='· '+date;
+    var box=document.getElementById('roster');
+    if(!team){ box.innerHTML='<div class="msg">Pick a team.</div>'; document.getElementById('hours').value=''; return; }
+    box.innerHTML='<div class="msg">Loading…</div>';
+    try{
+      var r=await fetch('/api/hours?i='+encodeURIComponent(I)+'&k='+encodeURIComponent(K)+'&team='+encodeURIComponent(team)+'&date='+encodeURIComponent(date));
+      var d=await r.json();
+      if(!r.ok||!d.roster){ box.innerHTML='<div class="msg err">Could not load roster.</div>'; return; }
+      if(!d.roster.length){ box.innerHTML='<div class="msg">No students on this team yet.</div>'; }
+      else box.innerHTML=d.roster.map(function(k){
+        return '<div class="kid"><span class="nm">'+esc(k.name)+'</span>'
+          +'<button class="toggle'+(k.present?' on':'')+'" data-id="'+esc(k.id)+'" data-name="'+esc(k.name)+'" data-on="'+(k.present?1:0)+'" onclick="toggle(this)">'+(k.present?'✓ Present':'Absent')+'</button></div>';
+      }).join('');
+      document.getElementById('hours').value=(d.hours==null?'':d.hours);
+    }catch(e){ box.innerHTML='<div class="msg err">Could not load roster.</div>'; }
+  }
+
+  async function toggle(btn){
+    var team=document.getElementById('team').value, date=document.getElementById('date').value||todayET();
+    var on=btn.getAttribute('data-on')==='1'; var next=!on;
+    var id=btn.getAttribute('data-id'), name=btn.getAttribute('data-name');
+    var prevTxt=btn.textContent; btn.textContent='…';
+    try{
+      var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({i:I,k:K,action:'attendance',team:team,date:date,lead_id:id,name:name,present:next})});
+      if(!r.ok) throw new Error();
+      btn.setAttribute('data-on',next?'1':'0');
+      btn.className='toggle'+(next?' on':''); btn.textContent=next?'✓ Present':'Absent';
+    }catch(e){ btn.textContent=prevTxt; }
+  }
+
+  async function saveHours(){
+    var date=document.getElementById('date').value||todayET(), hours=document.getElementById('hours').value;
+    var msg=document.getElementById('hmsg'), btn=document.getElementById('hbtn');
+    if(hours===''||isNaN(+hours)||+hours<0||+hours>24){ msg.innerHTML='<span class="err">Enter hours between 0 and 24.</span>'; return; }
+    btn.disabled=true; msg.textContent='Saving…';
+    try{
+      var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({i:I,k:K,action:'hours',date:date,hours:+hours})});
+      if(!r.ok) throw new Error();
+      msg.innerHTML='<span class="ok">✓ Saved '+(+hours)+' hrs for '+date+'</span>';
+    }catch(e){ msg.innerHTML='<span class="err">That didn\'t save — try again.</span>'; }
+    finally{ btn.disabled=false; }
+  }
+
+  boot();
+</script>
+</body>
+</html>
