@@ -22,6 +22,12 @@
   #q{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;background:#fff}
   #q:focus{outline:none;border-color:var(--orange)}
   .count{font-size:12px;color:var(--gray);margin-top:6px}
+  .filters{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .fchip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 18px;font-size:13px;font-weight:700;font-family:'Space Grotesk';color:var(--navy);cursor:pointer;transition:.12s}
+  .fchip:hover{border-color:var(--orange)}
+  .fchip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .fchip.on.fll{background:#2E74B5;border-color:#2E74B5}
+  .fchip.on.ftc{background:#1a7f57;border-color:#1a7f57}
   h2{font-family:'Space Grotesk';color:var(--navy);font-size:16px;margin:22px 0 4px;display:flex;align-items:center;gap:8px}
   h2 .tag{font-size:11px;font-weight:600;color:#fff;background:#2E74B5;border-radius:999px;padding:2px 9px}
   h2 .tag.off{background:#8a5a00}.tag.ftc{background:#1a7f57}
@@ -79,6 +85,11 @@
 
   <div class="search">
     <input id="q" placeholder="Search… (e.g. missions video, rulebook, scoresheet, rubrics, register)" autofocus/>
+    <div class="filters" id="filters">
+      <button class="fchip on" data-f="all" onclick="setFilt('all',this)">All</button>
+      <button class="fchip fll" data-f="FLL" onclick="setFilt('FLL',this)">FLL</button>
+      <button class="fchip ftc" data-f="FTC" onclick="setFilt('FTC',this)">FTC</button>
+    </div>
     <div class="count" id="count"></div>
   </div>
 
@@ -182,10 +193,15 @@
       countEl=document.getElementById('count'), empty=document.getElementById('empty');
   var TAGLABEL={fll:'FLL',ftc:'FTC',off:'OFFICIAL'};
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  var FILT='all';
+  // Program of a row from its section label: FTC sections start with "FTC"; everything else (FLL BIOGLOW, VA-DC) is FLL.
+  function progOf(r){ return String(r[0]).indexOf('FTC')===0 ? 'FTC' : 'FLL'; }
+  function setFilt(f,btn){ FILT=f; var cs=document.querySelectorAll('.fchip'); for(var i=0;i<cs.length;i++)cs[i].classList.remove('on'); btn.classList.add('on'); render(q.value); }
   function render(filter){
     filter=(filter||'').toLowerCase().trim();
     var bySec={}, order=[];
     R.forEach(function(r){
+      if(FILT!=='all' && progOf(r)!==FILT) return;
       var hay=(r[2]+' '+r[3]+' '+r[0]+' '+r[4]).toLowerCase();
       if(filter && hay.indexOf(filter)<0) return;
       if(!bySec[r[0]]){bySec[r[0]]=[];order.push(r[0]);}
