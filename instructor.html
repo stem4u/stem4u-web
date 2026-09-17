@@ -94,9 +94,12 @@
     <div class="card">
       <h2 style="margin-top:0">⏱ Enter my hours</h2>
       <label class="fld">Date<input type="date" id="hdate" onchange="loadHours()"></label>
-      <label class="fld">Hours worked this day<input type="number" id="hours" min="0" max="24" step="0.25" placeholder="e.g. 2.5" inputmode="decimal"></label>
+      <label class="fld">Class<select id="hprog" onchange="loadHours()"><option value="">Select class…</option></select></label>
+      <label class="fld">Hours for this class, this day<input type="number" id="hours" min="0" max="24" step="0.25" placeholder="e.g. 2.5" inputmode="decimal"></label>
       <button class="savebtn" id="hbtn" onclick="saveHours()">Save my hours</button>
       <div class="msg" id="hmsg"></div>
+      <p class="hint" style="margin:6px 0 0">Log each class separately — e.g. FLL and Stonehill PTO on the same day are two entries.</p>
+      <div id="hlist"></div>
     </div>
   </div>
 </div>
@@ -106,7 +109,7 @@
   function qs(k){return new URLSearchParams(location.search).get(k);}
   // Auth: short code from /i/CODE path or ?c=CODE; legacy ?i=&k= still supported.
   var pathCode=(location.pathname.match(/^\/i\/([^\/?#]+)/)||[])[1]||'';
-  var C=pathCode||qs('c')||'', I=qs('i'), K=qs('k'), TEAMS=[];
+  var C=pathCode||qs('c')||'', I=qs('i'), K=qs('k'), TEAMS=[], PROGRAMS=[];
   function auth(){ return C?('c='+encodeURIComponent(C)):('i='+encodeURIComponent(I||'')+'&k='+encodeURIComponent(K||'')); }
   function authBody(){ return C?{c:C}:{i:I,k:K}; }
   var HAVE=C||(I&&K);
@@ -141,6 +144,9 @@
       TEAMS=d.teams||[];
       var sel=document.getElementById('team');
       sel.innerHTML='<option value="">Select team…</option>'+TEAMS.map(function(t){return '<option value="'+esc(t)+'">'+esc(t)+'</option>';}).join('');
+      PROGRAMS=d.programs||['FLL','FTC','Robotics','Drone','Stonehill PTO'];
+      var psel=document.getElementById('hprog');
+      psel.innerHTML='<option value="">Select class…</option>'+PROGRAMS.map(function(p){return '<option value="'+esc(p)+'">'+esc(p)+'</option>';}).join('');
       document.getElementById('adate').value=todayET();
       show('home');
     }catch(e){ lock('Could not reach the server. Check your connection and reload.'); }
@@ -177,27 +183,40 @@
     }catch(e){ btn.textContent=prevTxt; }
   }
 
+  function renderHList(list){
+    var box=document.getElementById('hlist'); if(!box) return;
+    if(!list.length){ box.innerHTML='<div style="color:#6b7699;font-size:13px;margin-top:12px">No hours logged for this day yet.</div>'; return; }
+    var tot=list.reduce(function(s,x){return s+(+x.hours||0);},0);
+    box.innerHTML='<div style="font-weight:700;color:#0D2B7A;font-family:\'Space Grotesk\';margin:14px 0 4px">Logged this day</div>'
+      +list.map(function(x){return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e6ecfb"><span>'+esc(x.program||'—')+'</span><b>'+(+x.hours)+' hrs</b></div>';}).join('')
+      +'<div style="display:flex;justify-content:space-between;padding:7px 0;font-weight:700;color:#0D2B7A"><span>Total</span><b>'+tot+' hrs</b></div>';
+  }
+
   async function loadHours(){
     var date=document.getElementById('hdate').value||todayET();
-    var box=document.getElementById('hmsg'); document.getElementById('hours').value='';
+    var prog=document.getElementById('hprog').value;
+    document.getElementById('hmsg').textContent=''; document.getElementById('hours').value='';
     try{
       var r=await fetch('/api/hours?'+auth()+'&date='+encodeURIComponent(date));
       var d=await r.json();
-      if(r.ok && d.hours!=null) document.getElementById('hours').value=d.hours;
-      box.textContent='';
-    }catch(e){ box.textContent=''; }
+      var list=(r.ok&&d.hoursList)?d.hoursList:[];
+      if(prog){ var hit=list.filter(function(x){return x.program===prog;})[0]; if(hit) document.getElementById('hours').value=hit.hours; }
+      renderHList(list);
+    }catch(e){ renderHList([]); }
   }
 
   async function saveHours(){
-    var date=document.getElementById('hdate').value||todayET(), hours=document.getElementById('hours').value;
+    var date=document.getElementById('hdate').value||todayET(), prog=document.getElementById('hprog').value, hours=document.getElementById('hours').value;
     var msg=document.getElementById('hmsg'), btn=document.getElementById('hbtn');
+    if(!prog){ msg.innerHTML='<span class="err">Pick a class first.</span>'; return; }
     if(hours===''||isNaN(+hours)||+hours<0||+hours>24){ msg.innerHTML='<span class="err">Enter hours between 0 and 24.</span>'; return; }
     btn.disabled=true; msg.textContent='Saving…';
     try{
       var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(Object.assign(authBody(),{action:'hours',date:date,hours:+hours}))});
+        body:JSON.stringify(Object.assign(authBody(),{action:'hours',date:date,program:prog,hours:+hours}))});
       if(!r.ok) throw new Error();
-      msg.innerHTML='<span class="ok">✓ Saved '+(+hours)+' hrs for '+date+'</span>';
+      msg.innerHTML='<span class="ok">✓ Saved '+(+hours)+' hrs of '+esc(prog)+' for '+date+'</span>';
+      loadHours();
     }catch(e){ msg.innerHTML='<span class="err">That didn\'t save — try again.</span>'; }
     finally{ btn.disabled=false; }
   }

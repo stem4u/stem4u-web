@@ -65,6 +65,14 @@ async function hoursFor(url, H, id, date) {
   const rows = hr.ok ? await hr.json() : [];
   return rows[0] ? rows[0].hours : null;
 }
+// Programs an instructor can log hours against (stored in tutor_sessions.team).
+const HOUR_PROGRAMS = ['FLL', 'FTC', 'Robotics', 'Drone', 'Stonehill PTO'];
+async function hoursList(url, H, id, date) {
+  // Every hours entry this instructor logged on this date, one per class/program.
+  const hr = await fetch(`${url}/rest/v1/tutor_sessions?select=team,hours&tutor_id=eq.${encodeURIComponent(id)}&session_date=eq.${encodeURIComponent(date)}`, { headers: H });
+  const rows = hr.ok ? await hr.json() : [];
+  return rows.filter(r => r.hours != null).map(r => ({ program: r.team || '', hours: r.hours }));
+}
 
 module.exports = async (req, res) => {
   const url = process.env.SUPABASE_URL, key = KEY();
@@ -79,7 +87,7 @@ module.exports = async (req, res) => {
       const team = cap(sp.get('team'), 40), date = cap(sp.get('date'), 10) || todayET();
       if (!team) {
         const teams = await teamsForInstructor(url, H, a.id);
-        res.status(200).json({ ok: true, name: a.name, teams, hours: await hoursFor(url, H, a.id, date) });
+        res.status(200).json({ ok: true, name: a.name, teams, programs: HOUR_PROGRAMS, hoursList: await hoursList(url, H, a.id, date) });
         return;
       }
       const lr = await fetch(`${url}/rest/v1/leads?select=id,child_first_name,child_last_name&assigned_team=eq.${encodeURIComponent(team)}&deleted_at=is.null&order=child_first_name`, { headers: H });
@@ -123,9 +131,11 @@ module.exports = async (req, res) => {
       const action = cap(b.action, 20), date = cap(b.date, 10) || todayET();
 
       if (action === 'hours') {
+        const program = cap(b.program, 40);
+        if (!HOUR_PROGRAMS.includes(program)) { res.status(400).json({ ok: false, error: 'Pick a class for these hours.' }); return; }
         const hours = (b.hours === '' || b.hours == null) ? null : Number(b.hours);
         if (hours == null || !isFinite(hours) || hours < 0 || hours > 24) { res.status(400).json({ ok: false, error: 'Enter hours between 0 and 24.' }); return; }
-        const row = { session_date: date, team: '', tutor_id: a.id, hours };
+        const row = { session_date: date, team: program, tutor_id: a.id, hours };
         const r = await fetch(`${url}/rest/v1/tutor_sessions?on_conflict=session_date,team,tutor_id`, { method: 'POST', headers: { ...H, Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(row) });
         if (!r.ok) { res.status(502).json({ ok: false, error: 'Could not save hours.', detail: await r.text() }); return; }
         res.status(200).json({ ok: true }); return;
