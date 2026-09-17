@@ -73,6 +73,23 @@ async function hoursList(url, H, id, date) {
   const rows = hr.ok ? await hr.json() : [];
   return rows.filter(r => r.hours != null).map(r => ({ program: r.team || '', hours: r.hours }));
 }
+async function payFor(url, H, id) {
+  // Recent pay history for the instructor: hours, amount, and whether/when it was paid.
+  const tr = await fetch(`${url}/rest/v1/tutors?id=eq.${encodeURIComponent(id)}&select=rate`, { headers: H });
+  const rate = tr.ok ? (((await tr.json())[0]) || {}).rate : null;
+  const since = new Date(Date.now() - 140 * 864e5).toISOString().slice(0, 10);
+  const sr = await fetch(`${url}/rest/v1/tutor_sessions?tutor_id=eq.${encodeURIComponent(id)}&session_date=gte.${since}&select=session_date,team,hours,paid_on,paid_amount&order=session_date.desc`, { headers: H });
+  const rows = sr.ok ? await sr.json() : [];
+  let earned = 0, paid = 0;
+  const items = rows.filter(r => r.hours != null).map(r => {
+    const calc = (rate != null) ? (+r.hours * +rate) : null;
+    const amt = (r.paid_amount != null) ? +r.paid_amount : calc;
+    if (calc != null) earned += calc;
+    if (r.paid_on) paid += (r.paid_amount != null ? +r.paid_amount : (calc || 0));
+    return { date: r.session_date, program: r.team || '', hours: r.hours, amount: amt, paid_on: r.paid_on || null };
+  });
+  return { rate, items, earned, paid, outstanding: earned - paid };
+}
 
 module.exports = async (req, res) => {
   const url = process.env.SUPABASE_URL, key = KEY();
@@ -129,6 +146,17 @@ module.exports = async (req, res) => {
       const a = await authInstructor(url, H, { c: cap(b.c, 40), i: cap(b.i, 60), k: cap(b.k, 32) });
       if (a.error) { res.status(a.status).json({ ok: false, error: a.error }); return; }
       const action = cap(b.action, 20), date = cap(b.date, 10) || todayET();
+
+      if (action === 'pay') {
+        // Pay (dollar amounts) is gated behind the instructor's PIN, even with a valid link.
+        const pin = cap(b.pin, 12);
+        const tr = await fetch(`${url}/rest/v1/tutors?id=eq.${encodeURIComponent(a.id)}&select=pin`, { headers: H });
+        const trow = tr.ok ? (await tr.json())[0] : null;
+        const realPin = (trow && trow.pin != null) ? String(trow.pin) : '';
+        if (!realPin) { res.status(400).json({ ok: false, error: 'No PIN is set for your account yet. Ask your coordinator to set one.' }); return; }
+        if (!pin || pin !== realPin) { res.status(401).json({ ok: false, error: 'Wrong PIN.' }); return; }
+        res.status(200).json({ ok: true, pay: await payFor(url, H, a.id) }); return;
+      }
 
       if (action === 'hours') {
         const program = cap(b.program, 40);

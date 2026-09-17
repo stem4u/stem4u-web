@@ -72,6 +72,10 @@
       <div class="big">⏱ Enter my hours</div>
       <div class="lil">Log the hours you worked on a day.</div>
     </button>
+    <button class="choice" onclick="show('pay')">
+      <div class="big">💵 My pay</div>
+      <div class="lil">See your hours, amount, and what's been paid.</div>
+    </button>
   </div>
 
   <!-- ATTENDANCE -->
@@ -102,6 +106,25 @@
       <div id="hlist"></div>
     </div>
   </div>
+
+  <!-- MY PAY -->
+  <div id="pay" style="display:none">
+    <button class="back" onclick="show('home')">‹ Back</button>
+    <div class="card">
+      <h2 style="margin-top:0">💵 My pay</h2>
+      <div id="paygate">
+        <p class="hint" style="margin:0 0 10px">For your privacy, enter your PIN to view your pay.</p>
+        <label class="fld">PIN<input type="password" id="ppin" inputmode="numeric" autocomplete="off" placeholder="Your PIN" onkeydown="if(event.key==='Enter')loadPay()"></label>
+        <button class="savebtn" id="pbtn" onclick="loadPay()">View my pay</button>
+        <div class="msg" id="pmsg"></div>
+      </div>
+      <div id="paydata" style="display:none">
+        <div id="paysum"></div>
+        <div id="paylist"></div>
+        <p class="hint" style="margin:8px 0 0">Shows the last few months. “Outstanding” is hours logged but not yet marked paid. Questions? Check with your coordinator.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -109,13 +132,13 @@
   function qs(k){return new URLSearchParams(location.search).get(k);}
   // Auth: short code from /i/CODE path or ?c=CODE; legacy ?i=&k= still supported.
   var pathCode=(location.pathname.match(/^\/i\/([^\/?#]+)/)||[])[1]||'';
-  var C=pathCode||qs('c')||'', I=qs('i'), K=qs('k'), TEAMS=[], PROGRAMS=[];
+  var C=pathCode||qs('c')||'', I=qs('i'), K=qs('k'), TEAMS=[], PROGRAMS=[], PAY={items:[]};
   function auth(){ return C?('c='+encodeURIComponent(C)):('i='+encodeURIComponent(I||'')+'&k='+encodeURIComponent(K||'')); }
   function authBody(){ return C?{c:C}:{i:I,k:K}; }
   var HAVE=C||(I&&K);
   function todayET(){ try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});}catch(e){return new Date().toISOString().slice(0,10);} }
-  function lock(html){ ['home','att','hrs','login'].forEach(function(v){var e=document.getElementById(v);if(e)e.style.display='none';}); var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
-  function showLogin(){ ['home','att','hrs','locked'].forEach(function(v){var e=document.getElementById(v);if(e)e.style.display='none';}); document.getElementById('login').style.display='block'; document.getElementById('hello').textContent='Instructor'; document.getElementById('subline').textContent='Sign in to log attendance & hours'; }
+  function lock(html){ ['home','att','hrs','pay','login'].forEach(function(v){var e=document.getElementById(v);if(e)e.style.display='none';}); var el=document.getElementById('locked'); el.innerHTML=html; el.style.display='block'; document.getElementById('subline').textContent=''; }
+  function showLogin(){ ['home','att','hrs','pay','locked'].forEach(function(v){var e=document.getElementById(v);if(e)e.style.display='none';}); document.getElementById('login').style.display='block'; document.getElementById('hello').textContent='Instructor'; document.getElementById('subline').textContent='Sign in to log attendance & hours'; }
   async function doLogin(){
     var first=document.getElementById('lg_first').value.trim(), pin=document.getElementById('lg_pin').value.trim();
     var msg=document.getElementById('lg_msg'), btn=document.getElementById('lg_btn');
@@ -129,8 +152,51 @@
       location.href='/i/'+encodeURIComponent(d.code);
     }catch(e){ msg.innerHTML='<span class="err">'+esc(e.message)+'</span>'; btn.disabled=false; if(window.turnstile){try{turnstile.reset();}catch(_){}} }
   }
-  function show(v){ ['home','att','hrs'].forEach(function(x){document.getElementById(x).style.display=(x===v?'block':'none');}); window.scrollTo(0,0);
-    if(v==='hrs'){ if(!document.getElementById('hdate').value) document.getElementById('hdate').value=todayET(); loadHours(); } }
+  function show(v){ ['home','att','hrs','pay'].forEach(function(x){document.getElementById(x).style.display=(x===v?'block':'none');}); window.scrollTo(0,0);
+    if(v==='hrs'){ if(!document.getElementById('hdate').value) document.getElementById('hdate').value=todayET(); loadHours(); }
+    if(v==='pay'){ resetPayGate(); } }
+
+  function resetPayGate(){
+    document.getElementById('paydata').style.display='none';
+    document.getElementById('paygate').style.display='block';
+    document.getElementById('ppin').value=''; document.getElementById('pmsg').textContent='';
+  }
+  async function loadPay(){
+    var pin=document.getElementById('ppin').value.trim();
+    var msg=document.getElementById('pmsg'), btn=document.getElementById('pbtn');
+    if(!pin){ msg.innerHTML='<span class="err">Enter your PIN.</span>'; return; }
+    btn.disabled=true; msg.textContent='Checking…';
+    try{
+      var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(Object.assign(authBody(),{action:'pay',pin:pin}))});
+      var d=await r.json();
+      if(!r.ok||!d.ok){ msg.innerHTML='<span class="err">'+esc((d&&d.error)||'Could not verify PIN.')+'</span>'; btn.disabled=false; return; }
+      PAY=d.pay||{items:[]};
+      document.getElementById('paygate').style.display='none';
+      document.getElementById('paydata').style.display='block';
+      renderPay();
+    }catch(e){ msg.innerHTML='<span class="err">Something went wrong — try again.</span>'; btn.disabled=false; }
+  }
+
+  function money(n){ return '$'+(Math.round((+n||0)*100)/100).toFixed(2); }
+  function renderPay(){
+    var sum=document.getElementById('paysum'), box=document.getElementById('paylist');
+    var items=(PAY&&PAY.items)||[];
+    var earned=(PAY&&PAY.earned)||0, paid=(PAY&&PAY.paid)||0, out=(PAY&&PAY.outstanding)||0;
+    if(PAY&&PAY.rate==null){ sum.innerHTML='<div style="color:#6b7699;font-size:13px">Your pay rate isn\'t set yet — ask your coordinator. Hours logged are shown below.</div>'; }
+    else { sum.innerHTML='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px">'
+      +'<div style="flex:1;min-width:96px;background:#f4f7ff;border:1px solid #e6ecfb;border-radius:10px;padding:9px 11px"><div style="font-size:11px;color:#6b7699">Earned</div><div style="font-weight:700;color:#0D2B7A;font-size:16px">'+money(earned)+'</div></div>'
+      +'<div style="flex:1;min-width:96px;background:#f1f9f4;border:1px solid #d6eede;border-radius:10px;padding:9px 11px"><div style="font-size:11px;color:#6b7699">Paid</div><div style="font-weight:700;color:#1a7f57;font-size:16px">'+money(paid)+'</div></div>'
+      +'<div style="flex:1;min-width:96px;background:#fff5ef;border:1px solid #ffd9c2;border-radius:10px;padding:9px 11px"><div style="font-size:11px;color:#6b7699">Outstanding</div><div style="font-weight:700;color:#FF5500;font-size:16px">'+money(out)+'</div></div>'
+      +'</div>'; }
+    if(!items.length){ box.innerHTML='<div style="color:#6b7699;font-size:13px;margin-top:10px">No hours logged yet.</div>'; return; }
+    box.innerHTML='<div style="margin-top:6px">'+items.map(function(x){
+      var right = x.paid_on ? '<b style="color:#1a7f57">'+money(x.amount)+'</b><div style="font-size:11px;color:#6b7699">paid '+esc(x.paid_on)+'</div>'
+                            : (x.amount!=null?'<b>'+money(x.amount)+'</b>':'')+'<div style="font-size:11px;color:#FF5500">unpaid</div>';
+      return '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid #e6ecfb">'
+        +'<div><div style="font-weight:600">'+esc(x.date)+(x.program?' · '+esc(x.program):'')+'</div><div style="font-size:12px;color:#6b7699">'+(+x.hours)+' hrs</div></div>'
+        +'<div style="text-align:right">'+right+'</div></div>';
+    }).join('')+'</div>'; }
 
   async function boot(){
     if(!HAVE){ showLogin(); return; }
