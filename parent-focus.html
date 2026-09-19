@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>STEM4U — Parent Focus</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTMiIGZpbGw9IiMxQjJBNEEiLz48dGV4dCB4PSIzMiIgeT0iNDMiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZm9udC13ZWlnaHQ9IjgwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRzcGFuIGZpbGw9IiNGMkYwRUIiPlM8L3RzcGFuPjx0c3BhbiBmaWxsPSIjRTg2NTFBIj40PC90c3Bhbj48dHNwYW4gZmlsbD0iI0YyRjBFQiI+VTwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root{ --navy:#1B2A4A; --orange:#E8651A; --chalk:#F2F0EB; --ink:#2E2E2E; --line:#d7dce4; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--chalk);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:640px;margin:0 auto;padding:22px 16px 60px}
+  .head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .badge{width:46px;height:46px;border-radius:12px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;color:#fff;font-size:15px}
+  .badge b{color:var(--orange)}
+  h1{font-family:'Space Grotesk';color:var(--navy);font-size:24px;margin:2px 0 2px}
+  .sub{color:#5A6472;font-size:14px;margin:0 0 4px}
+  .note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:10px;padding:12px 14px;margin:16px 0;font-size:14px}
+  .callout{background:#fdf6df;border:1.5px solid #F5C518;border-radius:10px;padding:12px 14px;margin:16px 0;font-size:13.5px;line-height:1.5}
+  .callout .lead{font-family:'Space Grotesk';font-weight:700;color:var(--navy);display:block;margin-bottom:2px}
+  label.fld{display:block;font-family:'Space Grotesk';font-weight:600;color:var(--navy);margin:18px 0 6px;font-size:15px}
+  input[type=text], textarea{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;font-family:inherit;background:#fff;resize:vertical}
+  input[type=text]:focus, textarea:focus{outline:none;border-color:var(--orange)}
+  .namerow{display:flex;gap:10px}
+  @media(max-width:420px){.namerow{flex-direction:column;gap:0}.namerow input{margin-bottom:0}}
+  .hint{font-size:12.5px;color:#7a8496;margin-top:4px}
+  ul.rank{list-style:none;margin:8px 0 0;padding:0}
+  .ritem{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:11px 10px;margin-bottom:9px;touch-action:manipulation}
+  .ritem.drag{opacity:.6;border-color:var(--orange)}
+  .ghost{opacity:.35}
+  .rnum{flex:0 0 26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .rem{font-size:18px;flex:0 0 auto}
+  .rbody{flex:1 1 auto;min-width:0}
+  .rbody .t{font-family:'Space Grotesk';font-weight:700;color:var(--navy);font-size:14.5px}
+  .rbody .d{font-size:12px;color:#5A6472}
+  .handle{flex:0 0 auto;cursor:grab;color:var(--orange);font-size:24px;line-height:1;padding:6px 8px;touch-action:none;user-select:none}
+  .handle:active{cursor:grabbing}
+  button.send{margin-top:22px;width:100%;background:var(--orange);color:#fff;border:none;border-radius:12px;padding:15px;font-family:'Space Grotesk';font-weight:700;font-size:17px;cursor:pointer}
+  button.send:disabled{opacity:.6;cursor:default}
+  .err{color:#b02a2a;font-size:13.5px;margin-top:8px;min-height:18px}
+  .done{display:none;text-align:center;padding:40px 10px}
+  .done .big{font-size:52px}
+  .done h2{font-family:'Space Grotesk';color:var(--navy);font-size:24px;margin:8px 0 4px}
+  .foot{margin-top:26px;text-align:center;color:#8a94a6;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="formview">
+    <div class="head">
+      <div class="badge">S<b>4</b>U</div>
+      <div>
+        <h1>Where should your child focus?</h1>
+        <p class="sub">STEM4U Robotics · FTC 2026–27 · parent input</p>
+      </div>
+    </div>
+    <div class="callout"><span class="lead">A quick note 👍</span>This tells the coach where <b>you'd like your child to grow</b> this season. It's guidance, not a guarantee of a role — coaches build balanced teams so every kid gets to try a bit of everything.</div>
+
+    <div class="note"><b>No wrong answers.</b> <b>Drag</b> the areas into order — the one you'd most like your child to <b>focus on at the top</b>.</div>
+
+    <form id="pform" action="/api/skills" method="POST">
+      <label class="fld">Your child's name</label>
+      <div class="namerow">
+        <input type="text" id="cfirst" placeholder="Child's first name" required maxlength="40"/>
+        <input type="text" id="clast" placeholder="Child's last name" required maxlength="40"/>
+      </div>
+      <label class="fld">Your name <span style="font-weight:400;color:#7a8496">(parent/guardian)</span></label>
+      <input type="text" id="pname" placeholder="Your name" maxlength="80"/>
+      <div class="hint">Only your coach sees this.</div>
+
+      <label class="fld">Rank the focus areas — most important at the top</label>
+      <div class="hint" style="margin:-2px 0 8px">Press and drag the <b style="color:var(--orange)">⠿</b> handle on the right to move an area up or down.</div>
+      <ul class="rank" id="ranklist"></ul>
+
+      <label class="fld">Goals for your child this season <span style="font-weight:400;color:#7a8496">(optional)</span></label>
+      <textarea name="goal" id="goal" rows="3" maxlength="600" placeholder="Anything you'd like the coach to know — what you hope your child gets out of the season, strengths to build on, etc."></textarea>
+
+      <input type="text" name="_gotcha" id="gotcha" style="display:none" tabindex="-1" autocomplete="off"/>
+
+      <div class="err" id="err"></div>
+      <button type="submit" class="send" id="btn">Send →</button>
+    </form>
+  </div>
+
+  <div class="done" id="done">
+    <div class="big">🎉</div>
+    <h2>Thank you!</h2>
+    <p>Your input is with the coach. It helps us support your child this season.</p>
+  </div>
+
+  <div class="foot">STEM4U · Real tools. Real teams. Real engineers.</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+  // data-val strings MUST match the kid survey skill names so reports line up.
+  var TRACKS=[
+    ["🔧","Robot Build & Strategy","Building the robot — mechanisms, drivetrain, wiring, hands-on making."],
+    ["💻","Programming (Java)","Coding autonomous & driver control."],
+    ["📐","CAD / Design","3D modeling, printing, designing & making parts."],
+    ["📓","Engineering Notebook","Documenting the work — technical writing & layout."],
+    ["🎮","Driver / Operator","Driving & operating the robot in matches."],
+    ["🤝","Outreach (Connect)","Community, communication, meeting engineers."],
+    ["🗂️","PM / Biz","Planning, timelines, sponsors & budget."],
+    ["🎬","Media","Photos/video, social, the team website."]
+  ];
+  var list=document.getElementById('ranklist');
+  TRACKS.forEach(function(t){
+    var li=document.createElement('li'); li.className='ritem'; li.setAttribute('data-val',t[1]);
+    li.innerHTML='<span class="rnum"></span><span class="rem">'+t[0]+'</span>'
+      +'<span class="rbody"><span class="t">'+t[1]+'</span><span class="d">'+t[2]+'</span></span>'
+      +'<span class="handle" aria-hidden="true">⠿</span>';
+    list.appendChild(li);
+  });
+  function renumber(){ [].forEach.call(list.children,function(li,i){ li.querySelector('.rnum').textContent=i+1; }); }
+  renumber();
+  if(window.Sortable){ Sortable.create(list,{handle:'.handle',animation:150,ghostClass:'ghost',chosenClass:'drag',onEnd:renumber}); }
+
+  var form=document.getElementById('pform'), err=document.getElementById('err'), btn=document.getElementById('btn');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var cf=document.getElementById('cfirst').value.trim(), cl=document.getElementById('clast').value.trim();
+    if(!cf||!cl){ err.textContent="Please enter your child's first and last name."; return; }
+    var who=cf+' '+cl;
+    err.textContent=''; btn.disabled=true; btn.textContent='Sending…';
+    var ranked=[].map.call(list.children,function(li){ return li.getAttribute('data-val'); });
+    var payload={ form:'parent', who:who, parent:document.getElementById('pname').value.trim(), skills:ranked, extra:document.getElementById('goal').value.trim(), _gotcha:document.getElementById('gotcha').value||'' };
+    fetch('/api/skills',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)})
+      .then(function(r){
+        if(r.ok){ document.getElementById('formview').style.display='none'; document.getElementById('done').style.display='block'; window.scrollTo(0,0); }
+        else{ return r.json().then(function(d){ throw new Error(d.error||'Something went wrong'); }); }
+      })
+      .catch(function(x){ err.textContent=x.message+' — try again.'; btn.disabled=false; btn.textContent='Send →'; });
+  });
+</script>
+<!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

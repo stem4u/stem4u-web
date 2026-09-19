@@ -43,13 +43,15 @@ module.exports = async (req, res) => {
   let skills = Array.isArray(data.skills) ? data.skills : (data.skills ? [data.skills] : []);
   skills = skills.map((s) => cap(s, 60).trim()).filter(Boolean).slice(0, 8);   // ranked order preserved
   const extra = cap(data.extra, 600).trim();
+  const isParent = cap(data.form, 20).trim() === 'parent';   // parent focus form vs kid skills form
+  const parentName = cap(data.parent, 80).trim();
 
   if (!who || skills.length === 0) {
     res.status(400).json({ ok: false, error: 'Name and at least one skill are required.' });
     return;
   }
 
-  const subject = 'New FTC skill ranking — ' + who;
+  const subject = (isParent ? 'New parent focus — ' : 'New FTC skill ranking — ') + who;
   const ranked = skills.map((s, i) => `<tr><td style="padding:2px 8px 2px 0;color:#E8651A;font-weight:700">${i + 1}.</td><td style="padding:2px 0">${escapeHtml(s)}</td></tr>`).join('');
   const html = `<div style="font-family:Inter,Arial,sans-serif;color:#2E2E2E">
       <h2 style="color:#1B2A4A;margin:0 0 10px">FTC Skills Ranking</h2>
@@ -66,7 +68,11 @@ module.exports = async (req, res) => {
   const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
   if (process.env.SUPABASE_URL && SUPA_KEY) {
     try {
-      const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/ftc_skills`, {
+      const table = isParent ? 'parent_focus' : 'ftc_skills';
+      const rowBody = isParent
+        ? { student_name: who, parent_name: parentName || null, ranking: skills, goal: extra || null }
+        : { student_name: who, ranking: skills, extra: extra || null };
+      const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${table}`, {
         method: 'POST',
         headers: {
           apikey: SUPA_KEY,
@@ -74,7 +80,7 @@ module.exports = async (req, res) => {
           'Content-Type': 'application/json',
           Prefer: 'return=minimal',
         },
-        body: JSON.stringify({ student_name: who, ranking: skills, extra: extra || null }),
+        body: JSON.stringify(rowBody),
       });
       results.db = rdb.ok ? 'inserted' : `error ${rdb.status}`;
     } catch (e) { results.db = 'error'; }
