@@ -218,6 +218,8 @@
     }catch(e){ lock('Could not reach the server. Check your connection and reload.'); }
   }
 
+  var REASONS=['Sick','Travel','School event','Family','Other'];
+  function reasonOpts(sel){ var o='<option value="">Reason for absence…</option>'; REASONS.forEach(function(r){ o+='<option'+(sel===r?' selected':'')+'>'+r+'</option>'; }); if(sel && REASONS.indexOf(sel)<0) o+='<option selected>'+esc(sel)+'</option>'; return o; }
   async function loadRoster(){
     var team=document.getElementById('team').value, date=document.getElementById('adate').value||todayET();
     var box=document.getElementById('roster');
@@ -229,24 +231,37 @@
       if(!r.ok||!d.roster){ box.innerHTML='<div class="msg err">Could not load roster.</div>'; return; }
       if(!d.roster.length){ box.innerHTML='<div class="msg">No students on this team yet.</div>'; }
       else box.innerHTML=d.roster.map(function(k){
-        return '<div class="kid"><span class="nm">'+esc(k.name)+'</span>'
+        return '<div class="kid" style="align-items:flex-start">'
+          +'<div style="flex:1"><span class="nm">'+esc(k.name)+'</span>'
+          +'<select class="rsn" style="display:'+(k.present?'none':'block')+';margin-top:7px;width:100%;padding:9px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;background:#fff" onchange="setReason(this,\''+esc(k.id)+'\',\''+esc(k.name)+'\')">'+reasonOpts(k.reason||'')+'</select></div>'
           +'<button class="toggle'+(k.present?' on':'')+'" data-id="'+esc(k.id)+'" data-name="'+esc(k.name)+'" data-on="'+(k.present?1:0)+'" onclick="toggle(this)">'+(k.present?'✓ Present':'Absent')+'</button></div>';
       }).join('');
     }catch(e){ box.innerHTML='<div class="msg err">Could not load roster.</div>'; }
   }
 
-  async function toggle(btn){
+  function postAtt(id,name,present,reason){
     var team=document.getElementById('team').value, date=document.getElementById('adate').value||todayET();
+    return fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(Object.assign(authBody(),{action:'attendance',team:team,date:date,lead_id:id,name:name,present:present,reason:reason||''}))});
+  }
+  async function toggle(btn){
     var on=btn.getAttribute('data-on')==='1'; var next=!on;
     var id=btn.getAttribute('data-id'), name=btn.getAttribute('data-name');
+    var row=btn.closest('.kid'), sel=row?row.querySelector('.rsn'):null;
     var prevTxt=btn.textContent; btn.textContent='…';
     try{
-      var r=await fetch('/api/hours',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(Object.assign(authBody(),{action:'attendance',team:team,date:date,lead_id:id,name:name,present:next}))});
+      var reason=(!next && sel)?sel.value:'';
+      var r=await postAtt(id,name,next,reason);
       if(!r.ok) throw new Error();
       btn.setAttribute('data-on',next?'1':'0');
       btn.className='toggle'+(next?' on':''); btn.textContent=next?'✓ Present':'Absent';
+      if(sel) sel.style.display=next?'none':'block';
     }catch(e){ btn.textContent=prevTxt; }
+  }
+  async function setReason(sel,id,name){
+    var prev=sel.getAttribute('data-prev')||'';
+    try{ var r=await postAtt(id,name,false,sel.value); if(!r.ok) throw new Error(); sel.setAttribute('data-prev',sel.value); }
+    catch(e){ sel.value=prev; }
   }
 
   function renderHList(list){

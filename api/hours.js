@@ -109,13 +109,14 @@ module.exports = async (req, res) => {
       }
       const lr = await fetch(`${url}/rest/v1/leads?select=id,child_first_name,child_last_name&assigned_team=eq.${encodeURIComponent(team)}&deleted_at=is.null&order=child_first_name`, { headers: H });
       const lrows = lr.ok ? await lr.json() : [];
-      const cr = await fetch(`${url}/rest/v1/checkins?select=lead_id,present&session_date=eq.${encodeURIComponent(date)}`, { headers: H });
+      const cr = await fetch(`${url}/rest/v1/checkins?select=lead_id,present,reason&session_date=eq.${encodeURIComponent(date)}`, { headers: H });
       const crows = cr.ok ? await cr.json() : [];
-      const pres = {}; crows.forEach(x => { pres[x.lead_id] = !!x.present; });
+      const pres = {}, rsn = {}; crows.forEach(x => { pres[x.lead_id] = !!x.present; rsn[x.lead_id] = x.reason || ''; });
       const roster = lrows.filter(l => (l.child_first_name || '').trim()).map(l => ({
         id: l.id,
         name: ((l.child_first_name || '').trim() + ' ' + ((l.child_last_name || '').trim() ? (l.child_last_name || '').trim()[0] + '.' : '')).trim(),
         present: !!pres[l.id],
+        reason: rsn[l.id] || '',
       }));
       res.status(200).json({ ok: true, roster, hours: await hoursFor(url, H, a.id, date) });
       return;
@@ -173,7 +174,8 @@ module.exports = async (req, res) => {
         const team = cap(b.team, 40), lead_id = cap(b.lead_id, 60), name = cap(b.name, 80);
         const present = b.present === true || b.present === 'true';
         if (!lead_id) { res.status(400).json({ ok: false, error: 'lead_id required' }); return; }
-        const row = { session_date: date, team: team || null, lead_id, child_name: name || null, present, method: 'instructor', updated_at: new Date().toISOString() };
+        const reason = present ? null : (cap(b.reason, 120) || null);   // reason only when absent
+        const row = { session_date: date, team: team || null, lead_id, child_name: name || null, present, reason, method: 'instructor', updated_at: new Date().toISOString() };
         const r = await fetch(`${url}/rest/v1/checkins?on_conflict=session_date,lead_id`, { method: 'POST', headers: { ...H, Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(row) });
         if (!r.ok) { res.status(502).json({ ok: false, error: 'Could not save attendance.', detail: await r.text() }); return; }
         res.status(200).json({ ok: true }); return;
