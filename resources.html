@@ -172,6 +172,7 @@
     ["FLL BIOGLOW · Innovation Project","fll","Challenge Story","Season narrative","https://va-dcfll.org/app/uploads/2026/08/fll-c-bioglow-challenge-story.pdf"],
     ["FLL BIOGLOW · Innovation Project","fll","Project Sparks","Idea starters","https://va-dcfll.org/app/uploads/2026/08/fll-c-bioglow-project-sparks.pdf"],
     ["FLL BIOGLOW · Innovation Project","fll","Innovation Project Rubric","What judges look for","https://va-dcfll.org/app/uploads/2024/08/Innovation-Project-Rubric-2024.pdf"],
+    ["FLL BIOGLOW · Innovation Project","fll","🔒 STEM4U Innovation Project — Team Packets","34 project ideas (forest / urban / rural) · PIN required","pin:/assets/ip-team-packets-7f3a9c.pdf"],
 
     // ---- Team & Judging ----
     ["FLL BIOGLOW · Team & Judging","fll","Team Meeting Guide","Session-by-session guide","https://firstinspires.blob.core.windows.net/fll/challenge/2026-27/fll-challenge-bioglow-tmg.pdf"],
@@ -236,15 +237,31 @@
       bySec[sec].forEach(function(r){
         shown++;
         var title=r[2].replace('★','<span class="star">★</span>');
-        html+='<a class="res" href="'+esc(r[4])+'" target="_blank" rel="noopener">'
-          +'<div class="t">'+title+'</div><div class="d">'+esc(r[3])+'</div>'
-          +'<div class="u">'+esc(r[4])+'</div></a>';
+        if(r[4].indexOf('pin:')===0){
+          var real=r[4].slice(4);
+          html+='<a class="res" href="#" onclick="return unlockDoc(event,\''+real.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')">'
+            +'<div class="t">'+title+'</div><div class="d">'+esc(r[3])+'</div>'
+            +'<div class="u">🔒 PIN required</div></a>';
+        } else {
+          html+='<a class="res" href="'+esc(r[4])+'" target="_blank" rel="noopener">'
+            +'<div class="t">'+title+'</div><div class="d">'+esc(r[3])+'</div>'
+            +'<div class="u">'+esc(r[4])+'</div></a>';
+        }
       });
       html+='</div>';
     });
     list.innerHTML=html;
     empty.style.display=shown?'none':'block';
     countEl.textContent=shown+' of '+R.length+' resources'+(filter?' matching "'+esc(filter)+'"':'');
+  }
+  var DOC_PIN='43211234';
+  function unlockDoc(e,url){
+    e.preventDefault();
+    var p=prompt('Enter the PIN to open this document:');
+    if(p===null) return false;
+    if(String(p).trim()===DOC_PIN){ window.open(url,'_blank','noopener'); }
+    else { alert('Incorrect PIN — check with your coach.'); }
+    return false;
   }
   q.addEventListener('input',function(){render(q.value);});
   render('');
