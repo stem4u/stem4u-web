@@ -114,6 +114,7 @@ module.exports = async (req, res) => {
     parent_email,
     parent_phone: cap(b.parent_phone, 40).trim() || null,
     contact2_name: cap(b.contact2_name, 120).trim() || null,
+    contact2_relation: cap(b.contact2_relation, 120).trim() || null,
     contact2_phone: cap(b.contact2_phone, 40).trim() || null,
     allergies: cap(b.allergies, 500).trim() || null,
     conditions: cap(b.conditions, 500).trim() || null,
