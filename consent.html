@@ -98,7 +98,7 @@
 
 <div class="page-hero">
   <h1>Enrollment Consent &amp; Agreement</h1>
-  <p>One short form to review and sign — the agreements, consents, and emergency info STEM4U needs for your child. No account needed.</p>
+  <p>One short form to review and sign — the agreements, consents, and emergency info.</p>
 </div>
 
 <div class="wrap">
@@ -117,8 +117,8 @@
     <div class="sec">
       <h2>1 · Child &amp; parent</h2>
       <div class="grid2">
-        <div class="fg"><label class="lbl">Child's full name <span class="req">*</span></label><input type="text" name="child_name" required/></div>
-        <div class="fg"><label class="lbl">Child's date of birth</label><input type="text" name="child_dob" placeholder="MM/DD/YYYY"/></div>
+        <div class="fg"><label class="lbl">Child's first name <span class="req">*</span></label><input type="text" name="child_first" required/></div>
+        <div class="fg"><label class="lbl">Child's last name <span class="req">*</span></label><input type="text" name="child_last" required/></div>
         <div class="fg full">
           <label class="lbl">Program(s) enrolled in</label>
           <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13.5px;">
@@ -129,11 +129,13 @@
             <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" name="programs" value="Drone"/> Drone</label>
           </div>
         </div>
-        <div class="fg"><label class="lbl">Parent / Guardian name <span class="req">*</span></label><input type="text" name="parent_name" required/></div>
+        <div class="fg"><label class="lbl">Parent / Guardian first name <span class="req">*</span></label><input type="text" name="parent_first" required/></div>
+        <div class="fg"><label class="lbl">Parent / Guardian last name <span class="req">*</span></label><input type="text" name="parent_last" required/></div>
         <div class="fg"><label class="lbl">Email <span class="req">*</span></label><input type="email" name="parent_email" required/></div>
         <div class="fg"><label class="lbl">Phone</label><input type="tel" name="parent_phone"/></div>
-        <div class="fg"><label class="lbl">2nd contact — name</label><input type="text" name="contact2_name"/></div>
-        <div class="fg"><label class="lbl">2nd contact — phone</label><input type="tel" name="contact2_phone"/></div>
+        <div class="fg"><label class="lbl">2nd contact — first name</label><input type="text" name="contact2_first"/></div>
+        <div class="fg"><label class="lbl">2nd contact — last name</label><input type="text" name="contact2_last"/></div>
+        <div class="fg full"><label class="lbl">2nd contact — phone</label><input type="tel" name="contact2_phone"/></div>
       </div>
     </div>
 
@@ -157,8 +159,8 @@
       </label>
       <label class="check">
         <input type="checkbox" name="agree_payment" required/>
-        <span>I authorize recurring monthly tuition billing to my payment method on file, per the
-          <a href="policies/payment-policies.pdf" target="_blank" rel="noopener">Payment Policies</a> (billed on the 1st; cancel by the 25th to stop the next month). <span class="req">*</span></span>
+        <span>I understand the monthly tuition fee is <b>due on the 1st of each month</b>, with a <b>grace period through the 5th</b>, per the
+          <a href="policies/payment-policies.pdf" target="_blank" rel="noopener">Payment Policies</a>. <span class="req">*</span></span>
       </label>
       <label class="check">
         <input type="checkbox" name="agree_esign" required/>
@@ -202,7 +204,8 @@
       <h2>6 · Signature</h2>
       <p class="legal">By typing my name below I confirm I am the parent/legal guardian of the child named (or, if the participant is 18+, that I am the participant), that the information is accurate, and that I agree to all the STEM4U enrollment documents referenced above. This agreement is governed by the laws of the Commonwealth of Virginia.</p>
       <div class="grid2">
-        <div class="fg"><label class="lbl">Type your full name (this is your signature) <span class="req">*</span></label><input type="text" name="signature_name" class="sign-name" required autocomplete="name"/></div>
+        <div class="fg"><label class="lbl">Your first name (signature) <span class="req">*</span></label><input type="text" name="sign_first" class="sign-name" required autocomplete="given-name"/></div>
+        <div class="fg"><label class="lbl">Your last name (signature) <span class="req">*</span></label><input type="text" name="sign_last" class="sign-name" required autocomplete="family-name"/></div>
         <div class="fg"><label class="lbl">I am the…</label>
           <select name="signature_relation"><option value="parent">Parent</option><option value="guardian">Legal guardian</option><option value="adult">Adult participant (18+)</option></select></div>
         <div class="fg"><label class="lbl">Date</label><input type="date" name="signed_date"/></div>
@@ -239,6 +242,13 @@
     err.style.display='none';
     var fd=new FormData(form);
     var data=Object.fromEntries(fd.entries());
+    // combine split first/last names into the fields the server expects
+    function comb(a,b){ return ((data[a]||'').trim()+' '+(data[b]||'').trim()).trim(); }
+    data.child_name=comb('child_first','child_last');
+    data.parent_name=comb('parent_first','parent_last');
+    data.contact2_name=comb('contact2_first','contact2_last');
+    data.signature_name=comb('sign_first','sign_last');
+    ['child_first','child_last','parent_first','parent_last','contact2_first','contact2_last','sign_first','sign_last'].forEach(function(k){ delete data[k]; });
     // multi-checkbox programs
     data.programs=[].slice.call(form.querySelectorAll('input[name="programs"]:checked')).map(function(x){return x.value;}).join(', ');
     // normalize checkbox booleans
