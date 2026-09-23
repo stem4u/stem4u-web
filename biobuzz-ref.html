@@ -316,7 +316,7 @@
           <tr><td><div class="action-label">HIVE TIP</div><div class="action-note">LAUNCH into CELL to tip the bi-stable HIVE</div></td>
               <td style="font-size:10px;color:var(--muted)">per tip</td>
               <td style="text-align:center"><span class="pts-pill pts-teleop">+20</span></td></tr>
-          <tr><td><div class="action-label">POLLEN / NECTAR in CELL</div><div class="action-note">Pieces remaining in upward-facing CELL at match end</div></td>
+          <tr><td><div class="action-label">POLLEN / NECTAR in CELL</div><div class="action-note">Pieces in YOUR upward-facing CELL at match end score for you</div></td>
               <td style="font-size:10px;color:var(--muted)">each piece</td>
               <td style="text-align:center"><span class="pts-pill pts-teleop">+2</span></td></tr>
           <tr><td><div class="action-label">Owned FLOWER piece</div><div class="action-note">Owner (top-most NECTAR alliance) scores ALL pieces inside — POLLEN + both NECTARs. Max 8 pieces × 2 = 16 pts per FLOWER</div></td>
@@ -392,7 +392,7 @@
       <div class="tip-row"><span class="ti">🌸</span><div><strong>Own the FLOWER</strong> — place your NECTAR last on top to score all pieces inside</div></div>
       <div class="tip-row"><span class="ti">📈</span><div><strong>SWARM RP is nearly free</strong> — Both LEAVE (6) + AUTO PARK ×2 (10) + TELEOP PARK ×2 (10) = 26 pts. Need only 16. Design for it every match</div></div>
       <div class="tip-row"><span class="ti">🎯</span><div><strong>4 Tips for P1 RP</strong>, 7 for P2. Target 2 tips/robot/match</div></div>
-      <div class="tip-row"><span class="ti">🌿</span><div><strong>Clear CELLS</strong> — opponent scores 2 pts each for pieces left in upward-facing CELL</div></div>
+      <div class="tip-row"><span class="ti">🌿</span><div><strong>Pack your CELL</strong> — pieces left in your upward-facing CELL at match end score 2 pts each for you</div></div>
       <div class="tip-row"><span class="ti">💎</span><div><strong>Max FLOWER = 21 pts</strong> — own the top + bottom NECTAR with 6 POLLEN inside. Both can be the same alliance</div></div>
     </div>
   </div>
@@ -558,6 +558,26 @@
         <span class="sub-total-label">TELEOP Subtotal</span>
         <span class="sub-total-val teleop-color" id="r-tel-sub">0</span>
       </div>
+      <!-- Penalties earned (from opponent fouls) -->
+      <div class="calc-section-hdr" style="background:#7F1D1D;font-size:11px;padding:6px 16px">⚠️ Penalty Points Received (from opponent fouls)</div>
+      <div class="calc-row">
+        <div class="calc-label"><div class="calc-label-name">Minor Fouls on opponent</div><div class="calc-label-note">Opponent committed minor fouls → +5 pts each to your score</div></div>
+        <span class="calc-pts">×5</span>
+        <div class="stepper">
+          <button class="step-btn" onclick="step('r','mfoul',-1)">−</button>
+          <input class="step-val" id="r-mfoul" type="number" value="0" min="0" oninput="calc()">
+          <button class="step-btn" onclick="step('r','mfoul',1)">+</button>
+        </div>
+      </div>
+      <div class="calc-row">
+        <div class="calc-label"><div class="calc-label-name">Major Fouls on opponent</div><div class="calc-label-note">Opponent committed major fouls → +20 pts each to your score</div></div>
+        <span class="calc-pts">×20</span>
+        <div class="stepper">
+          <button class="step-btn" onclick="step('r','jfoul',-1)">−</button>
+          <input class="step-val" id="r-jfoul" type="number" value="0" min="0" oninput="calc()">
+          <button class="step-btn" onclick="step('r','jfoul',1)">+</button>
+        </div>
+      </div>
     </div>
 
     <!-- BLUE -->
@@ -664,6 +684,26 @@
         <span class="sub-total-label">TELEOP Subtotal</span>
         <span class="sub-total-val teleop-color" id="b-tel-sub">0</span>
       </div>
+      <!-- Penalties earned (from opponent fouls) -->
+      <div class="calc-section-hdr" style="background:#7F1D1D;font-size:11px;padding:6px 16px">⚠️ Penalty Points Received (from opponent fouls)</div>
+      <div class="calc-row">
+        <div class="calc-label"><div class="calc-label-name">Minor Fouls on opponent</div><div class="calc-label-note">Opponent committed minor fouls → +5 pts each to your score</div></div>
+        <span class="calc-pts">×5</span>
+        <div class="stepper">
+          <button class="step-btn" onclick="step('b','mfoul',-1)">−</button>
+          <input class="step-val" id="b-mfoul" type="number" value="0" min="0" oninput="calc()">
+          <button class="step-btn" onclick="step('b','mfoul',1)">+</button>
+        </div>
+      </div>
+      <div class="calc-row">
+        <div class="calc-label"><div class="calc-label-name">Major Fouls on opponent</div><div class="calc-label-note">Opponent committed major fouls → +20 pts each to your score</div></div>
+        <span class="calc-pts">×20</span>
+        <div class="stepper">
+          <button class="step-btn" onclick="step('b','jfoul',-1)">−</button>
+          <input class="step-val" id="b-jfoul" type="number" value="0" min="0" oninput="calc()">
+          <button class="step-btn" onclick="step('b','jfoul',1)">+</button>
+        </div>
+      </div>
     </div>
 
   </div><!-- .alliance-grid -->
@@ -716,8 +756,8 @@
 <script>
 // ── State ──────────────────────────────────────────────────────────
 const state = {
-  r: { leave1:'N', leave2:'N', apk1:'N', apk2:'N', aht:0, tht:0, cell:0, grd:0, tpk1:'N', tpk2:'N' },
-  b: { leave1:'N', leave2:'N', apk1:'N', apk2:'N', aht:0, tht:0, cell:0, grd:0, tpk1:'N', tpk2:'N' },
+  r: { leave1:'N', leave2:'N', apk1:'N', apk2:'N', aht:0, tht:0, cell:0, grd:0, tpk1:'N', tpk2:'N', mfoul:0, jfoul:0 },
+  b: { leave1:'N', leave2:'N', apk1:'N', apk2:'N', aht:0, tht:0, cell:0, grd:0, tpk1:'N', tpk2:'N', mfoul:0, jfoul:0 },
 };
 // Shared FLOWERs (4 total on the field, both alliances compete for them)
 // top/bot: 'r' = Red NECTAR on top/bottom, 'b' = Blue, '' = empty
@@ -759,7 +799,7 @@ function step(alliance, field, delta) {
 
 // ── Sync stepper inputs ───────────────────────────────────────────
 ['r','b'].forEach(a => {
-  ['aht','tht','cell','grd'].forEach(f => {
+  ['aht','tht','cell','grd','mfoul','jfoul'].forEach(f => {
     const el = document.getElementById(a + '-' + f);
     if (el) el.addEventListener('input', () => { state[a][f] = parseInt(el.value)||0; calc(); });
   });
@@ -787,7 +827,8 @@ function computeFlowerScores() {
 }
 function computeTeleop(s) {
   // FLOWER/BNB excluded here — added separately in calc() from shared flowers[]
-  return s.tht*20 + s.cell*2 + s.grd*1 + yn(s.tpk1)*5 + yn(s.tpk2)*5;
+  // mfoul/jfoul = penalty points received (opponent's fouls)
+  return s.tht*20 + s.cell*2 + s.grd*1 + yn(s.tpk1)*5 + yn(s.tpk2)*5 + s.mfoul*5 + s.jfoul*20;
 }
 function computeLeavePark(s) {
   return yn(s.leave1)*3 + yn(s.leave2)*3 + yn(s.apk1)*5 + yn(s.apk2)*5 + yn(s.tpk1)*5 + yn(s.tpk2)*5;
@@ -842,7 +883,7 @@ function calc() {
   const bP2    = bTips >= 7;
   const rWin   = rTotal > bTotal;
   const bWin   = bTotal > rTotal;
-  const tie    = rTotal === bTotal;
+  const tie    = rTotal === bTotal && (rTotal > 0 || bTotal > 0);
 
   setChip('red-rp-swarm',  rSwarm);
   setChip('red-rp-p1',     rP1);
@@ -886,7 +927,7 @@ function calc() {
 }
 
 // ── Reset ─────────────────────────────────────────────────────────
-const DEFAULT_STATE = { leave1:'N', leave2:'N', apk1:'N', apk2:'N', aht:0, tht:0, cell:0, grd:0, tpk1:'N', tpk2:'N' };
+const DEFAULT_STATE = { leave1:'N', leave2:'N', apk1:'N', apk2:'N', aht:0, tht:0, cell:0, grd:0, tpk1:'N', tpk2:'N', mfoul:0, jfoul:0 };
 
 function syncToggleButtons() {
   // Sync all Y/N toggle buttons to match current state
@@ -909,7 +950,7 @@ function syncToggleButtons() {
 function resetAll() {
   ['r','b'].forEach(a => {
     Object.assign(state[a], JSON.parse(JSON.stringify(DEFAULT_STATE)));
-    ['aht','tht','cell','grd'].forEach(f => {
+    ['aht','tht','cell','grd','mfoul','jfoul'].forEach(f => {
       const el = document.getElementById(a + '-' + f);
       if (el) el.value = 0;
     });
@@ -970,7 +1011,7 @@ function stepFlower(fi, delta) {
         <div class="stepper">
           <button class="step-btn" onclick="stepFlower(${i},-1)">−</button>
           <input class="step-val" id="fw${n}-pcs" type="number" value="0" min="0" max="6"
-            oninput="flowers[${i}].pcs=parseInt(this.value)||0; calc()">
+            oninput="const v=Math.max(0,Math.min(6,parseInt(this.value)||0));this.value=v;flowers[${i}].pcs=v;calc()">
           <button class="step-btn" onclick="stepFlower(${i},1)">+</button>
         </div>
       </div>
