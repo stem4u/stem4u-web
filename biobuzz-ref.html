@@ -29,7 +29,7 @@
   /* ── Header ── */
   .page-header {
     background: linear-gradient(135deg, var(--navy), var(--blue));
-    padding: 20px 24px; color: #fff;
+    padding: 20px 24px; color: #fff; border-bottom: 5px solid var(--orange);
     display: flex; align-items: center; justify-content: space-between;
   }
   .page-header .season { font-size: 10px; font-weight: 800; letter-spacing: 2px; opacity:.55; text-transform:uppercase; }
@@ -81,13 +81,13 @@
   .pts-pill { display:inline-flex; align-items:center; justify-content:center;
     font-weight:900; font-size:14px; border-radius:7px; padding:2px 10px; min-width:42px; }
   .pts-auto   { color:var(--blue2); }
-  .pts-teleop { color:#9A3412; }
+  .pts-teleop { color:#C2410C; }
   .pts-penalty{ color:var(--amber); }
   .pts-rp     { color:var(--teal); }
 
   /* ── Header colours ── */
   .hdr-auto    { background:var(--blue2); }
-  .hdr-teleop  { background:#9A3412; }
+  .hdr-teleop  { background:var(--orange); }
   .hdr-flower  { background:var(--purple); }
   .hdr-rp      { background:var(--teal); }
   .hdr-penalty { background:var(--amber); }
@@ -136,7 +136,7 @@
   .match-bar .seg { display:flex; align-items:center; justify-content:center; padding:0 8px; }
   .seg-auto { background:var(--blue2); flex:3; }
   .seg-trans { background:#64748B; flex:.8; font-size:8px; }
-  .seg-teleop { background:#9A3412; flex:12; }
+  .seg-teleop { background:var(--orange); flex:12; }
   .seg-flower { background:var(--purple); flex:6; }
 
   /* ══════════════════════════════════════════
@@ -155,7 +155,7 @@
   .calc-section-hdr { padding: 7px 16px; font-size: 10px; font-weight: 800;
     letter-spacing: 1px; text-transform: uppercase; color: #fff; }
   .calc-section-auto   { background: var(--blue2); }
-  .calc-section-teleop { background: #9A3412; }
+  .calc-section-teleop { background: var(--orange); }
 
   .calc-row { display: flex; align-items: center; padding: 9px 16px;
     border-bottom: 1px solid var(--border); gap: 10px; background: #fff; }
@@ -204,7 +204,7 @@
   .sub-total-label { font-size: 11px; font-weight: 700; color: var(--muted); }
   .sub-total-val { font-size: 16px; font-weight: 900; }
   .sub-total-val.auto-color   { color: var(--blue2); }
-  .sub-total-val.teleop-color { color: #9A3412; }
+  .sub-total-val.teleop-color { color: #C2410C; }
 
   /* Results panel */
   .results-panel { background: var(--surface); border-radius: 12px;
@@ -223,7 +223,7 @@
   .result-breakdown { display: flex; gap: 8px; flex-wrap: wrap; }
   .breakdown-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
   .bp-auto   { background: #DBEAFE; color: var(--blue2); }
-  .bp-teleop { background: #FEE2E2; color: #9A3412; }
+  .bp-teleop { background: #FFE7DA; color: #C2410C; }
 
   /* RP display */
   .rp-display { padding: 12px 20px; border-top: 1px solid var(--border);
