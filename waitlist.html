@@ -155,6 +155,7 @@
         <div class="form-group"><label>Child's Grade *</label><select name="grade" required><option value="" disabled selected>Select grade</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option><option>9th Grade</option><option>10th Grade</option><option>11th Grade</option><option>12th Grade</option></select></div>
         <div class="form-group"><label>Programs of Interest *</label>
           <div class="checkbox-group">
+            <label class="checkbox-item"><input type="checkbox" name="programs" value="CS & AI"/> 🧱 LEGO CS &amp; AI (K–8) <span style="color:#0D2B7A;font-weight:700">· New</span></label>
             <label class="checkbox-item"><input type="checkbox" name="programs" value="Robotics"/> 🤖 Robotics</label>
             <label class="checkbox-item" style="opacity:.55;cursor:not-allowed"><input type="checkbox" name="programs" value="FTC" disabled/> 🏆 FTC <span style="color:#b02a2a;font-weight:700">· Full</span></label>
             <label class="checkbox-item" style="opacity:.55;cursor:not-allowed"><input type="checkbox" name="programs" value="FLL" disabled/> ⭐ FLL <span style="color:#b02a2a;font-weight:700">· Full</span></label>
@@ -240,6 +241,18 @@
       }catch{btn.textContent='Network error — try again';btn.disabled=false;}
     });
   });
+  // Preselect a program from ?program= (e.g. QR links: waitlist.html?program=CS%20%26%20AI)
+  (function(){
+    try{
+      var p=new URLSearchParams(location.search).get('program');
+      if(!p) return;
+      var want=p.trim().toLowerCase().replace(/lego\s*/,'').replace(/[^a-z0-9]/g,'');
+      document.querySelectorAll('input[name="programs"]').forEach(function(b){
+        var v=(b.value||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+        if(v===want && !b.disabled){ b.checked=true; var l=b.closest('label'); if(l) l.style.outline='2px solid #FF5500'; }
+      });
+    }catch(e){}
+  })();
 </script>
 <!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
 </body>
