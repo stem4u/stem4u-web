@@ -28,9 +28,10 @@
   .fchip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
   .fchip.on.fll{background:#2E74B5;border-color:#2E74B5}
   .fchip.on.ftc{background:#1a7f57;border-color:#1a7f57}
+  .fchip.on.csai{background:#E8651A;border-color:#E8651A}
   h2{font-family:'Space Grotesk';color:var(--navy);font-size:16px;margin:22px 0 4px;display:flex;align-items:center;gap:8px}
   h2 .tag{font-size:11px;font-weight:600;color:#fff;background:#2E74B5;border-radius:999px;padding:2px 9px}
-  h2 .tag.off{background:#8a5a00}.tag.ftc{background:#1a7f57}.tag.sh{background:#5a3a8a}
+  h2 .tag.off{background:#8a5a00}.tag.ftc{background:#1a7f57}.tag.sh{background:#5a3a8a}.tag.csai{background:#E8651A}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
   @media(max-width:640px){.grid{grid-template-columns:1fr}}
   a.res{display:block;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;text-decoration:none;color:inherit;transition:.12s}
@@ -89,6 +90,7 @@
       <button class="fchip on" data-f="all" onclick="setFilt('all',this)">All</button>
       <button class="fchip fll" data-f="FLL" onclick="setFilt('FLL',this)">FLL</button>
       <button class="fchip ftc" data-f="FTC" onclick="setFilt('FTC',this)">FTC</button>
+      <button class="fchip csai" data-f="CSAI" onclick="setFilt('CSAI',this)">CS &amp; AI</button>
     </div>
     <div class="count" id="count"></div>
   </div>
@@ -244,16 +246,23 @@
     ["Stonehill Middle School · Robotics (EV3)","sh","③ Robot Arm — build","Pick & place","https://assets.education.lego.com/v3/assets/blt293eea581807678a/blt1462fd6a67d57cc5/5f8801e9722f2a15c7ba2511/ev3-model-core-set-robot-arm-h25.pdf?locale=en-us"],
     ["Stonehill Middle School · Robotics (EV3)","sh","③ Robot Arm — code","Program description","https://assets.education.lego.com/v3/assets/blt293eea581807678a/blta876965f795d31e0/5f8803c5b5866d0d5c4099df/ev3-program-description-robotarm.pdf?locale=en-us"],
     ["Stonehill Middle School · Robotics (EV3)","sh","③ Puppy — build","Interactive pet (engagement)","https://assets.education.lego.com/v3/assets/blt293eea581807678a/blt074d025a1a1eccd9/5f8801e41189001a2dc76d4d/ev3-model-core-set-puppy.pdf?locale=en-us"],
-    ["Stonehill Middle School · Robotics (EV3)","sh","③ Puppy — code","Program description","https://assets.education.lego.com/v3/assets/blt293eea581807678a/blt8e4d14f57f043a47/5f8803bd82eaa522ca601cbf/ev3-program-description-puppy.pdf?locale=en-us"]
+    ["Stonehill Middle School · Robotics (EV3)","sh","③ Puppy — code","Program description","https://assets.education.lego.com/v3/assets/blt293eea581807678a/blt8e4d14f57f043a47/5f8803bd82eaa522ca601cbf/ev3-program-description-puppy.pdf?locale=en-us"],
+
+    // ---- LEGO CS & AI · Coach lesson plans (PIN) + LEGO build instructions (public) ----
+    ["LEGO CS & AI","csai","🔒 Lesson Plan — Sparks (Grades K–2)","30-lesson plan · LEGO Kit 45520 · icon-only coding · PIN required","pin:/assets/csai-lessonplan-k2-7a1c.pdf"],
+    ["LEGO CS & AI","csai","🔒 Lesson Plan — Builders (Grades 3–5)","30-lesson plan · LEGO Kit 45521 · PIN required","pin:/assets/csai-lessonplan-3to5-7a1c.pdf"],
+    ["LEGO CS & AI","csai","🔒 Lesson Plan — Engineers (Grades 6–8)","30-lesson plan · LEGO Kit 45522 · PIN required","pin:/assets/csai-lessonplan-6to8-7a1c.pdf"],
+    ["LEGO CS & AI","csai","Building Instructions — Builders (Grades 3–5)","LEGO official build booklet · Kit 45521","https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6674599.pdf"],
+    ["LEGO CS & AI","csai","Building Instructions — Engineers (Grades 6–8)","LEGO official build booklet · Kit 45522","https://www.lego.com/cdn/product-assets/product.bi.core.pdf/6640383.pdf"]
   ];
 
   var list=document.getElementById('list'), q=document.getElementById('q'),
       countEl=document.getElementById('count'), empty=document.getElementById('empty');
-  var TAGLABEL={fll:'FLL',ftc:'FTC',off:'OFFICIAL',sh:'STONEHILL'};
+  var TAGLABEL={fll:'FLL',ftc:'FTC',off:'OFFICIAL',sh:'STONEHILL',csai:'CS & AI'};
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   var FILT='all';
   // Program of a row from its section label: FTC sections start with "FTC"; everything else (FLL BIOGLOW, VA-DC) is FLL.
-  function progOf(r){ return r[1]==='ftc' ? 'FTC' : (r[1]==='fll' ? 'FLL' : 'OTHER'); }
+  function progOf(r){ return r[1]==='ftc' ? 'FTC' : (r[1]==='fll' ? 'FLL' : (r[1]==='csai' ? 'CSAI' : 'OTHER')); }
   function setFilt(f,btn){ FILT=f; var cs=document.querySelectorAll('.fchip'); for(var i=0;i<cs.length;i++)cs[i].classList.remove('on'); btn.classList.add('on'); render(q.value); }
   function render(filter){
     filter=(filter||'').toLowerCase().trim();
