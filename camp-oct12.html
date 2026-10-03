@@ -277,7 +277,9 @@
     data.parent_name=comb('parent_first','parent_last');
     data.contact2_name=comb('contact2_first','contact2_last');
     data.signature_name=comb('sign_first','sign_last');
-    ['child_first','child_last','parent_first','parent_last','contact2_first','contact2_last','sign_first','sign_last'].forEach(function(k){ delete data[k]; });
+    ['contact2_first','contact2_last','sign_first','sign_last'].forEach(function(k){ delete data[k]; });
+    // Flag this as a camp signup so the server also creates a Manage lead for the roster.
+    data.camp='Oct 12 STEM4U Camp';
 
     // Build the "programs" string the server stores: camp + grade + any add-ons.
     var addons=[].slice.call(form.querySelectorAll('input[name="addons"]:checked')).map(function(x){return x.value;});

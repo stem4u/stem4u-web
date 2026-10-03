@@ -156,6 +156,39 @@ module.exports = async (req, res) => {
     if (!r.ok) { res.status(502).json({ ok: false, error: 'Could not save — please try again.', detail: await r.text() }); return; }
     const saved = await r.json();
     const id = Array.isArray(saved) && saved[0] ? saved[0].id : null;
+
+    // Camp signups: also create a Manage lead so the camper shows in the roster /
+    // Classes & Fees / Attendance. Gated to camp submissions (b.camp) so regular
+    // enrollment consents don't create duplicate leads. Non-fatal.
+    if (cap(b.camp, 120).trim()) {
+      try {
+        const sp = (full) => { const t = String(full || '').trim().split(/\s+/); return { first: t.shift() || '', last: t.join(' ') }; };
+        const cn = b.child_first ? { first: cap(b.child_first, 80), last: cap(b.child_last, 80) } : sp(child_name);
+        const pn = b.parent_first ? { first: cap(b.parent_first, 80), last: cap(b.parent_last, 80) } : sp(parent_name);
+        const leadRow = {
+          submitted_at: new Date().toISOString(),
+          type: 'Camp',
+          source: 'Camp Signup',
+          parent_first_name: pn.first,
+          parent_last_name: pn.last,
+          child_first_name: cn.first,
+          child_last_name: cn.last,
+          email: parent_email.toLowerCase(),
+          parent2_email: cap(b.contact2_email, 160).trim().toLowerCase() || null,
+          phone: cap(b.parent_phone, 40).trim() || null,
+          grade: cap(b.grade, 40).trim() || null,
+          programs: cap(b.programs, 200).trim() || cap(b.camp, 120).trim(),
+          message: 'Signed up via the Oct 12 camp page. Waiver signed.',
+          status: 'new',
+        };
+        await fetch(`${url}/rest/v1/leads`, {
+          method: 'POST',
+          headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify(leadRow),
+        });
+      } catch (e) { /* lead creation is best-effort; the signed consent is already saved */ }
+    }
+
     res.status(200).json({ ok: true, id });
   } catch (e) {
     res.status(500).json({ ok: false, error: 'Consent handler failed' });
