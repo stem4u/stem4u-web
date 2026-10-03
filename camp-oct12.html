@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Robotics &amp; Drone Day Camp — Sign Up | STEM4U</title>
+<meta name="description" content="Sign up for the STEM4U Robotics & Drone Day Camp on Monday, October 12, 2026 in Ashburn, VA. Register and sign the waivers in one short form."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --navy:#0D2B7A; --blue:#1A5CD8; --orange:#FF5500; --orange-lt:#FF7733;
+    --light:#F4F7FF; --white:#FFFFFF; --text:#0A1E52; --muted:#4A5A80; --card:#FFFFFF; --line:#D0D8EE;
+  }
+  html{scroll-behavior:smooth;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--light);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
+
+  .page-hero{background:var(--navy);color:#fff;padding:40px 24px 30px;text-align:center;position:relative;}
+  .page-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--orange);}
+  .page-hero .eyebrow{color:#F5C518;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+  .page-hero h1{font-size:clamp(26px,4.5vw,38px);font-weight:900;}
+  .page-hero p{font-size:16px;color:rgba(255,255,255,.82);max-width:640px;margin:10px auto 0;line-height:1.6;}
+
+  .wrap{max-width:760px;margin:0 auto;padding:30px 20px 60px;width:100%;}
+  .intro{background:#EEF3FF;border:1px solid #cdd9f7;border-left:4px solid var(--blue);border-radius:10px;padding:16px 18px;font-size:14.5px;line-height:1.6;color:var(--navy);margin-bottom:26px;}
+  .intro a{color:var(--blue);font-weight:700;}
+
+  .sec{background:var(--card);border-radius:12px;padding:22px 22px 20px;box-shadow:0 2px 16px rgba(13,43,122,.07);border-top:4px solid var(--orange);margin-bottom:20px;}
+  .sec:nth-child(even){border-top-color:var(--blue);}
+  .sec h2{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+  .sec .hint{font-size:12.5px;color:var(--muted);margin-bottom:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr;}}
+  .fg{margin-bottom:14px;}
+  .fg.full{grid-column:1/-1;}
+  label.lbl{display:block;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+  .req{color:var(--orange);}
+  input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea{
+    width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:7px;font-size:14px;font-family:inherit;color:var(--text);background:var(--light);outline:none;transition:border-color .15s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;}
+  textarea{resize:vertical;min-height:60px;}
+
+  .daycard{background:var(--light);border:1.5px solid var(--line);border-left:4px solid var(--orange);border-radius:9px;padding:13px 15px;margin-bottom:14px;font-size:14px;color:var(--text);line-height:1.6;}
+  .daycard b{color:var(--navy);}
+
+  .check{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--light);margin-bottom:10px;cursor:pointer;}
+  .check input{margin-top:3px;width:17px;height:17px;flex-shrink:0;accent-color:var(--orange);}
+  .check span{font-size:13.5px;line-height:1.5;color:var(--text);}
+  .check a{color:var(--blue);font-weight:700;}
+  .choice{display:flex;flex-direction:column;gap:9px;}
+  .choice label{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;cursor:pointer;background:var(--light);}
+  .choice input{margin-top:2px;accent-color:var(--orange);}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+
+  .sign-name{font-family:"Brush Script MT","Segoe Script",cursive;font-size:22px !important;color:var(--navy);}
+  .legal{font-size:12px;color:var(--muted);line-height:1.55;margin:6px 0 14px;}
+
+  .submit-btn{width:100%;padding:15px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.02em;transition:background .15s;}
+  .submit-btn:hover{background:var(--orange-lt);}
+  .submit-btn:disabled{opacity:.6;cursor:default;}
+  .form-err{display:none;background:#FDEBEB;border:1.5px solid #E58A8A;color:#8A1F1F;border-radius:8px;padding:12px 14px;font-size:14px;margin-bottom:14px;}
+  .done{display:none;background:#EAF7EF;border:1.5px solid #6FBF8F;border-radius:12px;padding:34px 24px;text-align:center;color:var(--navy);}
+  .done .big{font-size:56px;}
+  .done h2{font-size:24px;margin:6px 0 8px;color:#1a7f57;}
+  .done p{font-size:15px;color:var(--text);max-width:460px;margin:0 auto;line-height:1.6;}
+  .done a{display:inline-block;margin-top:20px;background:var(--orange);color:#fff;text-decoration:none;font-weight:800;padding:12px 26px;border-radius:8px;}
+
+  footer{background:#070F2B;color:rgba(255,255,255,.5);text-align:center;padding:26px 24px;font-size:13px;margin-top:auto;}
+  footer a{color:var(--orange);text-decoration:none;margin:0 8px;}
+</style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programs.html" class="nav-link">Programs</a>
+    <a href="teams.html" class="nav-link">Teams</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <a href="waitlist.html" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<div class="page-hero">
+  <div class="eyebrow">Monday, October 12, 2026 · Grades 2–6</div>
+  <h1>Robotics &amp; Drone Day Camp — Sign Up</h1>
+  <p>A full day of hands-on robotics and drones on the LCPS school holiday. One short form to register your camper and sign the waivers.</p>
+</div>
+
+<div class="wrap">
+  <div class="intro">
+    This single form registers your child for the <b>October 12 day camp</b> and covers all the required agreements. The full policy documents are linked next to each item —
+    <a href="policies/master-enrollment-agreement.pdf" target="_blank" rel="noopener">view all policies</a>.
+    By signing, you agree to them together, as allowed under Virginia's electronic-signature law. We'll follow up by email to confirm your spot and any fees.
+  </div>
+
+  <div class="form-err" id="formErr"></div>
+
+  <form id="campForm" autocomplete="on">
+    <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true"/>
+
+    <!-- 1. Child + parent -->
+    <div class="sec">
+      <h2>1 · Child &amp; parent</h2>
+      <div class="grid2">
+        <div class="fg"><label class="lbl">Child's first name <span class="req">*</span></label><input type="text" name="child_first" required/></div>
+        <div class="fg"><label class="lbl">Child's last name <span class="req">*</span></label><input type="text" name="child_last" required/></div>
+        <div class="fg"><label class="lbl">Child's grade <span class="req">*</span></label>
+          <select name="grade" required><option value="" disabled selected>Select grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option></select></div>
+        <div class="fg"><label class="lbl">Child's age</label><input type="text" name="child_age" placeholder="optional"/></div>
+        <div class="fg"><label class="lbl">Parent / Guardian first name <span class="req">*</span></label><input type="text" name="parent_first" required/></div>
+        <div class="fg"><label class="lbl">Parent / Guardian last name <span class="req">*</span></label><input type="text" name="parent_last" required/></div>
+        <div class="fg"><label class="lbl">Email <span class="req">*</span></label><input type="email" name="parent_email" required/></div>
+        <div class="fg"><label class="lbl">Phone</label><input type="tel" name="parent_phone"/></div>
+      </div>
+      <div class="hint" style="margin-top:6px">Emergency contact — someone we can reach if we can't reach you.</div>
+      <div class="grid2">
+        <div class="fg"><label class="lbl">Emergency contact — first name</label><input type="text" name="contact2_first"/></div>
+        <div class="fg"><label class="lbl">Emergency contact — last name</label><input type="text" name="contact2_last"/></div>
+        <div class="fg"><label class="lbl">Relationship to child</label><input type="text" name="contact2_relation" placeholder="e.g. grandparent, neighbor, family friend"/></div>
+        <div class="fg"><label class="lbl">Emergency contact — phone</label><input type="tel" name="contact2_phone"/></div>
+        <div class="fg"><label class="lbl">Emergency contact — email <span style="font-weight:400;color:#7a8299">(optional)</span></label><input type="email" name="contact2_email"/></div>
+      </div>
+    </div>
+
+    <!-- 2. Camp day & options -->
+    <div class="sec">
+      <h2>2 · Camp day &amp; options</h2>
+      <div class="daycard">
+        <b>Date:</b> Monday, October 12, 2026 &nbsp;·&nbsp; <b>Main camp:</b> 9:00 am – 4:00 pm <span style="color:var(--muted)">(included)</span><br>
+        <b>Where:</b> STEM4U · 21690 Red Rum Dr #182, Ashburn, VA 20147
+      </div>
+      <div class="hint">Need care outside the main day? Add it below — we'll confirm the add-on fees with you by email.</div>
+      <label class="check">
+        <input type="checkbox" name="addons" value="Early drop-off (8:00 am)"/>
+        <span><b>Early drop-off — 8:00 am</b> &nbsp;<span style="color:var(--muted)">(before the 9:00 am start)</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="addons" value="Late pickup (until 5:00 pm)"/>
+        <span><b>Late pickup — until 5:00 pm</b> &nbsp;<span style="color:var(--muted)">(after the 4:00 pm end)</span></span>
+      </label>
+    </div>
+
+    <!-- 3. Agreements -->
+    <div class="sec">
+      <h2>3 · Agreements</h2>
+      <div class="hint">Tap a policy name to read the full text. Checking the box means you've read and agree.</div>
+      <label class="check">
+        <input type="checkbox" name="agree_policies" required/>
+        <span>I have read and agree to STEM4U's
+          <a href="policies/assumption-of-risk.pdf" target="_blank" rel="noopener">Assumption of Risk</a>,
+          <a href="policies/release-of-liability.pdf" target="_blank" rel="noopener">Release &amp; Waiver</a>,
+          <a href="policies/code-of-conduct.pdf" target="_blank" rel="noopener">Code of Conduct</a>,
+          <a href="policies/child-safety.pdf" target="_blank" rel="noopener">Child Safety Policy</a>, and
+          <a href="policies/authorized-pickup.pdf" target="_blank" rel="noopener">Pick-Up policy</a>. <span class="req">*</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="agree_medical" required/>
+        <span>I authorize STEM4U staff to give basic first aid and, in an emergency, to call 911 and obtain emergency treatment for my child (per the
+          <a href="policies/emergency-medical.pdf" target="_blank" rel="noopener">Emergency Medical Authorization</a>). <span class="req">*</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="agree_payment" required/>
+        <span>I understand the day-camp fee reserves my child's spot and I agree to the
+          <a href="policies/payment-policies.pdf" target="_blank" rel="noopener">Payment Policies</a> (including any add-on fees I selected above). <span class="req">*</span></span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="agree_esign" required/>
+        <span>I consent to electronic records and signatures — a typed name here is my legal signature, under Virginia UETA / the federal E-SIGN Act
+          (<a href="policies/electronic-signatures.pdf" target="_blank" rel="noopener">details</a>). <span class="req">*</span></span>
+      </label>
+    </div>
+
+    <!-- 4. Emergency medical -->
+    <div class="sec">
+      <h2>4 · Emergency &amp; medical info</h2>
+      <div class="hint">Optional — just so our staff know what to watch for and can tell 911 responders. STEM4U staff do not administer medication; a student who carries emergency medication (e.g. an inhaler or EpiPen) self-administers it, and staff call 911 in an emergency.</div>
+      <div class="fg full"><label class="lbl">Allergies or anything our staff should know</label><input type="text" name="allergies" placeholder="e.g. severe peanut allergy · asthma · carries an EpiPen in her bag"/></div>
+    </div>
+
+    <!-- 5. Authorized pickup -->
+    <div class="sec">
+      <h2>5 · Authorized pick-up</h2>
+      <div class="hint">Adults (besides you) allowed to pick up your child. Staff may ask for photo ID.</div>
+      <div class="grid2">
+        <div class="fg full"><label class="lbl">Authorized adult 1 — name, relationship, phone</label><input type="text" name="pickup1"/></div>
+        <div class="fg full"><label class="lbl">Authorized adult 2 — name, relationship, phone</label><input type="text" name="pickup2"/></div>
+        <div class="fg"><label class="lbl">May your child (13+) sign out and leave on their own?</label>
+          <select name="self_signout"><option value="">— select —</option><option value="no">No</option><option value="yes">Yes</option></select></div>
+      </div>
+    </div>
+
+    <!-- 6. Photo choice -->
+    <div class="sec">
+      <h2>6 · Photo &amp; video</h2>
+      <div class="hint">Your choice does not affect enrollment. (<a href="policies/photo-video-release.pdf" target="_blank" rel="noopener">full release</a>)</div>
+      <div class="choice">
+        <label><input type="radio" name="photo_choice" value="yes" required/> <span><b>Yes</b> — STEM4U may use my child's image to promote and document its programs.</span></label>
+        <label><input type="radio" name="photo_choice" value="limited"/> <span><b>Limited</b> — internal use only (private class recaps, program review). No public marketing or social media.</span></label>
+        <label><input type="radio" name="photo_choice" value="no"/> <span><b>No</b> — please don't use my child's image in any STEM4U materials.</span></label>
+      </div>
+    </div>
+
+    <!-- 7. Signature -->
+    <div class="sec">
+      <h2>7 · Signature</h2>
+      <p class="legal">By typing my name below I confirm I am the parent/legal guardian of the child named, that the information is accurate, and that I agree to all the STEM4U enrollment documents referenced above. This agreement is governed by the laws of the Commonwealth of Virginia.</p>
+      <div class="grid2">
+        <div class="fg"><label class="lbl">Your first name (signature) <span class="req">*</span></label><input type="text" name="sign_first" class="sign-name" required autocomplete="given-name"/></div>
+        <div class="fg"><label class="lbl">Your last name (signature) <span class="req">*</span></label><input type="text" name="sign_last" class="sign-name" required autocomplete="family-name"/></div>
+        <div class="fg"><label class="lbl">I am the…</label>
+          <select name="signature_relation"><option value="parent">Parent</option><option value="guardian">Legal guardian</option></select></div>
+        <div class="fg"><label class="lbl">Date</label><input type="date" name="signed_date"/></div>
+      </div>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAElTfPsKirO6gQZd" style="margin:6px 0 16px"></div>
+      <button type="submit" class="submit-btn">Sign up &amp; submit</button>
+    </div>
+  </form>
+
+  <div class="done" id="done">
+    <div class="big">✅</div>
+    <h2>You're signed up!</h2>
+    <p>We've recorded your Robotics &amp; Drone Day Camp registration and signed agreement for <b>October 12</b>. We'll email you to confirm your spot and any add-on fees. Questions? <a href="mailto:contact@stem4u.com" style="color:var(--blue);text-decoration:none;font-weight:700">contact@stem4u.com</a>.</p>
+    <a href="index.html">Back to home</a>
+  </div>
+</div>
+
+<footer>
+  <div><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+  <p style="margin-top:8px;">© 2026 STEM4U LLC. · 21690 Red Rum Dr #182, Ashburn, VA 20147</p>
+  <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px;">STEM4U is the brand of Stem for You LLC.</p>
+</footer>
+
+<script>
+(function(){
+  var form=document.getElementById('campForm');
+  var err=document.getElementById('formErr');
+  var dt=form.querySelector('input[name="signed_date"]');
+  if(dt){ dt.value=new Date().toISOString().slice(0,10); }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    err.style.display='none';
+    var fd=new FormData(form);
+    var data=Object.fromEntries(fd.entries());
+    function comb(a,b){ return ((data[a]||'').trim()+' '+(data[b]||'').trim()).trim(); }
+    data.child_name=comb('child_first','child_last');
+    data.parent_name=comb('parent_first','parent_last');
+    data.contact2_name=comb('contact2_first','contact2_last');
+    data.signature_name=comb('sign_first','sign_last');
+    ['child_first','child_last','parent_first','parent_last','contact2_first','contact2_last','sign_first','sign_last'].forEach(function(k){ delete data[k]; });
+
+    // Build the "programs" string the server stores: camp + grade + any add-ons.
+    var addons=[].slice.call(form.querySelectorAll('input[name="addons"]:checked')).map(function(x){return x.value;});
+    var parts=['Oct 12 STEM4U Camp (Robotics & Drone)'];
+    if(data.grade){ parts.push('Grade: '+data.grade); }
+    if(addons.length){ parts.push(addons.join(' · ')); }
+    data.programs=parts.join(' · ');
+    delete data.addons;
+
+    ['agree_policies','agree_medical','agree_payment','agree_esign'].forEach(function(k){
+      var el=form.querySelector('[name="'+k+'"]'); data[k]= el ? !!el.checked : false;
+    });
+    if(!data.signed_date){ data.signed_date=new Date().toISOString().slice(0,10); }
+
+    var btn=form.querySelector('button[type=submit]');
+    var bt=btn.textContent; btn.disabled=true; btn.textContent='Submitting…';
+    try{
+      var res=await fetch('/api/consent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      var j={}; try{ j=await res.json(); }catch(_){}
+      if(res.ok && j.ok){
+        form.style.display='none';
+        document.getElementById('done').style.display='block';
+        window.scrollTo(0,0);
+      } else {
+        err.textContent=(j&&j.error)||'Something went wrong. Please check the form and try again.';
+        err.style.display='block';
+        btn.disabled=false; btn.textContent=bt;
+        if(window.turnstile){ try{ turnstile.reset(); }catch(_){} }
+        window.scrollTo(0,0);
+      }
+    }catch(_){
+      err.textContent='Network error — please try again.';
+      err.style.display='block';
+      btn.disabled=false; btn.textContent=bt;
+    }
+  });
+})();
+</script>
+<!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
