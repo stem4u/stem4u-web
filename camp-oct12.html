@@ -55,6 +55,12 @@
     width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:7px;font-size:14px;font-family:inherit;color:var(--text);background:var(--light);outline:none;transition:border-color .15s;}
   input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;}
   textarea{resize:vertical;min-height:60px;}
+  /* missing-required highlighting */
+  input.invalid,select.invalid,textarea.invalid{border-color:#E05A5A !important;background:#FDEBEB !important;}
+  .check.invalid,.choice.invalid{border:1.5px solid #E05A5A;background:#FDEBEB;border-radius:8px;}
+  .choice.invalid{padding:8px;}
+  .field-msg{display:none;color:#B42318;font-size:12px;font-weight:700;margin-top:5px;}
+  .field-msg.show{display:block;}
 
   .daycard{background:var(--light);border:1.5px solid var(--line);border-left:4px solid var(--orange);border-radius:9px;padding:13px 15px;margin-bottom:14px;font-size:14px;color:var(--text);line-height:1.6;}
   .daycard b{color:var(--navy);}
@@ -115,7 +121,7 @@
 
   <div class="form-err" id="formErr"></div>
 
-  <form id="campForm" autocomplete="on">
+  <form id="campForm" autocomplete="on" novalidate>
     <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true"/>
 
     <!-- 1. Child + parent -->
@@ -249,7 +255,6 @@
         <div style="color:var(--muted);font-size:13px;margin-top:8px;">Your spot is confirmed once payment is received. We'll email you about any extended-care add-on fees (early drop-off / late pickup). Questions about payment? Email <a href="mailto:contact@stem4u.com" style="color:var(--blue);font-weight:700;text-decoration:none;">contact@stem4u.com</a>.</div>
       </div>
     </div>
-    <p style="font-size:13.5px;color:var(--muted);margin-top:12px;">Questions? <a href="mailto:contact@stem4u.com" style="color:var(--blue);text-decoration:none;font-weight:700">contact@stem4u.com</a>.</p>
     <a href="index.html">Back to home</a>
   </div>
 </div>
@@ -267,9 +272,60 @@
   var dt=form.querySelector('input[name="signed_date"]');
   if(dt){ dt.value=new Date().toISOString().slice(0,10); }
 
+  var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function box(el){ return el.closest('.check') || el; }
+  function setBad(el,bad){ if(!el)return; var t=box(el); if(bad){t.classList.add('invalid');} else {t.classList.remove('invalid');} }
+  // clear a field's highlight as soon as the parent fixes it
+  form.addEventListener('input', function(e){ setBad(e.target,false); err.style.display='none'; });
+  form.addEventListener('change', function(e){
+    setBad(e.target,false);
+    if(e.target.name==='photo_choice'){ var c=form.querySelector('.choice'); if(c)c.classList.remove('invalid'); }
+    err.style.display='none';
+  });
+
+  function validate(){
+    var missing=[];
+    function req(name,label){
+      var el=form.querySelector('[name="'+name+'"]');
+      var v=el?String(el.value||'').trim():'';
+      var bad=!v; setBad(el,bad); if(bad)missing.push(label); return !bad;
+    }
+    req('child_first',"Child's first name");
+    req('child_last',"Child's last name");
+    req('grade',"Child's grade");
+    req('parent_first',"Parent first name");
+    req('parent_last',"Parent last name");
+    if(req('parent_email','Email')){
+      var em=form.querySelector('[name="parent_email"]');
+      if(!EMAIL_RE.test(em.value.trim())){ setBad(em,true); missing.push('a valid email'); }
+    }
+    req('parent_phone','Phone');
+    // photo choice (radio)
+    if(!form.querySelector('input[name="photo_choice"]:checked')){
+      var ch=form.querySelector('.choice'); if(ch)ch.classList.add('invalid'); missing.push('Photo & video choice');
+    }
+    // agreement checkboxes
+    [['agree_policies','the Release & Waiver agreement'],['agree_medical','the Emergency Medical authorization'],
+     ['agree_payment','the Payment agreement'],['agree_esign','the E-signature consent']].forEach(function(p){
+      var el=form.querySelector('[name="'+p[0]+'"]'); var bad=!(el&&el.checked); setBad(el,bad); if(bad)missing.push(p[1]);
+    });
+    req('sign_first','Your first name (signature)');
+    req('sign_last','Your last name (signature)');
+    return missing;
+  }
+
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     err.style.display='none';
+    var missing=validate();
+    if(missing.length){
+      err.innerHTML='Please complete the highlighted field'+(missing.length>1?'s':'')+': <b>'+missing.join(', ')+'</b>.';
+      err.style.display='block';
+      var first=form.querySelector('.invalid, input.invalid, select.invalid');
+      if(first){ first.scrollIntoView({behavior:'smooth',block:'center'}); var f=first.querySelector('input,select')||first; try{f.focus({preventScroll:true});}catch(_){ } }
+      else { window.scrollTo({top:0,behavior:'smooth'}); }
+      return;
+    }
     var fd=new FormData(form);
     var data=Object.fromEntries(fd.entries());
     function comb(a,b){ return ((data[a]||'').trim()+' '+(data[b]||'').trim()).trim(); }
