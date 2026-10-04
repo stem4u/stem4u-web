@@ -35,6 +35,9 @@
  .c2.on2{background:#eaf1ff;color:#1a5cd8;border-color:#c7d9ff}
  .c2.on3{background:#fff2e8;color:#E8651A;border-color:#f3cdb3}
  .c2.warn{background:#fdecec;color:#c0392b;border-color:#f3c0c0}
+ .filt{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 2px}
+ .fb{font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+ .fb:hover{border-color:var(--orange)} .fb.on{background:var(--navy);color:#fff;border-color:var(--navy)}
  .lacts{display:flex;gap:7px;flex:0 0 auto}
  .btn{font-size:12px;font-weight:700;padding:7px 11px;border-radius:8px;white-space:nowrap}
  .btn.pdf{background:var(--orange);color:#fff} .btn.pdf:hover{background:#d1560f}
@@ -70,12 +73,19 @@
     <div class="meta"><span class="chip">30 lessons · 6 units</span><span class="chip">LEGO Kit 45520</span><span class="chip">Groups of 4</span><span class="chip">Explore how AI works</span></div>
   </div>
   <div class="note"><b>How to use — two phases:</b> <b>① Learn &amp; teach LEGO first</b> — click <b>“LEGO lesson”</b> for the official plan in the Teacher Portal (needs a free LEGO account login + the kit PIN). <b>② Enhance later</b> — <b>“STEM4U (enhanced)”</b> is our own 60-minute version of that same lesson, ready for when we switch over. Honest AI framing (both): K–2 kids <b>use</b> pretrained AI pose blocks — they do not train their own model.<br><b>Tags on each lesson:</b> 🧱 Build (new model) · 💻 Device (coding on a screen) · ⚙️ Motor + sensor (hardware). <b>⚠ Low-tech</b> flags lessons with <b>no device and no hardware</b> — bricks only (mostly the Basics intro lessons). Motor/sensor is shown at the unit level.</div>
+  <div class="filt">
+    <button class="fb on" data-k="all" onclick="filt('all',this)">All 30</button>
+    <button class="fb" data-k="b" onclick="filt('b',this)">🧱 Build</button>
+    <button class="fb" data-k="d" onclick="filt('d',this)">💻 Device</button>
+    <button class="fb" data-k="h" onclick="filt('h',this)">⚙️ Motor + sensor</button>
+    <button class="fb" data-k="l" onclick="filt('l',this)">⚠ Low-tech</button>
+  </div>
   
     <section class="unit">
       <div class="uh"><span class="udot"></span><h2>Basics</h2><span class="ucount">5 lessons</span></div>
       <p class="ud">Steps in order — model daily processes, build algorithms, decompose problems.</p>
       <div class="lessons">
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="0" data-l="1">
         <div class="ln">01</div>
         <div class="lmid">
           <div class="lt">Meet the Kit &amp; First Press</div>
@@ -87,7 +97,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-01.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="0" data-l="1">
         <div class="ln">02</div>
         <div class="lmid">
           <div class="lt">Everyday Steps in Order</div>
@@ -99,7 +109,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-02.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="0" data-l="1">
         <div class="ln">03</div>
         <div class="lmid">
           <div class="lt">Break the Big Job into Little Steps</div>
@@ -111,7 +121,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-03.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="0" data-l="1">
         <div class="ln">04</div>
         <div class="lmid">
           <div class="lt">Say the Plan First (Picture Plan)</div>
@@ -123,7 +133,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-04.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="0" data-d="0" data-h="0" data-l="1">
         <div class="ln">05</div>
         <div class="lmid">
           <div class="lt">Design Challenge — Build-a-Bot Parade</div>
@@ -141,7 +151,7 @@
       <div class="uh"><span class="udot"></span><h2>Hardware</h2><span class="ucount">5 lessons</span></div>
       <p class="ud">How the machine's parts work — start/stop a motor and read the color sensor.</p>
       <div class="lessons">
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">06</div>
         <div class="lmid">
           <div class="lt">Build the Machine &amp; Start the Motor</div>
@@ -153,7 +163,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-06.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">07</div>
         <div class="lmid">
           <div class="lt">Fast, Slow, Forward, Back</div>
@@ -165,7 +175,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-07.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">08</div>
         <div class="lmid">
           <div class="lt">Meet the Color Sensor</div>
@@ -177,7 +187,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-08.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">09</div>
         <div class="lmid">
           <div class="lt">When the Sensor Talks to the Motor</div>
@@ -189,7 +199,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-09.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="0" data-d="0" data-h="1" data-l="0">
         <div class="ln">10</div>
         <div class="lmid">
           <div class="lt">Design Challenge — Color Signal Machine</div>
@@ -207,7 +217,7 @@
       <div class="uh"><span class="udot"></span><h2>Events</h2><span class="ucount">5 lessons</span></div>
       <p class="ud">Something makes the program start — triggers, presses, and colors.</p>
       <div class="lessons">
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">11</div>
         <div class="lmid">
           <div class="lt">Build the Model &amp; First Trigger</div>
@@ -219,7 +229,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-11.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">12</div>
         <div class="lmid">
           <div class="lt">Red Light, Green Light</div>
@@ -231,7 +241,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-12.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">13</div>
         <div class="lmid">
           <div class="lt">Make Your Own Triggers</div>
@@ -243,7 +253,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-13.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">14</div>
         <div class="lmid">
           <div class="lt">The Machine Answers Back</div>
@@ -255,7 +265,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-14.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="0" data-d="1" data-h="1" data-l="0">
         <div class="ln">15</div>
         <div class="lmid">
           <div class="lt">Design Challenge — Press-to-Go Gadget</div>
@@ -273,7 +283,7 @@
       <div class="uh"><span class="udot"></span><h2>Sequences</h2><span class="ucount">5 lessons</span></div>
       <p class="ud">The right order gets the job done — build, debug, and tell stories in order.</p>
       <div class="lessons">
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">16</div>
         <div class="lmid">
           <div class="lt">Build the Model &amp; Run a Sequence</div>
@@ -285,7 +295,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-16.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">17</div>
         <div class="lmid">
           <div class="lt">Fix-It — The Steps Are Jumbled</div>
@@ -297,7 +307,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-17.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">18</div>
         <div class="lmid">
           <div class="lt">A Sequence That Solves a Problem</div>
@@ -309,7 +319,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-18.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">19</div>
         <div class="lmid">
           <div class="lt">Draw the Sequence First</div>
@@ -321,7 +331,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-19.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="0" data-d="1" data-h="1" data-l="0">
         <div class="ln">20</div>
         <div class="lmid">
           <div class="lt">Design Challenge — Tell a Story in Order</div>
@@ -339,7 +349,7 @@
       <div class="uh"><span class="udot"></span><h2>Loops</h2><span class="ucount">5 lessons</span></div>
       <p class="ud">Computers repeat for us — repeat patterns and keep count.</p>
       <div class="lessons">
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">21</div>
         <div class="lmid">
           <div class="lt">Build the Model &amp; Do It Again</div>
@@ -351,7 +361,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-21.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">22</div>
         <div class="lmid">
           <div class="lt">Loops with Moves &amp; Sounds (+ Fix-It)</div>
@@ -363,7 +373,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-22.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="0" data-h="1" data-l="0">
         <div class="ln">23</div>
         <div class="lmid">
           <div class="lt">Repeat and Keep Count</div>
@@ -375,7 +385,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-23.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">24</div>
         <div class="lmid">
           <div class="lt">Make Your Own Loops</div>
@@ -387,7 +397,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-24.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="0" data-d="1" data-h="1" data-l="0">
         <div class="ln">25</div>
         <div class="lmid">
           <div class="lt">Design Challenge — Pattern Party</div>
@@ -405,7 +415,7 @@
       <div class="uh"><span class="udot"></span><h2>AI &amp; Data</h2><span class="ucount">5 lessons</span></div>
       <p class="ud">Machines sort, show data, and recognize — explore how AI works with pose blocks.</p>
       <div class="lessons">
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">26</div>
         <div class="lmid">
           <div class="lt">Collect the Data (Build the Model)</div>
@@ -417,7 +427,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-26.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">27</div>
         <div class="lmid">
           <div class="lt">A Program That Shows Our Data</div>
@@ -429,7 +439,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-27.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">28</div>
         <div class="lmid">
           <div class="lt">Meet the AI Pose Blocks</div>
@@ -441,7 +451,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-28.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="1" data-d="1" data-h="1" data-l="0">
         <div class="ln">29</div>
         <div class="lmid">
           <div class="lt">Change the Pose Program</div>
@@ -453,7 +463,7 @@
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-k2/csai-k2-lesson-29.pdf')">② STEM4U (enhanced)</a>
         </div>
       </div>
-      <div class="lesson">
+      <div class="lesson" data-b="0" data-d="1" data-h="1" data-l="0">
         <div class="ln">30</div>
         <div class="lmid">
           <div class="lt">Design Challenge — AI Pose Story Circle</div>
@@ -481,6 +491,9 @@
    var ok=false; try{ok=sessionStorage.getItem('k2hub')==='1';}catch(_){}
    if(!ok){ var p=prompt('Enter the coach PIN:'); if(p===null)return false; if(String(p).trim()!==DOC_PIN){alert('Incorrect PIN.');return false;} }
    window.open(url,'_blank','noopener'); return false; }
+ function filt(k,btn){ var fbs=document.querySelectorAll('.fb'); for(var i=0;i<fbs.length;i++)fbs[i].classList.remove('on'); btn.classList.add('on');
+   var ls=document.querySelectorAll('.lesson'); for(var j=0;j<ls.length;j++){ var show=(k==='all')||ls[j].getAttribute('data-'+k)==='1'; ls[j].style.display=show?'':'none'; }
+   var us=document.querySelectorAll('.unit'); for(var u=0;u<us.length;u++){ var any=false; var L=us[u].querySelectorAll('.lesson'); for(var m=0;m<L.length;m++){ if(L[m].style.display!=='none'){any=true;break;} } us[u].style.display=any?'':'none'; } }
  try{ if(sessionStorage.getItem('k2hub')==='1') unlock(); }catch(e){}
  window.addEventListener('DOMContentLoaded',function(){ var p=document.getElementById('pin'); if(p) p.focus(); });
 </script>
