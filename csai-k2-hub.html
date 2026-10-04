@@ -28,6 +28,12 @@
  .lmid{flex:1;min-width:0}
  .lt{font-weight:700;color:var(--navy);font-size:14px}
  .lsub{font-size:11.5px;color:var(--muted);margin-top:1px}
+ .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+ .c2{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#fff;white-space:nowrap}
+ .c2.on{background:#e9f7ef;color:#1a7f57;border-color:#bfe6cf}
+ .c2.on2{background:#eaf1ff;color:#1a5cd8;border-color:#c7d9ff}
+ .c2.on3{background:#fff2e8;color:#E8651A;border-color:#f3cdb3}
+ .c2.warn{background:#fdecec;color:#c0392b;border-color:#f3c0c0}
  .lacts{display:flex;gap:7px;flex:0 0 auto}
  .btn{font-size:12px;font-weight:700;padding:7px 11px;border-radius:8px;white-space:nowrap}
  .btn.pdf{background:var(--orange);color:#fff} .btn.pdf:hover{background:#d1560f}
@@ -62,7 +68,7 @@
     <p>All 30 lessons across six units. <b>Teach LEGO's official plan first</b> — then switch to our STEM4U enhanced version as we grow into it. Each row links to both.</p>
     <div class="meta"><span class="chip">30 lessons · 6 units</span><span class="chip">LEGO Kit 45520</span><span class="chip">Groups of 4</span><span class="chip">Explore how AI works</span></div>
   </div>
-  <div class="note"><b>How to use — two phases:</b> <b>① Learn &amp; teach LEGO first</b> — click <b>“LEGO lesson”</b> for the official plan in the Teacher Portal (needs a free LEGO account login + the kit PIN). <b>② Enhance later</b> — <b>“STEM4U (enhanced)”</b> is our own 60-minute version of that same lesson, ready for when we switch over. Honest AI framing (both): K–2 kids <b>use</b> pretrained AI pose blocks — they do not train their own model.</div>
+  <div class="note"><b>How to use — two phases:</b> <b>① Learn &amp; teach LEGO first</b> — click <b>“LEGO lesson”</b> for the official plan in the Teacher Portal (needs a free LEGO account login + the kit PIN). <b>② Enhance later</b> — <b>“STEM4U (enhanced)”</b> is our own 60-minute version of that same lesson, ready for when we switch over. Honest AI framing (both): K–2 kids <b>use</b> pretrained AI pose blocks — they do not train their own model.<br><b>Tags on each lesson:</b> 🧱 Build (new model) · 💻 Device (coding on a screen) · ⚙️ Motor + sensor (hardware). <b>⚠ Low-tech</b> flags lessons with <b>no device and no hardware</b> — bricks only (mostly the Basics intro lessons). Motor/sensor is shown at the unit level.</div>
   
     <section class="unit">
       <div class="uh"><span class="udot"></span><h2>Basics</h2><span class="ucount">5 lessons</span></div>
@@ -73,6 +79,7 @@
         <div class="lmid">
           <div class="lt">Meet the Kit &amp; First Press</div>
           <div class="lsub">LEGO: “Mornings in Motion”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 ">⚙️ Bricks only</span><span class="c2 warn">⚠ Low-tech</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/mornings-in-motion')">① LEGO lesson ↗</a>
@@ -84,6 +91,7 @@
         <div class="lmid">
           <div class="lt">Everyday Steps in Order</div>
           <div class="lsub">LEGO: “Sleepy Steps”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 ">⚙️ Bricks only</span><span class="c2 warn">⚠ Low-tech</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/sleepy-steps')">① LEGO lesson ↗</a>
@@ -95,6 +103,7 @@
         <div class="lmid">
           <div class="lt">Break the Big Job into Little Steps</div>
           <div class="lsub">LEGO: “Caterpillar Friends”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 ">⚙️ Bricks only</span><span class="c2 warn">⚠ Low-tech</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/caterpillar-friends')">① LEGO lesson ↗</a>
@@ -106,6 +115,7 @@
         <div class="lmid">
           <div class="lt">Say the Plan First (Picture Plan)</div>
           <div class="lsub">LEGO: “Caterpillar Bus”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 ">⚙️ Bricks only</span><span class="c2 warn">⚠ Low-tech</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/caterpillar-bus')">① LEGO lesson ↗</a>
@@ -117,6 +127,7 @@
         <div class="lmid">
           <div class="lt">Design Challenge — Build-a-Bot Parade</div>
           <div class="lsub">LEGO: “Pet Sitter” · Design Challenge</div>
+          <div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 ">💻 Screen-free</span><span class="c2 ">⚙️ Bricks only</span><span class="c2 warn">⚠ Low-tech</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/pet-sitter')">① LEGO lesson ↗</a>
@@ -134,6 +145,7 @@
         <div class="lmid">
           <div class="lt">Build the Machine &amp; Start the Motor</div>
           <div class="lsub">LEGO: “Trunk Travels”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/trunk-travels')">① LEGO lesson ↗</a>
@@ -145,6 +157,7 @@
         <div class="lmid">
           <div class="lt">Fast, Slow, Forward, Back</div>
           <div class="lsub">LEGO: “Elephant’s Play Day”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/elephants-play-day')">① LEGO lesson ↗</a>
@@ -156,6 +169,7 @@
         <div class="lmid">
           <div class="lt">Meet the Color Sensor</div>
           <div class="lsub">LEGO: “Spin and Grin”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/spin-and-grin')">① LEGO lesson ↗</a>
@@ -167,6 +181,7 @@
         <div class="lmid">
           <div class="lt">When the Sensor Talks to the Motor</div>
           <div class="lsub">LEGO: “Ride Your Way”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/ride-your-way')">① LEGO lesson ↗</a>
@@ -178,6 +193,7 @@
         <div class="lmid">
           <div class="lt">Design Challenge — Color Signal Machine</div>
           <div class="lsub">LEGO: “Surprise Squad” · Design Challenge</div>
+          <div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/surprise-squad')">① LEGO lesson ↗</a>
@@ -195,6 +211,7 @@
         <div class="lmid">
           <div class="lt">Build the Model &amp; First Trigger</div>
           <div class="lsub">LEGO: “Go On Green”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/go-on-green')">① LEGO lesson ↗</a>
@@ -206,6 +223,7 @@
         <div class="lmid">
           <div class="lt">Red Light, Green Light</div>
           <div class="lsub">LEGO: “Safe City”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/safe-city')">① LEGO lesson ↗</a>
@@ -217,6 +235,7 @@
         <div class="lmid">
           <div class="lt">Make Your Own Triggers</div>
           <div class="lsub">LEGO: “Pet Feeder”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/pet-feeder')">① LEGO lesson ↗</a>
@@ -228,6 +247,7 @@
         <div class="lmid">
           <div class="lt">The Machine Answers Back</div>
           <div class="lsub">LEGO: “Treat Time”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/treat-time')">① LEGO lesson ↗</a>
@@ -239,6 +259,7 @@
         <div class="lmid">
           <div class="lt">Design Challenge — Press-to-Go Gadget</div>
           <div class="lsub">LEGO: “Animal Band” · Design Challenge</div>
+          <div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/animal-band')">① LEGO lesson ↗</a>
@@ -256,6 +277,7 @@
         <div class="lmid">
           <div class="lt">Build the Model &amp; Run a Sequence</div>
           <div class="lsub">LEGO: “Nest Quest”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/nest-quest')">① LEGO lesson ↗</a>
@@ -267,6 +289,7 @@
         <div class="lmid">
           <div class="lt">Fix-It — The Steps Are Jumbled</div>
           <div class="lsub">LEGO: “Quack the Code”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/quack-the-code')">① LEGO lesson ↗</a>
@@ -278,6 +301,7 @@
         <div class="lmid">
           <div class="lt">A Sequence That Solves a Problem</div>
           <div class="lsub">LEGO: “Deep Sea Directions”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/deep-sea-directions')">① LEGO lesson ↗</a>
@@ -289,6 +313,7 @@
         <div class="lmid">
           <div class="lt">Draw the Sequence First</div>
           <div class="lsub">LEGO: “Submarine Adventure”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/submarine-adventure')">① LEGO lesson ↗</a>
@@ -300,6 +325,7 @@
         <div class="lmid">
           <div class="lt">Design Challenge — Tell a Story in Order</div>
           <div class="lsub">LEGO: “Story Steps” · Design Challenge</div>
+          <div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/story-steps')">① LEGO lesson ↗</a>
@@ -317,6 +343,7 @@
         <div class="lmid">
           <div class="lt">Build the Model &amp; Do It Again</div>
           <div class="lsub">LEGO: “Slide and Share”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/slide-and-share')">① LEGO lesson ↗</a>
@@ -328,6 +355,7 @@
         <div class="lmid">
           <div class="lt">Loops with Moves &amp; Sounds (+ Fix-It)</div>
           <div class="lsub">LEGO: “Play All Day”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/play-all-day')">① LEGO lesson ↗</a>
@@ -339,6 +367,7 @@
         <div class="lmid">
           <div class="lt">Repeat and Keep Count</div>
           <div class="lsub">LEGO: “Picking Petals”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/picking-petals')">① LEGO lesson ↗</a>
@@ -350,6 +379,7 @@
         <div class="lmid">
           <div class="lt">Make Your Own Loops</div>
           <div class="lsub">LEGO: “Flowers for Croc”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/flowers-for-croc')">① LEGO lesson ↗</a>
@@ -361,6 +391,7 @@
         <div class="lmid">
           <div class="lt">Design Challenge — Pattern Party</div>
           <div class="lsub">LEGO: “Playground Patterns” · Design Challenge</div>
+          <div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/playground-patterns')">① LEGO lesson ↗</a>
@@ -378,6 +409,7 @@
         <div class="lmid">
           <div class="lt">Collect the Data (Build the Model)</div>
           <div class="lsub">LEGO: “Sorting Apples”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/sorting-apples')">① LEGO lesson ↗</a>
@@ -389,6 +421,7 @@
         <div class="lmid">
           <div class="lt">A Program That Shows Our Data</div>
           <div class="lsub">LEGO: “Count and Crunch”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/count-and-crunch')">① LEGO lesson ↗</a>
@@ -400,6 +433,7 @@
         <div class="lmid">
           <div class="lt">Meet the AI Pose Blocks</div>
           <div class="lsub">LEGO: “Twirling Toucan”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/twirling-toucan')">① LEGO lesson ↗</a>
@@ -411,6 +445,7 @@
         <div class="lmid">
           <div class="lt">Change the Pose Program</div>
           <div class="lsub">LEGO: “Rainforest Rhythm”</div>
+          <div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/rainforest-rhythm')">① LEGO lesson ↗</a>
@@ -422,6 +457,7 @@
         <div class="lmid">
           <div class="lt">Design Challenge — AI Pose Story Circle</div>
           <div class="lsub">LEGO: “Stop and Go Parade” · Design Challenge</div>
+          <div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div>
         </div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/stop-and-go-parade')">① LEGO lesson ↗</a>

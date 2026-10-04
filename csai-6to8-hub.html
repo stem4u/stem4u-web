@@ -26,6 +26,9 @@
  .lesson{display:flex;align-items:center;gap:13px;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:var(--light)}
  .ln{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--navy);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
  .lmid{flex:1;min-width:0} .lt{font-weight:700;color:var(--navy);font-size:14px} .lsub{font-size:11.5px;color:var(--muted);margin-top:1px}
+ .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+ .c2{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#fff;white-space:nowrap}
+ .c2.on{background:#e9f7ef;color:#1a7f57;border-color:#bfe6cf} .c2.on2{background:#eaf1ff;color:#1a5cd8;border-color:#c7d9ff} .c2.on3{background:#fff2e8;color:#E8651A;border-color:#f3cdb3} .c2.warn{background:#fdecec;color:#c0392b;border-color:#f3c0c0}
  .lacts{display:flex;gap:7px;flex:0 0 auto}
  .btn{font-size:12px;font-weight:700;padding:7px 11px;border-radius:8px;white-space:nowrap}
  .btn.pdf{background:var(--orange);color:#fff} .btn.pdf:hover{background:#d1560f}
@@ -57,7 +60,7 @@
     <p>All 30 lessons across six units. <b>Teach LEGO's official plan first</b> — then switch to our STEM4U enhanced version as we grow into it. Each row links to both.</p>
     <div class="meta"><span class="chip">30 lessons · 6 units</span><span class="chip">LEGO Kit 45522</span><span class="chip">Groups of 4</span></div>
   </div>
-  <div class="note"><b>How to use — two phases:</b> <b>① Learn &amp; teach LEGO first</b> — click <b>“LEGO lesson”</b> for the official plan in the Teacher Portal (needs a free LEGO account login + the kit PIN). <b>② Enhance later</b> — <b>“STEM4U (enhanced)”</b> is our own 60-minute version of that same lesson, ready for when we switch over.</div>
+  <div class="note"><b>How to use — two phases:</b> <b>① Learn &amp; teach LEGO first</b> — click <b>“LEGO lesson”</b> for the official plan in the Teacher Portal (needs a free LEGO account login + the kit PIN). <b>② Enhance later</b> — <b>“STEM4U (enhanced)”</b> is our own 60-minute version of that same lesson, ready for when we switch over.<br><b>Tags on each lesson:</b> 🧱 Build (new model) · 💻 Device (coding on a screen) · ⚙️ Motor + sensor (hardware). <b>⚠ Low-tech</b> flags lessons with no device and no hardware. Motor/sensor is used throughout this band.</div>
   
     <section class="unit">
       <div class="uh"><span class="udot"></span><h2>Basics</h2><span class="ucount">5 lessons</span></div>
@@ -65,7 +68,7 @@
       <div class="lessons">
       <div class="lesson">
         <div class="ln">01</div>
-        <div class="lmid"><div class="lt">Setup, the Canvas, and Your First Program</div><div class="lsub">LEGO: “Restaurant Rookie”</div></div>
+        <div class="lmid"><div class="lt">Setup, the Canvas, and Your First Program</div><div class="lsub">LEGO: “Restaurant Rookie”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 ">💻 Screen-free</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/restaurant-rookie')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-01.pdf')">② STEM4U (enhanced)</a>
@@ -73,7 +76,7 @@
       </div>
       <div class="lesson">
         <div class="ln">02</div>
-        <div class="lmid"><div class="lt">Build the Model &amp; Sequencing</div><div class="lsub">LEGO: “Robot Food Service”</div></div>
+        <div class="lmid"><div class="lt">Build the Model &amp; Sequencing</div><div class="lsub">LEGO: “Robot Food Service”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/robot-food-service')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-02.pdf')">② STEM4U (enhanced)</a>
@@ -81,7 +84,7 @@
       </div>
       <div class="lesson">
         <div class="ln">03</div>
-        <div class="lmid"><div class="lt">Decomposition &amp; Flowcharts</div><div class="lsub">LEGO: “Forest Flight Rescue”</div></div>
+        <div class="lmid"><div class="lt">Decomposition &amp; Flowcharts</div><div class="lsub">LEGO: “Forest Flight Rescue”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/forest-flight-rescue')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-03.pdf')">② STEM4U (enhanced)</a>
@@ -89,7 +92,7 @@
       </div>
       <div class="lesson">
         <div class="ln">04</div>
-        <div class="lmid"><div class="lt">Pseudocode, Abstraction &amp; Iterative Design</div><div class="lsub">LEGO: “Supplies from the Skies”</div></div>
+        <div class="lmid"><div class="lt">Pseudocode, Abstraction &amp; Iterative Design</div><div class="lsub">LEGO: “Supplies from the Skies”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/supplies-from-the-skies')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-04.pdf')">② STEM4U (enhanced)</a>
@@ -97,7 +100,7 @@
       </div>
       <div class="lesson">
         <div class="ln">05</div>
-        <div class="lmid"><div class="lt">Design Challenge — Spec-Build Review</div><div class="lsub">LEGO: “Chore Champion”</div></div>
+        <div class="lmid"><div class="lt">Design Challenge — Spec-Build Review</div><div class="lsub">LEGO: “Chore Champion”</div><div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/chore-champion')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-05.pdf')">② STEM4U (enhanced)</a>
@@ -111,7 +114,7 @@
       <div class="lessons">
       <div class="lesson">
         <div class="ln">06</div>
-        <div class="lmid"><div class="lt">Build the Model &amp; Count Loops</div><div class="lsub">LEGO: “Drop from the Top”</div></div>
+        <div class="lmid"><div class="lt">Build the Model &amp; Count Loops</div><div class="lsub">LEGO: “Drop from the Top”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/drop-from-the-top')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-06.pdf')">② STEM4U (enhanced)</a>
@@ -119,7 +122,7 @@
       </div>
       <div class="lesson">
         <div class="ln">07</div>
-        <div class="lmid"><div class="lt">Loop Bodies &amp; Systematic Debugging</div><div class="lsub">LEGO: “Dizzy Descent”</div></div>
+        <div class="lmid"><div class="lt">Loop Bodies &amp; Systematic Debugging</div><div class="lsub">LEGO: “Dizzy Descent”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/dizzy-descent')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-07.pdf')">② STEM4U (enhanced)</a>
@@ -127,7 +130,7 @@
       </div>
       <div class="lesson">
         <div class="ln">08</div>
-        <div class="lmid"><div class="lt">Forever Loops &amp; Controlled Stopping</div><div class="lsub">LEGO: “Wake-Up Call”</div></div>
+        <div class="lmid"><div class="lt">Forever Loops &amp; Controlled Stopping</div><div class="lsub">LEGO: “Wake-Up Call”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/wake-up-call')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-08.pdf')">② STEM4U (enhanced)</a>
@@ -135,7 +138,7 @@
       </div>
       <div class="lesson">
         <div class="ln">09</div>
-        <div class="lmid"><div class="lt">Nested Loops &amp; the Loop Variable</div><div class="lsub">LEGO: “Tick-Tick Trouble”</div></div>
+        <div class="lmid"><div class="lt">Nested Loops &amp; the Loop Variable</div><div class="lsub">LEGO: “Tick-Tick Trouble”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/tick-tick-trouble')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-09.pdf')">② STEM4U (enhanced)</a>
@@ -143,7 +146,7 @@
       </div>
       <div class="lesson">
         <div class="ln">10</div>
-        <div class="lmid"><div class="lt">Design Challenge — Iteration Showcase</div><div class="lsub">LEGO: “Repeat the Beat”</div></div>
+        <div class="lmid"><div class="lt">Design Challenge — Iteration Showcase</div><div class="lsub">LEGO: “Repeat the Beat”</div><div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/repeat-the-beat')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-10.pdf')">② STEM4U (enhanced)</a>
@@ -157,7 +160,7 @@
       <div class="lessons">
       <div class="lesson">
         <div class="ln">11</div>
-        <div class="lmid"><div class="lt">Build the Model &amp; If / Then</div><div class="lsub">LEGO: “Game On”</div></div>
+        <div class="lmid"><div class="lt">Build the Model &amp; If / Then</div><div class="lsub">LEGO: “Game On”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/game-on')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-11.pdf')">② STEM4U (enhanced)</a>
@@ -165,7 +168,7 @@
       </div>
       <div class="lesson">
         <div class="ln">12</div>
-        <div class="lmid"><div class="lt">If / Then / Else &amp; Tracing Logic</div><div class="lsub">LEGO: “Level Up”</div></div>
+        <div class="lmid"><div class="lt">If / Then / Else &amp; Tracing Logic</div><div class="lsub">LEGO: “Level Up”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/level-up')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-12.pdf')">② STEM4U (enhanced)</a>
@@ -173,7 +176,7 @@
       </div>
       <div class="lesson">
         <div class="ln">13</div>
-        <div class="lmid"><div class="lt">Compound Conditions (AND / OR / NOT)</div><div class="lsub">LEGO: “Ocean Walker”</div></div>
+        <div class="lmid"><div class="lt">Compound Conditions (AND / OR / NOT)</div><div class="lsub">LEGO: “Ocean Walker”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/ocean-walker')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-13.pdf')">② STEM4U (enhanced)</a>
@@ -181,7 +184,7 @@
       </div>
       <div class="lesson">
         <div class="ln">14</div>
-        <div class="lmid"><div class="lt">Sensor Thresholds &amp; Multi-Way Decisions (+ Debug)</div><div class="lsub">LEGO: “Robot in the Deep”</div></div>
+        <div class="lmid"><div class="lt">Sensor Thresholds &amp; Multi-Way Decisions (+ Debug)</div><div class="lsub">LEGO: “Robot in the Deep”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/robot-in-the-deep')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-14.pdf')">② STEM4U (enhanced)</a>
@@ -189,7 +192,7 @@
       </div>
       <div class="lesson">
         <div class="ln">15</div>
-        <div class="lmid"><div class="lt">Design Challenge — Logic Face-Off</div><div class="lsub">LEGO: “Smart Park”</div></div>
+        <div class="lmid"><div class="lt">Design Challenge — Logic Face-Off</div><div class="lsub">LEGO: “Smart Park”</div><div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/smart-park')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-15.pdf')">② STEM4U (enhanced)</a>
@@ -203,7 +206,7 @@
       <div class="lessons">
       <div class="lesson">
         <div class="ln">16</div>
-        <div class="lmid"><div class="lt">Build the Model &amp; Storing Data</div><div class="lsub">LEGO: “Save or Score”</div></div>
+        <div class="lmid"><div class="lt">Build the Model &amp; Storing Data</div><div class="lsub">LEGO: “Save or Score”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/save-or-score')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-16.pdf')">② STEM4U (enhanced)</a>
@@ -211,7 +214,7 @@
       </div>
       <div class="lesson">
         <div class="ln">17</div>
-        <div class="lmid"><div class="lt">Updating &amp; Accumulating Data</div><div class="lsub">LEGO: “Score Tracker”</div></div>
+        <div class="lmid"><div class="lt">Updating &amp; Accumulating Data</div><div class="lsub">LEGO: “Score Tracker”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/score-tracker')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-17.pdf')">② STEM4U (enhanced)</a>
@@ -219,7 +222,7 @@
       </div>
       <div class="lesson">
         <div class="ln">18</div>
-        <div class="lmid"><div class="lt">Variables Driving Decisions &amp; State</div><div class="lsub">LEGO: “Nap Needs”</div></div>
+        <div class="lmid"><div class="lt">Variables Driving Decisions &amp; State</div><div class="lsub">LEGO: “Nap Needs”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/nap-needs')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-18.pdf')">② STEM4U (enhanced)</a>
@@ -227,7 +230,7 @@
       </div>
       <div class="lesson">
         <div class="ln">19</div>
-        <div class="lmid"><div class="lt">Multiple Variables &amp; Data You Can Reason About</div><div class="lsub">LEGO: “Feelings in Flow”</div></div>
+        <div class="lmid"><div class="lt">Multiple Variables &amp; Data You Can Reason About</div><div class="lsub">LEGO: “Feelings in Flow”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/feelings-in-flow')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-19.pdf')">② STEM4U (enhanced)</a>
@@ -235,7 +238,7 @@
       </div>
       <div class="lesson">
         <div class="ln">20</div>
-        <div class="lmid"><div class="lt">Design Challenge — Systems Demo Day</div><div class="lsub">LEGO: “Game Designer”</div></div>
+        <div class="lmid"><div class="lt">Design Challenge — Systems Demo Day</div><div class="lsub">LEGO: “Game Designer”</div><div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/game-designer')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-20.pdf')">② STEM4U (enhanced)</a>
@@ -249,7 +252,7 @@
       <div class="lessons">
       <div class="lesson">
         <div class="ln">21</div>
-        <div class="lmid"><div class="lt">Build the Model &amp; Define Your First Function</div><div class="lsub">LEGO: “Music Machine”</div></div>
+        <div class="lmid"><div class="lt">Build the Model &amp; Define Your First Function</div><div class="lsub">LEGO: “Music Machine”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/music-machine')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-21.pdf')">② STEM4U (enhanced)</a>
@@ -257,7 +260,7 @@
       </div>
       <div class="lesson">
         <div class="ln">22</div>
-        <div class="lmid"><div class="lt">Parameters — One Function, Many Behaviors</div><div class="lsub">LEGO: “Funky Functions”</div></div>
+        <div class="lmid"><div class="lt">Parameters — One Function, Many Behaviors</div><div class="lsub">LEGO: “Funky Functions”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/funky-functions')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-22.pdf')">② STEM4U (enhanced)</a>
@@ -265,7 +268,7 @@
       </div>
       <div class="lesson">
         <div class="ln">23</div>
-        <div class="lmid"><div class="lt">Decomposing a Big Program into Functions</div><div class="lsub">LEGO: “Art Designer”</div></div>
+        <div class="lmid"><div class="lt">Decomposing a Big Program into Functions</div><div class="lsub">LEGO: “Art Designer”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/art-designer')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-23.pdf')">② STEM4U (enhanced)</a>
@@ -273,7 +276,7 @@
       </div>
       <div class="lesson">
         <div class="ln">24</div>
-        <div class="lmid"><div class="lt">Reuse, Documentation &amp; Refactoring (+ Debug)</div><div class="lsub">LEGO: “Pattern Party”</div></div>
+        <div class="lmid"><div class="lt">Reuse, Documentation &amp; Refactoring (+ Debug)</div><div class="lsub">LEGO: “Pattern Party”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/pattern-party')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-24.pdf')">② STEM4U (enhanced)</a>
@@ -281,7 +284,7 @@
       </div>
       <div class="lesson">
         <div class="ln">25</div>
-        <div class="lmid"><div class="lt">Design Challenge — Code-Review Gallery</div><div class="lsub">LEGO: “Culinary Convenience”</div></div>
+        <div class="lmid"><div class="lt">Design Challenge — Code-Review Gallery</div><div class="lsub">LEGO: “Culinary Convenience”</div><div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/culinary-convenience')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-25.pdf')">② STEM4U (enhanced)</a>
@@ -295,7 +298,7 @@
       <div class="lessons">
       <div class="lesson">
         <div class="ln">26</div>
-        <div class="lmid"><div class="lt">How Machines Learn from Data</div><div class="lsub">LEGO: “Dance Partner”</div></div>
+        <div class="lmid"><div class="lt">How Machines Learn from Data</div><div class="lsub">LEGO: “Dance Partner”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/dance-partner')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-26.pdf')">② STEM4U (enhanced)</a>
@@ -303,7 +306,7 @@
       </div>
       <div class="lesson">
         <div class="ln">27</div>
-        <div class="lmid"><div class="lt">Connecting a Trained Model to a Build</div><div class="lsub">LEGO: “Dance Trainer”</div></div>
+        <div class="lmid"><div class="lt">Connecting a Trained Model to a Build</div><div class="lsub">LEGO: “Dance Trainer”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/dance-trainer')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-27.pdf')">② STEM4U (enhanced)</a>
@@ -311,7 +314,7 @@
       </div>
       <div class="lesson">
         <div class="ln">28</div>
-        <div class="lmid"><div class="lt">Evaluating &amp; Improving a Model (Data Literacy)</div><div class="lsub">LEGO: “Skateboard Stunts”</div></div>
+        <div class="lmid"><div class="lt">Evaluating &amp; Improving a Model (Data Literacy)</div><div class="lsub">LEGO: “Skateboard Stunts”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/skateboard-stunts')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-28.pdf')">② STEM4U (enhanced)</a>
@@ -319,7 +322,7 @@
       </div>
       <div class="lesson">
         <div class="ln">29</div>
-        <div class="lmid"><div class="lt">Bias, Fairness &amp; Responsible Use</div><div class="lsub">LEGO: “Super Speed Skateboard”</div></div>
+        <div class="lmid"><div class="lt">Bias, Fairness &amp; Responsible Use</div><div class="lsub">LEGO: “Super Speed Skateboard”</div><div class="chips"><span class="c2 on">🧱 Build</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/super-speed-skateboard')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-29.pdf')">② STEM4U (enhanced)</a>
@@ -327,7 +330,7 @@
       </div>
       <div class="lesson">
         <div class="ln">30</div>
-        <div class="lmid"><div class="lt">Capstone Expo (Design Challenge)</div><div class="lsub">LEGO: “Password Pose”</div></div>
+        <div class="lmid"><div class="lt">Capstone Expo (Design Challenge)</div><div class="lsub">LEGO: “Password Pose”</div><div class="chips"><span class="c2 ">🧱 Reuse model</span><span class="c2 on2">💻 Code on device</span><span class="c2 on3">⚙️ Motor + sensor</span></div></div>
         <div class="lacts">
           <a class="btn pdf" href="#" onclick="return openSecure(event,'https://teach.legoeducation.com/en-us/computer-science/lesson/password-pose')">① LEGO lesson ↗</a>
           <a class="btn lego" href="#" onclick="return openSecure(event,'/assets/csai-6to8/csai-6to8-lesson-30.pdf')">② STEM4U (enhanced)</a>
