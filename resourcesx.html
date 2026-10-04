@@ -30,9 +30,10 @@
   .fchip.on.ftc{background:#1a7f57;border-color:#1a7f57}
   .fchip.on.csai{background:#E8651A;border-color:#E8651A}
   .fchip.on.sci{background:#1a7f57;border-color:#1a7f57}
+  .fchip.on.mb{background:#6a3fb5;border-color:#6a3fb5}
   h2{font-family:'Space Grotesk';color:var(--navy);font-size:16px;margin:22px 0 4px;display:flex;align-items:center;gap:8px}
   h2 .tag{font-size:11px;font-weight:600;color:#fff;background:#2E74B5;border-radius:999px;padding:2px 9px}
-  h2 .tag.off{background:#8a5a00}.tag.ftc{background:#1a7f57}.tag.sh{background:#5a3a8a}.tag.csai{background:#E8651A}.tag.sci{background:#1a7f57}
+  h2 .tag.off{background:#8a5a00}.tag.ftc{background:#1a7f57}.tag.sh{background:#5a3a8a}.tag.csai{background:#E8651A}.tag.sci{background:#1a7f57}.tag.mb{background:#6a3fb5}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
   @media(max-width:640px){.grid{grid-template-columns:1fr}}
   a.res{display:block;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;text-decoration:none;color:inherit;transition:.12s}
@@ -98,6 +99,7 @@
       <button class="fchip ftc" data-f="FTC" onclick="setFilt('FTC',this)">FTC</button>
       <button class="fchip csai" data-f="CSAI" onclick="setFilt('CSAI',this)">CS &amp; AI</button>
       <button class="fchip sci" data-f="SCI" onclick="setFilt('SCI',this)">Science</button>
+      <button class="fchip mb" data-f="MB" onclick="setFilt('MB',this)">micro:bit</button>
     </div>
     <div class="count" id="count"></div>
   </div>
@@ -269,16 +271,19 @@
     ["LEGO Science — coach hubs","sci","🔬 K–2 Science Hub — all 40 lessons","Searchable list; each lesson opens LEGO's official Science lesson · coach PIN","/sci-k2-hub.html"],
     ["LEGO Science — coach hubs","sci","🔬 Grades 3–5 Science Hub — all 40 lessons","Searchable list; each lesson opens LEGO's official Science lesson · coach PIN","/sci-3to5-hub.html"],
     ["LEGO Science — coach hubs","sci","🔬 Grades 6–8 Science Hub — all 40 lessons","Searchable list; each lesson opens LEGO's official Science lesson · coach PIN","/sci-6to8-hub.html"],
-    ["LEGO Science — coach hubs","sci","🔗 LEGO Teacher Portal — all Science lessons","LEGO's own site: official Science lessons & notes (login + kit PIN)","https://teach.legoeducation.com/en-us/science/lessons"]
+    ["LEGO Science — coach hubs","sci","🔗 LEGO Teacher Portal — all Science lessons","LEGO's own site: official Science lessons & notes (login + kit PIN)","https://teach.legoeducation.com/en-us/science/lessons"],
+    ["micro:bit — MicroPython","mb","🐍 micro:bit MicroPython Hub — class or camp","Official 6-project course + Python Editor, docs & an advanced track · coach PIN","/microbit-hub.html"],
+    ["micro:bit — MicroPython","mb","▶ micro:bit Python Editor","Write &amp; flash MicroPython in the browser (built-in simulator)","https://python.microbit.org/"],
+    ["micro:bit — MicroPython","mb","📘 First lessons with Python (6 projects)","micro:bit's classroom-ready Python unit, ages 9–14","https://microbit.org/teach/lessons/first-lessons-with-python-and-the-microbit/"]
   ];
 
   var list=document.getElementById('list'), q=document.getElementById('q'),
       countEl=document.getElementById('count'), empty=document.getElementById('empty');
-  var TAGLABEL={fll:'FLL',ftc:'FTC',off:'OFFICIAL',sh:'STONEHILL',csai:'CS & AI',sci:'Science'};
+  var TAGLABEL={fll:'FLL',ftc:'FTC',off:'OFFICIAL',sh:'STONEHILL',csai:'CS & AI',sci:'Science',mb:'micro:bit'};
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   var FILT='all';
   // Program of a row from its section label: FTC sections start with "FTC"; everything else (FLL BIOGLOW, VA-DC) is FLL.
-  function progOf(r){ return r[1]==='ftc' ? 'FTC' : (r[1]==='fll' ? 'FLL' : (r[1]==='csai' ? 'CSAI' : (r[1]==='sci' ? 'SCI' : 'OTHER'))); }
+  function progOf(r){ return r[1]==='ftc' ? 'FTC' : (r[1]==='fll' ? 'FLL' : (r[1]==='csai' ? 'CSAI' : (r[1]==='sci' ? 'SCI' : (r[1]==='mb' ? 'MB' : 'OTHER')))); }
   function setFilt(f,btn){ FILT=f; var cs=document.querySelectorAll('.fchip'); for(var i=0;i<cs.length;i++)cs[i].classList.remove('on'); btn.classList.add('on'); render(q.value); }
   function render(filter){
     filter=(filter||'').toLowerCase().trim();
