@@ -161,6 +161,9 @@ module.exports = async (req, res) => {
     // Classes & Fees / Attendance. Gated to camp submissions (b.camp) so regular
     // enrollment consents don't create duplicate leads. Non-fatal.
     if (cap(b.camp, 120).trim()) {
+      // The Oct 12 day camp: new signups must land on the camp roster automatically.
+      const CAMP_CLASS_ID = 'CAMP1012';
+      const CAMP_TEAM = 'Oct 12';        // team = the camp day
       try {
         const sp = (full) => { const t = String(full || '').trim().split(/\s+/); return { first: t.shift() || '', last: t.join(' ') }; };
         const cn = b.child_first ? { first: cap(b.child_first, 80), last: cap(b.child_last, 80) } : sp(child_name);
@@ -169,6 +172,7 @@ module.exports = async (req, res) => {
           submitted_at: new Date().toISOString(),
           type: 'Camp',
           source: 'Camp Signup',
+          assigned_team: CAMP_TEAM,
           parent_first_name: pn.first,
           parent_last_name: pn.last,
           child_first_name: cn.first,
@@ -177,15 +181,29 @@ module.exports = async (req, res) => {
           parent2_email: cap(b.contact2_email, 160).trim().toLowerCase() || null,
           phone: cap(b.parent_phone, 40).trim() || null,
           grade: cap(b.grade, 40).trim() || null,
-          programs: cap(b.programs, 200).trim() || cap(b.camp, 120).trim(),
+          programs: 'Day Camp',
           message: 'Signed up via the Oct 12 camp page. Waiver signed.',
           status: 'new',
         };
-        await fetch(`${url}/rest/v1/leads`, {
+        // return=representation so we get the new lead id back to enroll it
+        const leadResp = await fetch(`${url}/rest/v1/leads`, {
           method: 'POST',
-          headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
           body: JSON.stringify(leadRow),
         });
+        let leadId = null;
+        try { const lrows = await leadResp.json(); leadId = Array.isArray(lrows) && lrows[0] ? lrows[0].id : null; } catch (_) {}
+        // Auto-enroll the camper in the CAMP1012 class so they show in the roster,
+        // Classes & Fees, Attendance and Accounts Receivable without manual steps.
+        if (leadId) {
+          try {
+            await fetch(`${url}/rest/v1/class_enrollments?on_conflict=lead_id,class_id`, {
+              method: 'POST',
+              headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'resolution=ignore-duplicates,return=minimal' },
+              body: JSON.stringify({ lead_id: leadId, class_id: CAMP_CLASS_ID }),
+            });
+          } catch (e) { /* enrollment is best-effort; lead + consent are already saved */ }
+        }
       } catch (e) { /* lead creation is best-effort; the signed consent is already saved */ }
     }
 
