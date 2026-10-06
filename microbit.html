@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>micro:bit Coding Classes & Camps for Kids in Loudoun & Northern Virginia | STEM4U</title>
+<meta name="description" content="Hands-on micro:bit coding classes & camps for kids in grades 3–8 across Northern Virginia. Students program a real BBC micro:bit v2 in MicroPython to sense light, motion, temperature & sound — then make it respond. Serving Loudoun, Fairfax & Prince William. Now enrolling for the 2026–27 season."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0D2B7A; --blue:#1A5CD8; --orange:#FF5500; --orange-lt:#FF7733;
+    --light:#F4F7FF; --white:#FFFFFF; --text:#0A1E52; --muted:#4A5A80; --card:#FFFFFF;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
+
+  .page-hero { background: var(--navy); color: var(--white); padding: 46px 24px 40px; text-align: center; position: relative; }
+  .page-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
+  .hero-badge { display:inline-flex; align-items:center; gap:10px; color:#F5C518; font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; }
+  .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); }
+  .page-hero h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; line-height: 1.12; }
+  .page-hero h1 span { color: var(--orange); }
+  .page-hero .lede { font-size: 17px; color: rgba(255,255,255,.8); max-width: 620px; margin: 14px auto 24px; line-height: 1.6; }
+  .hero-cta { display:inline-block; background:var(--orange); color:#fff; font-size:15px; font-weight:800; padding:14px 34px; border-radius:6px; text-decoration:none; box-shadow:0 4px 20px rgba(255,85,0,.4); }
+  .hero-cta:hover { background:var(--orange-lt); }
+
+  .facts { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; max-width:900px; margin:-28px auto 0; padding:0 24px; position:relative; z-index:2; }
+  @media (max-width:720px){ .facts { grid-template-columns:repeat(2,1fr); } }
+  .fact { background:#fff; border-radius:10px; padding:18px 14px; text-align:center; box-shadow:0 4px 20px rgba(13,43,122,.1); border-top:3px solid var(--orange); }
+  .fact .n { font-size:18px; font-weight:900; color:var(--navy); line-height:1.15; }
+  .fact .l { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+
+  .prose { max-width: 720px; margin: 44px auto 0; text-align: left; background: var(--white); border-radius: 12px; padding: 36px 40px; box-shadow: 0 2px 18px rgba(13,43,122,.07); }
+  .prose h3 { font-size: 19px; font-weight: 800; color: var(--navy); margin: 30px 0 10px; padding-left: 12px; border-left: 4px solid var(--orange); }
+  .prose h3:first-child { margin-top: 0; }
+  .prose p { font-size: 16px; color: var(--text); line-height: 1.75; margin-bottom: 16px; }
+  .prose ul { margin: 0 0 16px 4px; list-style: none; }
+  .prose li { font-size: 16px; line-height: 1.7; padding-left: 26px; position: relative; margin-bottom: 8px; }
+  .prose li::before { content: '▸'; position: absolute; left: 4px; color: var(--orange); font-weight: 900; }
+  @media (max-width: 500px) { .prose { padding: 28px 22px; } }
+
+  .ladder { max-width:720px; margin:20px auto 0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  @media (max-width:600px){ .ladder { grid-template-columns:1fr; } }
+  .rung { border-radius:10px; padding:14px 16px; text-align:left; text-decoration:none; display:block; }
+  .rung.here { background:#F4F7FF; border:1.5px solid var(--orange); }
+  .rung.next { background:#fff; border:1.5px solid #E2E8F5; box-shadow:0 2px 12px rgba(13,43,122,.07); transition:transform .15s; }
+  .rung.next:hover { transform:translateY(-3px); }
+  .rung .tag { font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--orange); }
+  .rung .nm { font-size:16px; font-weight:900; color:var(--navy); margin:3px 0 2px; }
+  .rung .dt { font-size:12.5px; color:var(--muted); line-height:1.4; }
+  .tracks { max-width:720px; margin:20px auto 0; display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media(max-width:600px){ .tracks { grid-template-columns:1fr; } }
+  .track { background:var(--light); border-radius:12px; padding:20px 22px; border-top:3px solid var(--orange); }
+  .track .ttag { font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--orange); }
+  .track h4 { font-size:17px; font-weight:900; color:var(--navy); margin:5px 0 8px; }
+  .track p { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:12px; }
+  .track a.tlink { font-size:13px; font-weight:800; color:var(--blue); text-decoration:none; margin-right:14px; }
+  .track a.tlink:hover { text-decoration:underline; }
+
+  .form-section { background: var(--navy); padding: 56px 24px; text-align: center; margin-top:52px; position:relative; }
+  .form-section::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--orange); }
+  .form-wrap { max-width: 520px; margin: 0 auto; text-align: left; }
+  .form-title { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 6px; text-align: center; }
+  .form-subtitle { font-size: 14px; color: rgba(255,255,255,.7); text-align: center; margin-bottom: 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display:block; font-size:12px; font-weight:700; color:rgba(255,255,255,.85); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .form-group input, .form-group select { width:100%; padding:12px 14px; border:1px solid rgba(255,255,255,.2); border-radius:8px; font-size:15px; background:rgba(255,255,255,.06); color:#fff; }
+  .form-group input::placeholder { color:rgba(255,255,255,.4); }
+  .form-group select option { color:#000; }
+  .submit-btn { width:100%; background:var(--orange); color:#fff; font-size:16px; font-weight:800; padding:15px; border:none; border-radius:8px; cursor:pointer; margin-top:8px; transition:background .15s; }
+  .submit-btn:hover { background:var(--orange-lt); }
+  .success-msg { display:none; text-align:center; color:#fff; }
+  .success-msg h3 { font-size:20px; margin-bottom:8px; }
+  .success-msg p { color:rgba(255,255,255,.8); }
+  .priv { font-size:12px; color:rgba(255,255,255,.55); text-align:center; margin-top:14px; }
+
+  .related { max-width:720px; margin:44px auto 0; text-align:center; }
+  .related .section-label { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:14px; }
+  .related-grid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .related-grid a { background:#fff; border-radius:10px; padding:16px 22px; text-decoration:none; color:var(--navy); font-weight:800; font-size:14px; box-shadow:0 2px 14px rgba(13,43,122,.08); border-top:3px solid var(--blue); transition:transform .15s; }
+  .related-grid a:hover { transform:translateY(-3px); }
+
+  .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; margin-top:52px; }
+  .location-bar a { color: var(--white); text-decoration: underline; }
+  footer { background: #070F2B; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  footer a { color: var(--orange); text-decoration: none; }
+  .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
+  .areas { background:var(--navy); color:#fff; padding:36px 24px; text-align:center; }
+</style>
+<link rel="canonical" href="https://stem4u.com/microbit.html"/>
+<meta property="og:title" content="micro:bit Coding Classes & Camps for Kids in Loudoun & Northern Virginia | STEM4U"/>
+<meta property="og:description" content="Hands-on micro:bit coding classes & camps for kids in grades 3–8 in Northern Virginia. Students program a real BBC micro:bit v2 in MicroPython to sense the world and make it respond. Now enrolling for the 2026–27 season."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://stem4u.com/microbit.html"/>
+<meta property="og:image" content="https://stem4u.com/STEM4U-Logo-V3-clean.png"/>
+<meta name="geo.region" content="US-VA"/>
+<meta name="geo.placename" content="Loudoun County, Northern Virginia"/>
+<meta name="keywords" content="micro:bit classes for kids, microbit coding, MicroPython for kids, micro:bit camp, BBC micro:bit, coding classes Ashburn, kids coding Loudoun County, Python for kids Northern Virginia, beginner coding, coding classes near me, STEM coding, micro:bit Aldie, micro:bit Leesburg, micro:bit Sterling, micro:bit South Riding, micro:bit Chantilly, micro:bit Fairfax, micro:bit Prince William County, STEM, Northern Virginia, Virginia, VA, coding near me"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Course","name":"micro:bit Coding Classes & Camps for Kids","description":"Hands-on micro:bit coding classes and camps for students in grades 3–8 in Northern Virginia. Students program a real BBC micro:bit v2 in MicroPython to sense light, motion, temperature and sound, then make it respond with its LED display, speaker and radio. Offered as a weekly class or as a camp using the free, browser-based python.microbit.org editor.","provider":{"@type":"EducationalOrganization","name":"STEM4U","url":"https://stem4u.com"},"educationalLevel":"Grades 3-8","about":"micro:bit coding and MicroPython","areaServed":["Loudoun County, Virginia","Fairfax County, Virginia","Prince William County, Virginia","Northern Virginia"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":["EducationalOrganization","LocalBusiness"],"name":"STEM4U","alternateName":["Stem for You","Stem 4 U","STEM 4U","STEM Academy"],"legalName":"Stem for You","url":"https://stem4u.com","email":"contact@stem4u.com","image":"https://stem4u.com/STEM4U-Logo-V3-clean.png","logo":"https://stem4u.com/STEM4U-Logo-V3-clean.png","description":"K-12 STEM enrichment center offering robotics, micro:bit coding, drone, CAD, and FLL & FTC competition teams in Northern Virginia. Now enrolling for the 2026–27 season.","slogan":"Where kids discover their superpower","foundingDate":"2026","address":{"@type":"PostalAddress","streetAddress":"21690 Red Rum Dr #182","addressLocality":"Ashburn","addressRegion":"VA","postalCode":"20147","addressCountry":"US"},"areaServed":[{"@type":"AdministrativeArea","name":"Loudoun County, Virginia"},{"@type":"AdministrativeArea","name":"Fairfax County, Virginia"},{"@type":"AdministrativeArea","name":"Prince William County, Virginia"},{"@type":"AdministrativeArea","name":"Fauquier County, Virginia"},{"@type":"AdministrativeArea","name":"Arlington County, Virginia"}],"knowsAbout":["micro:bit","MicroPython","Python","Robotics","FIRST Tech Challenge (FTC)","FIRST LEGO League (FLL)","STEM Education"]}
+</script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programs.html" class="nav-link active">Programs</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <a href="waitlist.html" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<a href="camp-oct12.html" class="js-camp-promo" style="display:block;background:linear-gradient(90deg,#FF5500,#FF7733);color:#fff;text-decoration:none;text-align:center;padding:11px 16px;font-size:14.5px;font-weight:700;line-height:1.4;">
+  🚁 New — <strong style="font-weight:800;">Robotics &amp; Drone Day Camp</strong> · Mon, Oct 12 (LCPS holiday) · Grades 2–6 · 9am–4pm
+  <span style="display:inline-block;background:#fff;color:#FF5500;font-weight:800;padding:2px 12px;border-radius:999px;margin-left:8px;">Sign up →</span>
+</a>
+
+<section class="page-hero">
+  <div class="hero-badge"><span class="dot"></span>micro:bit · MicroPython · Grades 3–8<span class="dot"></span></div>
+  <h1>micro:bit <span>Coding</span></h1>
+  <p class="lede">Real code on real hardware. Students in grades 3–8 program a BBC micro:bit v2 — a pocket-sized computer packed with sensors — in genuine MicroPython, then watch it react to the world in their hands. No toy drag-and-drop detour: this is the real language, written line by line.</p>
+  <a href="waitlist.html?program=micro%3Abit" class="hero-cta">Start coding with us →</a>
+</section>
+
+<div class="facts">
+  <div class="fact"><div class="n">3–8</div><div class="l">Grades</div></div>
+  <div class="fact"><div class="n">BBC micro:bit v2</div><div class="l">Real hardware</div></div>
+  <div class="fact"><div class="n">Real MicroPython</div><div class="l">Actual Python code</div></div>
+  <div class="fact"><div class="n">Class or camp</div><div class="l">Pick your format</div></div>
+  <div class="fact"><div class="n">Hands-on</div><div class="l">A board per student</div></div>
+</div>
+
+<div class="prose">
+  <h3>What your child builds</h3>
+  <p>The BBC micro:bit v2 is a real pocket computer — and in this program your child writes the code that brings it to life. Using genuine MicroPython, students read the board's built-in sensors to detect light, motion, temperature, and sound, then make the board respond: scrolling words and animations across its 25-LED display, playing tones and melodies through its speaker, and even sending messages board-to-board over its built-in radio.</p>
+  <p>By the end, a student isn't just running someone else's demo — they've built things like a step counter, a light-sensing night light, a shake-to-roll dice, a thermometer, and a pair of boards that talk to each other across the room. Real projects, written in real code, running on hardware they can hold.</p>
+
+  <h3>Taught from first principles</h3>
+  <p>We don't hand kids a recipe to copy. We start with the idea underneath everything: a sensor reading is just a number the board measures about the world — how bright it is, how hot, how hard it was shaken — and code is what decides what to do with that number. Once a student truly understands that one loop — <em>read a value, check it, respond</em> — they can build almost any sense-and-respond project on their own.</p>
+  <p>Here's the shape of it in practice: read the light sensor; if the room gets dark, turn the LEDs on; otherwise turn them off; then do it again, forever. That's a working automatic night light — and it's the same pattern behind an alarm, a thermostat, or a motion detector. Master the pattern and the projects multiply on their own.</p>
+
+  <h3>Class or camp</h3>
+  <p>micro:bit is offered two ways, so families can pick what fits. As a <strong>weekly class</strong>, students build steadily over the season, taking on a new sensor and a new project each session. As a <strong>camp</strong>, they dive in over consecutive days and come out with a stack of finished projects. Either way, the coding happens in <a href="https://python.microbit.org" target="_blank" rel="noopener">python.microbit.org</a> — the official, browser-based MicroPython editor that's completely free, runs on any laptop or Chromebook, and needs no installation or login.</p>
+
+  <h3>How it works</h3>
+  <p>This is a hands-on workshop, not a lecture. Every student codes on a real micro:bit v2 — flashing their program to the board, seeing it run, debugging when it doesn't, and fixing it. Mentors coach, but the student does the building. As skills grow, the class builds toward our original STEM4U <strong>"SIGNAL"</strong> micro:bit projects — a set of sense-and-respond challenges we designed in-house to push students from copying code to creating their own.</p>
+  <div class="tracks">
+    <div class="track">
+      <div class="ttag">Format 1 · Weekly</div>
+      <h4>micro:bit Class</h4>
+      <p>A steady weekly build — a new sensor, a new project each session, coded in real MicroPython. Great for students who want to go deep over the season.</p>
+      <a class="tlink" href="waitlist.html?program=micro%3Abit">Join the waitlist →</a>
+    </div>
+    <div class="track">
+      <div class="ttag">Format 2 · Intensive</div>
+      <h4>micro:bit Camp</h4>
+      <p>An immersive, multi-day dive — walk away with a stack of finished projects and real confidence writing Python on hardware.</p>
+      <a class="tlink" href="pricing.html">See pricing →</a><a class="tlink" href="contact.html">Ask us →</a>
+    </div>
+  </div>
+</div>
+
+<section class="related">
+  <p class="section-label">Explore More Programs</p>
+  <div class="related-grid">
+    <a href="robotics.html">🤖 Robotics</a>
+    <a href="fll.html">🥇 FLL Challenge</a>
+    <a href="ftc.html">🏆 FTC</a>
+    <a href="programs.html">All programs →</a>
+  </div>
+</section>
+
+
+<section style="background:var(--light);padding:30px 24px;text-align:center;">
+  <p style="font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;">Why STEM4U</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:center;max-width:840px;margin:0 auto;font-size:14.5px;font-weight:700;color:var(--navy);">
+    <span><span style="color:var(--orange);">✓</span> Real code on real hardware</span>
+    <span><span style="color:var(--orange);">✓</span> A board per student, not screens</span>
+    <span><span style="color:var(--orange);">✓</span> A K–12 pathway</span>
+    <span><span style="color:var(--orange);">✓</span> Local &amp; mentor-led</span>
+  </div>
+</section>
+
+
+<section class="areas">
+  <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
+  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">micro:bit coding classes &amp; camps across Northern Virginia</h2>
+  <p style="max-width:760px;margin:0 auto;font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);">
+    STEM4U runs micro:bit coding classes and camps for families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Herndon, Reston, Gainesville, Haymarket, Bristow, Manassas and surrounding Northern Virginia communities.
+  </p>
+</section>
+
+<div class="location-bar">📍 21690 Red Rum Dr #182, Ashburn, VA 20147 &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+<footer>
+  <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
+  <p>© 2026 STEM4U LLC. · Northern Virginia · K-12 STEM Programs</p>
+  <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;">STEM4U is the brand of Stem for You.</p>
+</footer>
+
+<!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
+<script src="camp-promo.js" defer></script>
+</body>
+</html>

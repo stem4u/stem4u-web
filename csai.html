@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LEGO Computer Science & AI Classes for Kids (K–8) in Loudoun & Northern Virginia | STEM4U</title>
+<meta name="description" content="LEGO Computer Science & AI classes for kids in grades K–8 in Northern Virginia. Kids build with LEGO and code — and explore how AI actually works, with older kids training a simple model. Small groups of 4. Serving Loudoun, Fairfax & Prince William. $150/mo, first month $125 early-bird."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0D2B7A; --blue:#1A5CD8; --orange:#FF5500; --orange-lt:#FF7733;
+    --light:#F4F7FF; --white:#FFFFFF; --text:#0A1E52; --muted:#4A5A80; --card:#FFFFFF;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
+
+  .page-hero { background: var(--navy); color: var(--white); padding: 46px 24px 40px; text-align: center; position: relative; }
+  .page-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
+  .hero-badge { display:inline-flex; align-items:center; gap:10px; color:#F5C518; font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; }
+  .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); }
+  .page-hero h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; line-height: 1.12; }
+  .page-hero h1 span { color: var(--orange); }
+  .page-hero .lede { font-size: 17px; color: rgba(255,255,255,.8); max-width: 620px; margin: 14px auto 24px; line-height: 1.6; }
+  .hero-cta { display:inline-block; background:var(--orange); color:#fff; font-size:15px; font-weight:800; padding:14px 34px; border-radius:6px; text-decoration:none; box-shadow:0 4px 20px rgba(255,85,0,.4); }
+  .hero-cta:hover { background:var(--orange-lt); }
+
+  .facts { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; max-width:900px; margin:-28px auto 0; padding:0 24px; position:relative; z-index:2; }
+  @media (max-width:720px){ .facts { grid-template-columns:repeat(2,1fr); } }
+  .fact { background:#fff; border-radius:10px; padding:18px 14px; text-align:center; box-shadow:0 4px 20px rgba(13,43,122,.1); border-top:3px solid var(--orange); }
+  .fact .n { font-size:18px; font-weight:900; color:var(--navy); line-height:1.15; }
+  .fact .l { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+
+  .prose { max-width: 720px; margin: 44px auto 0; text-align: left; background: var(--white); border-radius: 12px; padding: 36px 40px; box-shadow: 0 2px 18px rgba(13,43,122,.07); }
+  .prose h3 { font-size: 19px; font-weight: 800; color: var(--navy); margin: 30px 0 10px; padding-left: 12px; border-left: 4px solid var(--orange); }
+  .prose h3:first-child { margin-top: 0; }
+  .prose p { font-size: 16px; color: var(--text); line-height: 1.75; margin-bottom: 16px; }
+  .prose ul { margin: 0 0 16px 4px; list-style: none; }
+  .prose li { font-size: 16px; line-height: 1.7; padding-left: 26px; position: relative; margin-bottom: 8px; }
+  .prose li::before { content: '▸'; position: absolute; left: 4px; color: var(--orange); font-weight: 900; }
+  @media (max-width: 500px) { .prose { padding: 28px 22px; } }
+
+  .ladder { max-width:720px; margin:20px auto 0; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  @media (max-width:600px){ .ladder { grid-template-columns:1fr; } }
+  .rung { border-radius:10px; padding:14px 16px; text-align:left; text-decoration:none; display:block; }
+  .rung.here { background:#F4F7FF; border:1.5px solid var(--orange); }
+  .rung.next { background:#fff; border:1.5px solid #E2E8F5; box-shadow:0 2px 12px rgba(13,43,122,.07); transition:transform .15s; }
+  .rung.next:hover { transform:translateY(-3px); }
+  .rung .tag { font-size:10px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--orange); }
+  .rung .nm { font-size:16px; font-weight:900; color:var(--navy); margin:3px 0 2px; }
+  .rung .dt { font-size:12.5px; color:var(--muted); line-height:1.4; }
+  .tracks { max-width:720px; margin:20px auto 0; display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media(max-width:600px){ .tracks { grid-template-columns:1fr; } }
+  .track { background:var(--light); border-radius:12px; padding:20px 22px; border-top:3px solid var(--orange); }
+  .track .ttag { font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--orange); }
+  .track h4 { font-size:17px; font-weight:900; color:var(--navy); margin:5px 0 8px; }
+  .track p { font-size:14px; color:var(--muted); line-height:1.6; margin-bottom:12px; }
+  .track a.tlink { font-size:13px; font-weight:800; color:var(--blue); text-decoration:none; margin-right:14px; }
+  .track a.tlink:hover { text-decoration:underline; }
+
+  .form-section { background: var(--navy); padding: 56px 24px; text-align: center; margin-top:52px; position:relative; }
+  .form-section::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--orange); }
+  .form-wrap { max-width: 520px; margin: 0 auto; text-align: left; }
+  .form-title { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 6px; text-align: center; }
+  .form-subtitle { font-size: 14px; color: rgba(255,255,255,.7); text-align: center; margin-bottom: 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display:block; font-size:12px; font-weight:700; color:rgba(255,255,255,.85); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .form-group input, .form-group select { width:100%; padding:12px 14px; border:1px solid rgba(255,255,255,.2); border-radius:8px; font-size:15px; background:rgba(255,255,255,.06); color:#fff; }
+  .form-group input::placeholder { color:rgba(255,255,255,.4); }
+  .form-group select option { color:#000; }
+  .submit-btn { width:100%; background:var(--orange); color:#fff; font-size:16px; font-weight:800; padding:15px; border:none; border-radius:8px; cursor:pointer; margin-top:8px; transition:background .15s; }
+  .submit-btn:hover { background:var(--orange-lt); }
+  .success-msg { display:none; text-align:center; color:#fff; }
+  .success-msg h3 { font-size:20px; margin-bottom:8px; }
+  .success-msg p { color:rgba(255,255,255,.8); }
+  .priv { font-size:12px; color:rgba(255,255,255,.55); text-align:center; margin-top:14px; }
+
+  .related { max-width:720px; margin:44px auto 0; text-align:center; }
+  .related .section-label { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:14px; }
+  .related-grid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .related-grid a { background:#fff; border-radius:10px; padding:16px 22px; text-decoration:none; color:var(--navy); font-weight:800; font-size:14px; box-shadow:0 2px 14px rgba(13,43,122,.08); border-top:3px solid var(--blue); transition:transform .15s; }
+  .related-grid a:hover { transform:translateY(-3px); }
+
+  .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; margin-top:52px; }
+  .location-bar a { color: var(--white); text-decoration: underline; }
+  footer { background: #070F2B; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  footer a { color: var(--orange); text-decoration: none; }
+  .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; }
+  .areas { background:var(--navy); color:#fff; padding:36px 24px; text-align:center; }
+</style>
+<link rel="canonical" href="https://stem4u.com/csai.html"/>
+<meta property="og:title" content="LEGO Computer Science & AI Classes for Kids (K–8) in Loudoun & Northern Virginia | STEM4U"/>
+<meta property="og:description" content="LEGO Computer Science & AI classes for kids in grades K–8 in Northern Virginia. Kids build with LEGO and code — and explore how AI actually works. Small groups of 4. $150/mo, first month $125 early-bird."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://stem4u.com/csai.html"/>
+<meta property="og:image" content="https://stem4u.com/STEM4U-Logo-V3-clean.png"/>
+<meta name="geo.region" content="US-VA"/>
+<meta name="geo.placename" content="Loudoun County, Northern Virginia"/>
+<meta name="keywords" content="computer science classes for kids, AI classes for kids, LEGO coding, coding classes for kids Loudoun County, AI for kids Northern Virginia, kids coding Ashburn, computer science Leesburg, AI classes Aldie, coding for kids Sterling, LEGO SPIKE, Teachable Machine, kids machine learning, coding South Riding, computer science Chantilly, AI Fairfax, coding Prince William County, STEM, Northern Virginia, Virginia, VA, coding classes near me"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Course","name":"LEGO Computer Science & AI Classes for Kids","description":"Hands-on LEGO Computer Science & AI classes for students in grades K–8 in Northern Virginia. Kids build with LEGO and learn to code — from icon-only blocks for pre-readers up to real logic — and explore how AI actually works, with older bands training a simple model using Google Teachable Machine. Small groups of 4.","provider":{"@type":"EducationalOrganization","name":"STEM4U","url":"https://stem4u.com"},"educationalLevel":"Grades K-8","about":["Computer Science","Artificial Intelligence","Coding","LEGO Robotics"],"areaServed":["Loudoun County, Virginia","Fairfax County, Virginia","Prince William County, Virginia","Northern Virginia"]}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":["EducationalOrganization","LocalBusiness"],"name":"STEM4U","alternateName":["Stem for You","Stem 4 U","STEM 4U","STEM Academy"],"legalName":"Stem for You","url":"https://stem4u.com","email":"contact@stem4u.com","image":"https://stem4u.com/STEM4U-Logo-V3-clean.png","logo":"https://stem4u.com/STEM4U-Logo-V3-clean.png","description":"K-12 STEM enrichment center offering robotics, computer science & AI, drone, CAD, and FLL & FTC competition teams in Northern Virginia. Now enrolling for the 2026–27 season.","slogan":"Where kids discover their superpower","foundingDate":"2026","address":{"@type":"PostalAddress","streetAddress":"21690 Red Rum Dr #182","addressLocality":"Ashburn","addressRegion":"VA","postalCode":"20147","addressCountry":"US"},"areaServed":[{"@type":"AdministrativeArea","name":"Loudoun County, Virginia"},{"@type":"AdministrativeArea","name":"Fairfax County, Virginia"},{"@type":"AdministrativeArea","name":"Prince William County, Virginia"},{"@type":"AdministrativeArea","name":"Fauquier County, Virginia"},{"@type":"AdministrativeArea","name":"Arlington County, Virginia"}],"knowsAbout":["Computer Science","Artificial Intelligence","Coding","Robotics","FIRST Tech Challenge (FTC)","FIRST LEGO League (FLL)","STEM Education"]}
+</script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programs.html" class="nav-link active">Programs</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <a href="waitlist.html" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+<a href="camp-oct12.html" class="js-camp-promo" style="display:block;background:linear-gradient(90deg,#FF5500,#FF7733);color:#fff;text-decoration:none;text-align:center;padding:11px 16px;font-size:14.5px;font-weight:700;line-height:1.4;">
+  🚁 New — <strong style="font-weight:800;">Robotics &amp; Drone Day Camp</strong> · Mon, Oct 12 (LCPS holiday) · Grades 2–6 · 9am–4pm
+  <span style="display:inline-block;background:#fff;color:#FF5500;font-weight:800;padding:2px 12px;border-radius:999px;margin-left:8px;">Sign up →</span>
+</a>
+
+<section class="page-hero">
+  <div class="hero-badge"><span class="dot"></span>Computer Science & AI · Grades K–8<span class="dot"></span></div>
+  <h1>LEGO <span>Computer Science &amp; AI</span></h1>
+  <p class="lede">Kids build with LEGO, write real code, and explore how AI actually works — not buzzwords, but the real ideas, learned hands-on and from first principles. For grades K–8, in small groups of four.</p>
+  <a href="waitlist.html?program=CS%20%26%20AI" class="hero-cta">Save your child's spot →</a>
+</section>
+
+<div class="facts">
+  <div class="fact"><div class="n">K–8</div><div class="l">Grades</div></div>
+  <div class="fact"><div class="n">3 bands</div><div class="l">Sparks K–2 · Builders 3–5 · Engineers 6–8</div></div>
+  <div class="fact"><div class="n">LEGO + code</div><div class="l">Kits &amp; icon-coding</div></div>
+  <div class="fact"><div class="n">Groups of 4</div><div class="l">Small by design</div></div>
+  <div class="fact"><div class="n">$150/mo</div><div class="l">First month $125 early-bird</div></div>
+</div>
+
+<div class="prose">
+  <h3>What your child does</h3>
+  <p>Every session pairs two things kids love: building something real with their hands, and making it come alive with code. Children build working models from LEGO Education kits — the icon-coding SPIKE Essential set (45345) for our youngest, and the SPIKE Prime platform (45678) for older bands — then program what they built to sense, move, and respond.</p>
+  <p>Coding meets kids exactly where they are. Pre-readers in K–2 program with icon-only blocks — no reading required, just logic they can see and drag. As kids grow, they move to word blocks and then toward real text-based logic: variables, conditions, loops, and debugging. The LEGO always stays in their hands; the code is how they give it a brain.</p>
+
+  <h3>How we talk about AI — honestly</h3>
+  <p>We will be straight with you, because a lot of programs are not. Across all of grades K–8, kids <strong>explore how AI works</strong> — what it is, how a machine can "learn" from examples, and where it shows up in daily life. They are <strong>not</strong> building or training their own AI, and we will never tell you they are.</p>
+  <p>Only our older bands — grades 3–5 and grade 6 — actually <strong>train a simple model</strong>, and even then it's a small, supervised classroom activity. They use Google's Teachable Machine, which trains right in the web browser on the device in front of them. There is no login or account, and the images kids use are not stored anywhere unless they choose to save them. It's a safe, transparent way to see a model learn — and just as importantly, to see its limits.</p>
+
+  <h3>Taught from first principles</h3>
+  <p>We don't teach kids to memorize the names of apps. We teach them what's actually happening underneath, so they can reason about anything they meet later. Two ideas anchor the whole program: how a <em>computer</em> makes a decision — step by step, using conditions and loops — and how an <em>AI model</em> learns a pattern from examples instead of being told a rule.</p>
+  <p>A concrete example: a child trains Teachable Machine to tell a red brick from a blue brick by showing it a handful of pictures of each. When it suddenly guesses wrong on a brick held in shadow, that's the lesson — the model only knows what it was shown. The child just discovered why AI needs good examples, in a way no lecture could teach. From there, they can reason about far bigger AI systems, because they understand the engine.</p>
+
+  <h3>By age band</h3>
+  <div class="ladder">
+    <div class="rung here">
+      <div class="tag">K–2</div>
+      <div class="nm">Sparks</div>
+      <div class="dt">Build LEGO models and code them with icon-only blocks — no reading needed. Explore how AI works through games and stories.</div>
+    </div>
+    <div class="rung here">
+      <div class="tag">Grades 3–5</div>
+      <div class="nm">Builders</div>
+      <div class="dt">Word-block coding with real logic — conditions and loops — plus training a simple model in Teachable Machine to see how AI learns from examples.</div>
+    </div>
+    <div class="rung here">
+      <div class="tag">Grades 6–8</div>
+      <div class="nm">Engineers</div>
+      <div class="dt">Deeper builds and text-based logic. Grade 6 trains a simple model and digs into how, and why, AI makes the choices it does.</div>
+    </div>
+  </div>
+
+  <h3>How it works</h3>
+  <ul>
+    <li>Weekly 75-minute sessions, in a real workshop</li>
+    <li>Choose <strong>Saturday mornings</strong> or <strong>Friday evenings</strong> — whatever fits your family</li>
+    <li>Small groups of <strong>4 students</strong>, with one LEGO kit per 4 kids so every child builds and codes</li>
+    <li>Three age bands so your child is always with peers at their level</li>
+    <li>$150/month, with a <strong>$125 early-bird rate for your first month</strong></li>
+    <li>No prior coding experience needed — complete beginners welcome</li>
+  </ul>
+</div>
+
+<section class="related">
+  <p class="section-label">Explore More Programs</p>
+  <div class="related-grid">
+    <a href="robotics.html">🤖 Robotics</a>
+    <a href="fll.html">🥇 FLL Challenge</a>
+    <a href="ftc.html">🏆 FTC</a>
+    <a href="programs.html">All programs →</a>
+  </div>
+</section>
+
+
+<section style="background:var(--light);padding:30px 24px;text-align:center;">
+  <p style="font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;">Why STEM4U</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:center;max-width:840px;margin:0 auto;font-size:14.5px;font-weight:700;color:var(--navy);">
+    <span><span style="color:var(--orange);">✓</span> Honest about what kids actually learn</span>
+    <span><span style="color:var(--orange);">✓</span> Real LEGO builds, not just screens</span>
+    <span><span style="color:var(--orange);">✓</span> Small groups of 4</span>
+    <span><span style="color:var(--orange);">✓</span> Local &amp; mentor-led</span>
+  </div>
+</section>
+
+
+<section class="form-section">
+  <div class="form-wrap">
+    <h2 class="form-title">Join the CS &amp; AI waitlist</h2>
+    <p class="form-subtitle">Reserve your child's spot in LEGO Computer Science &amp; AI. Tell us a little about your child and we'll be in touch with session times and the early-bird rate.</p>
+    <div style="text-align:center"><a class="submit-btn" style="display:inline-block;text-decoration:none;max-width:360px;padding:15px 40px" href="waitlist.html?program=CS%20%26%20AI">Join the CS & AI waitlist →</a><p class="priv" style="margin-top:14px">Secure sign-up on our waitlist page. No spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p></div>
+    <div class="success-msg" id="successMsg">
+      <h3>You're on the list! 🎉</h3>
+      <p>Thanks for your interest in LEGO Computer Science &amp; AI. We'll reach out soon with session times and next steps.</p>
+    </div>
+  </div>
+</section>
+
+
+<section class="areas">
+  <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
+  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">Computer Science &amp; AI classes across Northern Virginia</h2>
+  <p style="max-width:760px;margin:0 auto;font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);">
+    STEM4U runs LEGO Computer Science &amp; AI classes for families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Herndon, Reston, Gainesville, Haymarket, Bristow, Manassas and surrounding Northern Virginia communities.
+  </p>
+</section>
+
+<div class="location-bar">📍 21690 Red Rum Dr #182, Ashburn, VA 20147 &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+<footer>
+  <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
+  <p>© 2026 STEM4U LLC. · Northern Virginia · K-12 STEM Programs</p>
+  <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;">STEM4U is the brand of Stem for You.</p>
+</footer>
+
+<script>
+function submitForm(e){
+  e.preventDefault();
+  var form = document.getElementById('waitlistForm');
+  var data = {
+    parentName: form.parentName.value,
+    email: form.email.value,
+    phone: form.phone.value,
+    childGrade: form.childGrade.value,
+    program: form.program.value
+  };
+  fetch('/api/lead', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(function(){
+    form.style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  }).catch(function(){
+    form.style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  });
+  return false;
+}
+</script>
+<!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
+<script src="camp-promo.js" defer></script>
+</body>
+</html>
