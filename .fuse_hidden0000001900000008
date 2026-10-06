@@ -70,5 +70,4 @@
  try{ if(sessionStorage.getItem('scihub')==='1') unlock(); }catch(e){}
  window.addEventListener('DOMContentLoaded',function(){ var p=document.getElementById('pin'); if(p) p.focus(); });
 </script>
-<script defer src="/_vercel/insights/script.js"></script>
 </body></html>

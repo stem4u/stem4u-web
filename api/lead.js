@@ -8,6 +8,15 @@ function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
+// Clamp marketing-attribution object to a safe allow-list of short strings.
+function sanitizeAcq(a) {
+  if (!a || typeof a !== 'object') return null;
+  const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'fbclid', 'referrer', 'landing', 'ts'];
+  const o = {};
+  for (const k of keys) { if (a[k]) o[k] = String(a[k]).slice(0, 300); }
+  return Object.keys(o).length ? o : null;
+}
+
 // --- abuse controls -------------------------------------------------------
 const ALLOWED_HOSTS = ['stem4u.com', 'www.stem4u.com'];
 const ALLOWED_ORIGIN = 'https://stem4u.com';
@@ -262,6 +271,7 @@ module.exports = async (req, res) => {
           friend_request: data.friend_request,
           best_time: data.best_time,
           message: data.message,
+          acq: sanitizeAcq(b.acq),
         };
         const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
           method: 'POST',

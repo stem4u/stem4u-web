@@ -261,10 +261,5 @@
 </script>
 <!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
 <script src="camp-promo.js" defer></script>
-<script>
-(function(){try{var q=new URLSearchParams(location.search),s={};['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid'].forEach(function(k){var v=q.get(k);if(v)s[k]=v.slice(0,120);});if(Object.keys(s).length){try{if(!localStorage.getItem('stem_acq_first'))localStorage.setItem('stem_acq_first',JSON.stringify(Object.assign({referrer:(document.referrer||'').slice(0,300),landing:(location.pathname+location.search).slice(0,300),ts:new Date().toISOString()},s)));}catch(e){}}}catch(e){}
-window.stemAcq=function(){var cur={};try{var q=new URLSearchParams(location.search);['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid'].forEach(function(k){var v=q.get(k);if(v)cur[k]=v.slice(0,120);});}catch(e){}var first=null;try{first=JSON.parse(localStorage.getItem('stem_acq_first')||'null');}catch(e){}var o=Object.assign({},first||{},cur);o.referrer=(document.referrer||'').slice(0,300);o.landing=(location.pathname+location.search).slice(0,300);o.ts=new Date().toISOString();return o;};
-})();
-</script>
 </body>
 </html>

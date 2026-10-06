@@ -184,6 +184,7 @@ module.exports = async (req, res) => {
           programs: 'Day Camp',
           message: 'Signed up via the Oct 12 camp page. Waiver signed.',
           status: 'new',
+          acq: (function (a) { if (!a || typeof a !== 'object') return null; const ks = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid','referrer','landing','ts']; const o = {}; for (const k of ks) { if (a[k]) o[k] = String(a[k]).slice(0, 300); } return Object.keys(o).length ? o : null; })(b.acq),
         };
         // return=representation so we get the new lead id back to enroll it
         const leadResp = await fetch(`${url}/rest/v1/leads`, {

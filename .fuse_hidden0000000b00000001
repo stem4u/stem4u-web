@@ -1030,6 +1030,5 @@ function stepFlower(fi, delta) {
 // Initialize to all-zero state
 resetAll();
 </script>
-<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

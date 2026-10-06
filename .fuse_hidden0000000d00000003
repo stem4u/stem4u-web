@@ -335,7 +335,6 @@
     ['contact2_first','contact2_last','sign_first','sign_last'].forEach(function(k){ delete data[k]; });
     // Flag this as a camp signup so the server also creates a Manage lead for the roster.
     data.camp='Oct 12 STEM4U Camp';
-    if(window.stemAcq) data.acq=window.stemAcq();
 
     // Build the "programs" string the server stores: camp + grade + any add-ons.
     var addons=[].slice.call(form.querySelectorAll('input[name="addons"]:checked')).map(function(x){return x.value;});
@@ -376,10 +375,5 @@
 </script>
 <!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
 
-<script>
-(function(){try{var q=new URLSearchParams(location.search),s={};['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid'].forEach(function(k){var v=q.get(k);if(v)s[k]=v.slice(0,120);});if(Object.keys(s).length){try{if(!localStorage.getItem('stem_acq_first'))localStorage.setItem('stem_acq_first',JSON.stringify(Object.assign({referrer:(document.referrer||'').slice(0,300),landing:(location.pathname+location.search).slice(0,300),ts:new Date().toISOString()},s)));}catch(e){}}}catch(e){}
-window.stemAcq=function(){var cur={};try{var q=new URLSearchParams(location.search);['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid'].forEach(function(k){var v=q.get(k);if(v)cur[k]=v.slice(0,120);});}catch(e){}var first=null;try{first=JSON.parse(localStorage.getItem('stem_acq_first')||'null');}catch(e){}var o=Object.assign({},first||{},cur);o.referrer=(document.referrer||'').slice(0,300);o.landing=(location.pathname+location.search).slice(0,300);o.ts=new Date().toISOString();return o;};
-})();
-</script>
 </body>
 </html>
