@@ -157,6 +157,28 @@ module.exports = async (req, res) => {
     const saved = await r.json();
     const id = Array.isArray(saved) && saved[0] ? saved[0].id : null;
 
+    // Notify the team on every signed submission (camp registration OR enrollment
+    // consent). Best-effort — mirrors /api/lead. Needs RESEND_API_KEY + LEAD_TO.
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const campName = cap(b.camp, 120).trim();
+        const kind = campName ? ('Camp registration — ' + campName) : 'Enrollment consent';
+        const fields = [['Child', child_name], ['Parent', parent_name], ['Email', parent_email], ['Phone', row.parent_phone || ''], ['Program', row.programs || campName || ''], ['Grade', cap(b.grade, 40).trim() || ''], ['Photos', photo_choice], ['Signed', row.signed_date]];
+        const trs = fields.filter((f) => f[1]).map(([k, v]) => `<tr><td style="padding:3px 12px 3px 0;color:#555">${esc(k)}</td><td style="padding:3px 0"><b>${esc(v)}</b></td></tr>`).join('');
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
+            to: (process.env.LEAD_TO || 'contact@stem4u.com').split(',').map((x) => x.trim()),
+            subject: `New ${kind}: ${child_name}`,
+            html: `<h2 style="font-family:Arial;color:#0D2B7A">New ${esc(kind)}</h2><table style="border-collapse:collapse;font-family:Arial;font-size:14px">${trs}</table><p style="font-family:Arial;font-size:12px;color:#888">Signed waiver on file · ${esc(row.signed_date)}</p>`,
+          }),
+        });
+      } catch (e) { /* best-effort: the consent + lead are already saved */ }
+    }
+
     // Camp signups: also create a Manage lead so the camper shows in the roster /
     // Classes & Fees / Attendance. Gated to camp submissions (b.camp) so regular
     // enrollment consents don't create duplicate leads. Non-fatal.
