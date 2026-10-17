@@ -4,6 +4,8 @@
 // Env vars (set in Vercel): RESEND_API_KEY, LEAD_FROM, LEAD_TO, SHEETS_WEBHOOK_URL, SHEETS_TOKEN
 // Every var is optional — whichever is set, that channel runs. Missing keys are reported, never fatal.
 
+const { logEvent } = require('./_log');
+
 function escapeHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
@@ -115,16 +117,37 @@ module.exports = async (req, res) => {
   if (!originOk(req)) { res.status(403).json({ error: 'Forbidden origin' }); return; }
   if (rateLimited(clientIp(req))) { res.status(429).json({ error: 'Too many requests — please try again later.' }); return; }
 
+  let b = {};
   try {
-    let b = req.body;
+    b = req.body;
     if (typeof b === 'string') {
       try { b = JSON.parse(b); }
       catch { b = Object.fromEntries(new URLSearchParams(b)); }
     }
     b = b || {};
 
-    // Honeypot: if the hidden field is filled, it's a bot. Pretend success, do nothing.
-    if (b._gotcha) { res.status(200).json({ ok: true, bot: true }); return; }
+    // LOG FIRST — record every inbound submission the instant it arrives, BEFORE any
+    // honeypot / CAPTCHA / content / spam check can drop it. Bare-minimum trace so a
+    // waitlist sign-up can never be invisible. Best-effort; never blocks the request.
+    try {
+      await logEvent({
+        req, source: 'lead', event: 'submission_received', level: 'info', ok: true,
+        email: cap(b.email, 200).trim() || null,
+        child: cap(b.child_first_name, 80).trim() || cap(b.name, 120).trim() || null,
+        message: 'Lead submission received (pre-validation)',
+        detail: {
+          type: cap(b.type, 40).trim() || null, programs: Array.isArray(b.programs) ? b.programs.slice(0, 12).join(', ') : cap(b.programs, 200).trim() || null,
+          parent: `${cap(b.parent_first_name, 80).trim()} ${cap(b.parent_last_name, 80).trim()}`.trim() || cap(b.name, 120).trim() || null,
+          phone: cap(b.phone, 40).trim() || null, honeypot: !!b._gotcha,
+        },
+      });
+    } catch (_) { /* logging must never block a submission */ }
+
+    // Honeypot removed: it silently returned {ok:true} and dropped the lead whenever the
+    // hidden _gotcha field was filled — which browser autofill does — so real waitlist
+    // sign-ups vanished with no row, no email, no trace. Turnstile (below) + the content
+    // and spam guards are the real defense. We note it but NEVER drop the submission.
+    const honeypotFilled = !!b._gotcha;
 
     // Cloudflare Turnstile (CAPTCHA). Only enforced once TURNSTILE_SECRET is set,
     // so the form keeps working before you finish configuring it.
@@ -171,10 +194,58 @@ module.exports = async (req, res) => {
     }
 
     // Spam / gibberish: REJECT it outright — no email, no sheet, no DB row.
-    // Pretend success (200) so bots don't learn they were filtered.
-    if (looksSpammy(data)) { res.status(200).json({ ok: true, rejected: true }); return; }
+    // Pretend success (200) so bots don't learn they were filtered. BUT log it first,
+    // so a false-positive on a real family is recoverable instead of vanishing silently.
+    if (looksSpammy(data)) {
+      try {
+        await logEvent({
+          req, source: 'lead', event: 'lead_rejected_spam', level: 'warn', ok: false,
+          email: data.email || null, child: data.child_first_name || data.name || null,
+          message: 'Lead rejected by spam filter (not saved)',
+          detail: { name: `${data.parent_first_name||''} ${data.parent_last_name||''}`.trim(), email: data.email, phone: data.phone, programs: data.programs, score: spamScore(data), honeypot: honeypotFilled, msg: String(data.message||'').slice(0, 300) },
+        });
+      } catch (_) {}
+      res.status(200).json({ ok: true, rejected: true }); return;
+    }
 
     const results = { email: null, sheet: null };
+
+    // 0) Insert into Supabase `leads` FIRST, so the team email can report the result.
+    {
+      const SUPA_KEY0 = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
+      if (process.env.SUPABASE_URL && SUPA_KEY0) {
+        try {
+          const row0 = {
+            submitted_at: data.submitted_at, type: data.type, source: 'Website form',
+            parent_first_name: data.parent_first_name, parent_last_name: data.parent_last_name,
+            child_first_name: data.child_first_name, child_last_name: data.child_last_name,
+            email: data.email ? data.email.toLowerCase() : '',
+            parent2_email: data.parent2_email ? data.parent2_email.toLowerCase() : '',
+            phone: data.phone, grade: data.grade, programs: data.programs,
+            schedule: data.schedule, friend_request: data.friend_request,
+            best_time: data.best_time, message: data.message, acq: sanitizeAcq(b.acq),
+          };
+          const rdb0 = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
+            method: 'POST',
+            headers: { apikey: SUPA_KEY0, Authorization: `Bearer ${SUPA_KEY0}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+            body: JSON.stringify(row0),
+          });
+          results.db = rdb0.ok ? 'inserted' : `error: ${rdb0.status} ${await rdb0.text()}`;
+        } catch (e) { results.db = `error: ${String(e)}`; }
+      } else {
+        results.db = 'skipped (no SUPABASE env)';
+      }
+      // Durable activity log — one row per website form submission.
+      const okDb = results.db === 'inserted';
+      const ev = /reserve/i.test(data.type) ? 'reserve' : /coach/i.test(data.type) ? 'coach_request' : /contact/i.test(data.type) ? 'contact' : 'waitlist';
+      const childNm = [data.child_first_name, data.child_last_name].filter(Boolean).join(' ') || null;
+      await logEvent({
+        req, source: 'lead', event: okDb ? ev : 'save_failed', level: okDb ? 'info' : 'error',
+        ok: okDb, email: data.email || null, child: childNm,
+        message: okDb ? (`${data.type} saved to Manage leads`) : (`${data.type} did NOT save`),
+        detail: { type: data.type, programs: data.programs || null, db: results.db, parent: (data.name || [data.parent_first_name, data.parent_last_name].filter(Boolean).join(' ')) || null, phone: data.phone || null },
+      });
+    }
 
     // 1) Email via Resend (sends from your own domain → no spam-folder problem)
     if (process.env.RESEND_API_KEY) {
@@ -187,7 +258,7 @@ module.exports = async (req, res) => {
         from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
         to: (process.env.LEAD_TO || 'contact@stem4u.com').split(',').map((s) => s.trim()),
         subject: subj,
-        html: `<h2 style="font-family:Arial;color:#0D2B7A">New ${escapeHtml(data.type)}</h2><table style="border-collapse:collapse;font-family:Arial;font-size:14px">${rows}</table>`,
+        html: `<h2 style="font-family:Arial;color:#0D2B7A">New ${escapeHtml(data.type)}</h2><table style="border-collapse:collapse;font-family:Arial;font-size:14px">${rows}</table><p style="font-family:Arial;font-size:12px;color:#888">Saved to Manage leads: <b>${escapeHtml(results.db || '')}</b></p>`,
       };
       if (data.email) payload.reply_to = data.email;
       const r = await fetch('https://api.resend.com/emails', {
@@ -250,49 +321,40 @@ module.exports = async (req, res) => {
       results.sheet = 'skipped (no SHEETS_WEBHOOK_URL)';
     }
 
-    // 3) Insert into Supabase `leads` table (server-side service role only)
-    const SUPA_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
-    if (process.env.SUPABASE_URL && SUPA_KEY) {
-      try {
-        const row = {
-          submitted_at: data.submitted_at,
-          type: data.type,
-          source: 'Website form',
-          parent_first_name: data.parent_first_name,
-          parent_last_name: data.parent_last_name,
-          child_first_name: data.child_first_name,
-          child_last_name: data.child_last_name,
-          email: data.email ? data.email.toLowerCase() : '',
-          parent2_email: data.parent2_email ? data.parent2_email.toLowerCase() : '',
-          phone: data.phone,
-          grade: data.grade,
-          programs: data.programs,
-          schedule: data.schedule,
-          friend_request: data.friend_request,
-          best_time: data.best_time,
-          message: data.message,
-          acq: sanitizeAcq(b.acq),
-        };
-        const rdb = await fetch(`${process.env.SUPABASE_URL}/rest/v1/leads`, {
-          method: 'POST',
-          headers: {
-            apikey: SUPA_KEY,
-            Authorization: `Bearer ${SUPA_KEY}`,
-            'Content-Type': 'application/json',
-            Prefer: 'return=minimal',
-          },
-          body: JSON.stringify(row),
-        });
-        results.db = rdb.ok ? 'inserted' : `error: ${rdb.status} ${await rdb.text()}`;
-      } catch (e) {
-        results.db = `error: ${String(e)}`;
-      }
-    } else {
-      results.db = 'skipped (no SUPABASE env)';
-    }
+    // (Lead insert now happens in step 0 above, so its result can be emailed.)
 
     res.status(200).json({ ok: true, results });
   } catch (e) {
+    // Last-resort fallback: a crash must NOT be silent. Log it and email the details.
+    const nm = `${cap(b.parent_first_name, 80)} ${cap(b.parent_last_name, 80)}`.trim() || cap(b.name, 120);
+    const errMsg = String(e && e.message || e).slice(0, 500);
+    try {
+      await logEvent({ req, source: 'lead', event: 'handler_exception', level: 'error', ok: false,
+        email: cap(b.email, 200) || null, child: cap(b.child_first_name, 80) || null,
+        message: 'Lead handler threw — submission may not have saved',
+        detail: { error: errMsg, parent: nm, phone: cap(b.phone, 40), programs: Array.isArray(b.programs) ? b.programs.join(', ') : cap(b.programs, 200) } });
+    } catch (_) {}
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
+            to: (process.env.LEAD_TO || 'contact@stem4u.com').split(',').map((x) => x.trim()),
+            subject: '⚠ Lead/waitlist ERROR — recover this family',
+            html: `<h3 style="font-family:Arial;color:#b02a2a">A waitlist/lead hit an error and may not have saved — contact this family</h3>`
+              + `<table style="font-family:Arial;font-size:14px">`
+              + `<tr><td>Name</td><td><b>${esc(nm)}</b></td></tr>`
+              + `<tr><td>Email</td><td><b>${esc(b.email || '')}</b></td></tr>`
+              + `<tr><td>Phone</td><td><b>${esc(b.phone || '')}</b></td></tr>`
+              + `<tr><td>Program</td><td>${esc(Array.isArray(b.programs) ? b.programs.join(', ') : (b.programs || ''))}</td></tr></table>`
+              + `<pre style="font-family:monospace;font-size:12px;color:#666;white-space:pre-wrap">${esc(errMsg)}</pre>`,
+          }),
+        });
+      } catch (_) {}
+    }
     res.status(500).json({ error: 'Lead handler failed' });
   }
 };

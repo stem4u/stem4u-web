@@ -128,8 +128,8 @@
   <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
 </nav>
 
-<a href="camp-oct12.html" class="js-camp-promo" style="display:block;background:linear-gradient(90deg,#FF5500,#FF7733);color:#fff;text-decoration:none;text-align:center;padding:11px 16px;font-size:14.5px;font-weight:700;line-height:1.4;">
-  🚁 New — <strong style="font-weight:800;">Robotics &amp; Drone Day Camp</strong> · Mon, Oct 12 (LCPS holiday) · Grades 2–6 · 9am–4pm
+<a href="camp-oct30.html" class="js-camp-promo" style="display:block;background:linear-gradient(90deg,#FF5500,#FF7733);color:#fff;text-decoration:none;text-align:center;padding:11px 16px;font-size:14.5px;font-weight:700;line-height:1.4;">
+  🤖 New — <strong style="font-weight:800;">Robotics &amp; Code Day Camp</strong> · Fri, Oct 30 (LCPS holiday) · Grades 2–6 · 9am–4pm
   <span style="display:inline-block;background:#fff;color:#FF5500;font-weight:800;padding:2px 12px;border-radius:999px;margin-left:8px;">Sign up →</span>
 </a>
 
@@ -156,11 +156,12 @@
         <div class="form-group"><label>Phone *</label><input type="tel" name="phone" placeholder="(571) 000-0000" required/></div>
         <div class="form-group"><label>Child's First Name *</label><input type="text" name="child_first_name" placeholder="First name only" required/></div>
         <div class="form-group"><label>Child's Last Name *</label><input type="text" name="child_last_name" placeholder="Last name" required/></div>
-        <div class="form-group"><label>Child's Grade *</label><select name="grade" required><option value="" disabled selected>Select grade</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option><option>9th Grade</option><option>10th Grade</option><option>11th Grade</option><option>12th Grade</option></select></div>
+        <div class="form-group"><label>Child's Grade *</label><select name="grade" required><option value="" disabled selected>Select grade</option><option value="K">Kindergarten</option><option value="1">1st Grade</option><option value="2">2nd Grade</option><option value="3">3rd Grade</option><option value="4">4th Grade</option><option value="5">5th Grade</option><option value="6">6th Grade</option><option value="7">7th Grade</option><option value="8">8th Grade</option><option value="9">9th Grade</option><option value="10">10th Grade</option><option value="11">11th Grade</option><option value="12">12th Grade</option></select></div>
         <div class="form-group"><label>Programs of Interest *</label>
           <div class="checkbox-group">
             <label class="checkbox-item"><input type="checkbox" name="programs" value="CS & AI"/> 🧱 LEGO CS &amp; AI (K–8) <span style="color:#0D2B7A;font-weight:700">· New</span></label>
-            <label class="checkbox-item"><input type="checkbox" name="programs" value="Robotics"/> 🤖 Robotics</label>
+            <label class="checkbox-item"><input type="checkbox" name="programs" value="Robotics Engineering"/> 🤖 Robotics Engineering</label>
+            <label class="checkbox-item"><input type="checkbox" name="programs" value="Math Enrichment"/> 📐 Math Enrichment (K–8) <span style="color:#0D2B7A;font-weight:700">· New</span></label>
             <label class="checkbox-item" style="opacity:.55;cursor:not-allowed"><input type="checkbox" name="programs" value="FTC" disabled/> 🏆 FTC <span style="color:#b02a2a;font-weight:700">· Full</span></label>
             <label class="checkbox-item" style="opacity:.55;cursor:not-allowed"><input type="checkbox" name="programs" value="FLL" disabled/> ⭐ FLL <span style="color:#b02a2a;font-weight:700">· Full</span></label>
             <label class="checkbox-item"><input type="checkbox" name="programs" value="Drone"/> <svg width="17" height="17" viewBox="0 0 44 44" fill="none" style="vertical-align:-3px"><line x1="22" y1="22" x2="8" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="8" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="8" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><line x1="22" y1="22" x2="36" y2="36" stroke="#2d3748" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="8" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="8" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><circle cx="36" cy="36" r="6.5" stroke="#2d3748" stroke-width="2.2"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="8" x2="42.5" y2="8" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="1.5" y1="36" x2="14.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><line x1="29.5" y1="36" x2="42.5" y2="36" stroke="#2d3748" stroke-width="2.5" stroke-linecap="round"/><rect x="17" y="17" width="10" height="10" rx="2.5" fill="#2d3748"/><circle cx="22" cy="22" r="2" fill="white"/></svg> Drone</label>
@@ -181,6 +182,7 @@
         <input type="hidden" name="type" value="Reserve"/>
         <input type="hidden" name="_subject" value="STEM4U — Reserve a spot"/>
         <input type="text" name="_gotcha" style="display:none"/>
+        <p class="form-note" style="text-align:left;margin:4px 0 2px;color:#0D2B7A"><b>Payment is due at sign-up</b> — the first month's tuition secures your child's spot and holds their place in the group.</p>
         <div class="cf-turnstile" data-sitekey="0x4AAAAAAElTfPsKirO6gQZd" style="margin:12px 0"></div>
         <button type="submit" class="submit-btn">Reserve your child's spot &rarr;</button>
         <p class="form-note">We use this only to contact you about STEM4U programs — the parent's and child's name, contact details, and grade. No spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p>
@@ -199,7 +201,7 @@
         <div class="form-group"><label>Second Parent / Guardian Email <span style="font-weight:400;color:#64748b">(optional)</span></label><input type="email" name="parent2_email" placeholder="co-parent's email — we'll keep both looped in"/></div>
         <div class="form-group"><label>Phone *</label><input type="tel" name="phone" placeholder="(571) 000-0000" required/></div>
         <div class="form-group"><label>Best time to reach you</label><input type="text" name="best_time" placeholder="e.g. weekday evenings"/></div>
-        <div class="form-group"><label>Child's Grade</label><select name="grade"><option value="" disabled selected>Select grade</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>7th Grade</option><option>8th Grade</option><option>9th Grade</option><option>10th Grade</option><option>11th Grade</option><option>12th Grade</option></select></div>
+        <div class="form-group"><label>Child's Grade</label><select name="grade"><option value="" disabled selected>Select grade</option><option value="K">Kindergarten</option><option value="1">1st Grade</option><option value="2">2nd Grade</option><option value="3">3rd Grade</option><option value="4">4th Grade</option><option value="5">5th Grade</option><option value="6">6th Grade</option><option value="7">7th Grade</option><option value="8">8th Grade</option><option value="9">9th Grade</option><option value="10">10th Grade</option><option value="11">11th Grade</option><option value="12">12th Grade</option></select></div>
         <div class="form-group"><label>What would you like help with?</label><textarea name="message" placeholder="e.g. is my 4th grader ready for FLL? how big is the time commitment?"></textarea></div>
         <input type="hidden" name="type" value="Coach request"/>
         <input type="hidden" name="_subject" value="STEM4U — Coach request"/>
@@ -232,6 +234,22 @@
   document.querySelectorAll('form.ajax-form').forEach(function(form){
     form.addEventListener('submit',async function(e){
       e.preventDefault();
+      // Require at least one program (only on forms that have program checkboxes)
+      var progBoxes=form.querySelectorAll('input[name="programs"]');
+      if(progBoxes.length){
+        var err=form.querySelector('#progErr');
+        if(!form.querySelector('input[name="programs"]:checked')){
+          if(!err){
+            err=document.createElement('p'); err.id='progErr'; err.className='form-note';
+            err.style.cssText='text-align:left;margin-top:8px;color:#b02a2a;font-weight:700';
+            err.textContent='Please select at least one program to continue.';
+            var grp=progBoxes[0].closest('.form-group'); grp.appendChild(err);
+            grp.scrollIntoView({behavior:'smooth',block:'center'});
+          }
+          err.style.display='block';
+          return;
+        } else if(err){ err.style.display='none'; }
+      }
       const btn=form.querySelector('.submit-btn');
       const success=form.parentElement.querySelector('.success-msg');
       const label=btn.textContent;

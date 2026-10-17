@@ -1,3 +1,5 @@
 _gen_location_pages.py
 waitlist8.html
 test-lead.html
+.vercel
+.env*

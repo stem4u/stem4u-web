@@ -4,5 +4,8 @@
     { "source": "/consent", "destination": "/consent.html" },
     { "source": "/instructor", "destination": "/instructor.html" },
     { "source": "/i/:code", "destination": "/instructor.html" }
+  ],
+  "crons": [
+    { "path": "/api/log-digest", "schedule": "0 12 * * *" }
   ]
 }

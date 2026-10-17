@@ -14,6 +14,8 @@
 // Env: SUPABASE_URL, SUPABASE_SECRET_KEY|SUPABASE_SERVICE_KEY, TURNSTILE_SECRET (optional)
 'use strict';
 
+const { logEvent } = require('./_log');
+
 const POLICIES_VERSION = '2026-09-02';
 
 const KEY = () => process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SECRET_KEY;
@@ -74,8 +76,28 @@ module.exports = async (req, res) => {
   if (typeof b === 'string') { try { b = JSON.parse(b || '{}'); } catch { b = {}; } }
   b = b || {};
 
-  // honeypot
-  if (cap(b._gotcha, 100).trim()) { res.status(200).json({ ok: true }); return; }
+  // LOG FIRST — record every inbound submission the instant it arrives, BEFORE any
+  // honeypot / CAPTCHA / validation can drop it. This is the bare-minimum trace: a
+  // registration can never again be invisible. Best-effort; never blocks the request.
+  try {
+    await logEvent({
+      req, source: 'consent', event: 'submission_received', level: 'info', ok: true,
+      email: cap(b.parent_email, 160).trim() || null, child: cap(b.child_name, 120).trim() || null,
+      message: 'Consent submission received (pre-validation)',
+      detail: {
+        programs: cap(b.programs, 200).trim() || null, camp: cap(b.camp, 120).trim() || null,
+        parent: cap(b.parent_name, 120).trim() || null, phone: cap(b.parent_phone, 40).trim() || null,
+        grade: cap(b.grade, 40).trim() || null, honeypot: !!cap(b._gotcha, 100).trim(),
+      },
+    });
+  } catch (_) { /* logging must never block a registration */ }
+
+  // NOTE: a honeypot used to live here and SILENTLY returned {ok:true} (dropping the
+  // submission) whenever the hidden _gotcha field had any value. Browser autofill fills
+  // that hidden field, so real registrations vanished with no row, no log, no email.
+  // It is removed on purpose — spam is handled by Turnstile + rate-limit + origin check.
+  // We still record if it was filled, but we NEVER drop the submission.
+  const honeypotFilled = !!cap(b._gotcha, 100).trim();
 
   // CAPTCHA (only enforced once TURNSTILE_SECRET is set)
   if (process.env.TURNSTILE_SECRET) {
@@ -136,6 +158,7 @@ module.exports = async (req, res) => {
     agree_medical: true,
     agree_payment: true,
     agree_esign: true,
+    agree_tutor: bool(b.agree_tutor),
     signature_name,
     signature_relation: cap(b.signature_relation, 20).trim() || null,
     signed_date: cap(b.signed_date, 20).trim() || new Date().toISOString().slice(0, 10),
@@ -153,9 +176,52 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify(row),
     });
-    if (!r.ok) { res.status(502).json({ ok: false, error: 'Could not save — please try again.', detail: await r.text() }); return; }
+    if (!r.ok) {
+      const detail = await r.text();
+      // Durable log of the failure (exact DB error + who it was) — survives forever.
+      await logEvent({
+        req, source: 'consent', event: 'save_failed', level: 'error', ok: false, status: r.status,
+        email: parent_email, child: child_name,
+        message: cap(b.camp, 120).trim() ? 'Camp signup did NOT save' : 'Enrollment consent did NOT save',
+        detail: { db_error: String(detail).slice(0, 2000), camp: cap(b.camp, 120).trim() || null, programs: row.programs, parent: parent_name, phone: row.parent_phone },
+      });
+      // DEBUG: email the exact DB error so we can see why camp signups aren't saving.
+      if (process.env.RESEND_API_KEY) {
+        try {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
+              to: (process.env.LEAD_TO || 'contact@stem4u.com').split(',').map((x) => x.trim()),
+              subject: '⚠ Camp/consent save FAILED — recover this family',
+              html: `<h3 style="font-family:Arial;color:#b02a2a">A signup did NOT save — contact this family</h3>`
+                + `<table style="font-family:Arial;font-size:14px">`
+                + `<tr><td>Child</td><td><b>${String((b.child_first||'')+' '+(b.child_last||'')).replace(/[<>]/g,'')}</b></td></tr>`
+                + `<tr><td>Parent</td><td><b>${String((b.parent_first||'')+' '+(b.parent_last||'')).replace(/[<>]/g,'')}</b></td></tr>`
+                + `<tr><td>Email</td><td><b>${String(b.parent_email||'').replace(/[<>]/g,'')}</b></td></tr>`
+                + `<tr><td>Phone</td><td><b>${String(b.parent_phone||'').replace(/[<>]/g,'')}</b></td></tr>`
+                + `<tr><td>Camp</td><td>${String(b.camp||'').replace(/[<>]/g,'')}</td></tr>`
+                + `</table>`
+                + `<pre style="font-family:monospace;font-size:12px;white-space:pre-wrap;color:#666">status ${r.status}\n${String(detail).replace(/[&<>]/g,'')}</pre>`,
+            }),
+          });
+        } catch (e) { /* ignore */ }
+      }
+      res.status(502).json({ ok: false, error: 'Could not save — please try again.', detail });
+      return;
+    }
     const saved = await r.json();
     const id = Array.isArray(saved) && saved[0] ? saved[0].id : null;
+    const isCamp = !!cap(b.camp, 120).trim();
+
+    // Durable success log — one row per signed submission.
+    await logEvent({
+      req, source: 'consent', event: isCamp ? 'camp_signup' : 'enrollment_consent',
+      level: 'info', ok: true, status: 200, email: parent_email, child: child_name,
+      message: isCamp ? ('Camp signup saved — ' + cap(b.camp, 120).trim()) : 'Enrollment consent saved',
+      detail: { consent_id: id, programs: row.programs, grade: cap(b.grade, 40).trim() || null, photo_choice, parent: parent_name, phone: row.parent_phone },
+    });
 
     // Notify the team on every signed submission (camp registration OR enrollment
     // consent). Best-effort — mirrors /api/lead. Needs RESEND_API_KEY + LEAD_TO.
@@ -176,16 +242,32 @@ module.exports = async (req, res) => {
             html: `<h2 style="font-family:Arial;color:#0D2B7A">New ${esc(kind)}</h2><table style="border-collapse:collapse;font-family:Arial;font-size:14px">${trs}</table><p style="font-family:Arial;font-size:12px;color:#888">Signed waiver on file · ${esc(row.signed_date)}</p>`,
           }),
         });
-      } catch (e) { /* best-effort: the consent + lead are already saved */ }
+      } catch (e) {
+        // The email backup failed to send — log it so a broken backup is never silent.
+        await logEvent({ req, source: 'consent', event: 'alert_email_failed', level: 'warn', ok: false,
+          email: parent_email, child: child_name, message: 'Signup saved, but the backup/alert email failed to send',
+          detail: { error: String(e && e.message || e).slice(0, 300), to: process.env.LEAD_TO || 'contact@stem4u.com' } });
+      }
+    } else {
+      // No email backup configured at all — log it loudly so you know the backup is OFF.
+      await logEvent({ req, source: 'consent', event: 'alert_email_not_configured', level: 'warn', ok: false,
+        email: parent_email, child: child_name, message: 'Signup saved, but NO email backup is configured (set RESEND_API_KEY + LEAD_TO)',
+        detail: { programs: row.programs } });
     }
 
     // Camp signups: also create a Manage lead so the camper shows in the roster /
     // Classes & Fees / Attendance. Gated to camp submissions (b.camp) so regular
     // enrollment consents don't create duplicate leads. Non-fatal.
     if (cap(b.camp, 120).trim()) {
-      // The Oct 12 day camp: new signups must land on the camp roster automatically.
-      const CAMP_CLASS_ID = 'CAMP1012';
-      const CAMP_TEAM = 'Oct 12';        // team = the camp day
+      // Map each camp (the page sends data.camp) to its team, roster class, and program label.
+      const campName = cap(b.camp, 120).trim();
+      const CAMP_MAP = {
+        'Oct 30 STEM4U Camp':    { team: 'Oct 30',      class_id: 'CAMP-OCT30', programs: 'Day Camp',    note: 'Signed up via the Oct 30 camp page. Waiver signed.' },
+        'Robo Rumble (Nov 2-3)': { team: 'Robo Rumble', class_id: 'CAMP-RR',    programs: 'Robo Rumble', note: 'Signed up via the Robo Rumble camp page. Waiver signed.' },
+      };
+      const CM = CAMP_MAP[campName] || { team: (campName || 'Camp').slice(0, 60), class_id: null, programs: 'Day Camp', note: 'Signed up via a camp page. Waiver signed.' };
+      const CAMP_CLASS_ID = CM.class_id;
+      const CAMP_TEAM = CM.team;
       try {
         const sp = (full) => { const t = String(full || '').trim().split(/\s+/); return { first: t.shift() || '', last: t.join(' ') }; };
         const cn = b.child_first ? { first: cap(b.child_first, 80), last: cap(b.child_last, 80) } : sp(child_name);
@@ -203,8 +285,8 @@ module.exports = async (req, res) => {
           parent2_email: cap(b.contact2_email, 160).trim().toLowerCase() || null,
           phone: cap(b.parent_phone, 40).trim() || null,
           grade: cap(b.grade, 40).trim() || null,
-          programs: 'Day Camp',
-          message: 'Signed up via the Oct 12 camp page. Waiver signed.',
+          programs: CM.programs,
+          message: CM.note,
           status: 'new',
           acq: (function (a) { if (!a || typeof a !== 'object') return null; const ks = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid','referrer','landing','ts']; const o = {}; for (const k of ks) { if (a[k]) o[k] = String(a[k]).slice(0, 300); } return Object.keys(o).length ? o : null; })(b.acq),
         };
@@ -216,9 +298,9 @@ module.exports = async (req, res) => {
         });
         let leadId = null;
         try { const lrows = await leadResp.json(); leadId = Array.isArray(lrows) && lrows[0] ? lrows[0].id : null; } catch (_) {}
-        // Auto-enroll the camper in the CAMP1012 class so they show in the roster,
+        // Auto-enroll the camper in the mapped camp class so they show in the roster,
         // Classes & Fees, Attendance and Accounts Receivable without manual steps.
-        if (leadId) {
+        if (leadId && CAMP_CLASS_ID) {
           try {
             await fetch(`${url}/rest/v1/class_enrollments?on_conflict=lead_id,class_id`, {
               method: 'POST',
@@ -227,11 +309,49 @@ module.exports = async (req, res) => {
             });
           } catch (e) { /* enrollment is best-effort; lead + consent are already saved */ }
         }
-      } catch (e) { /* lead creation is best-effort; the signed consent is already saved */ }
+        await logEvent({
+          req, source: 'consent', event: 'camp_lead_created', level: leadId ? 'info' : 'warn',
+          ok: !!leadId, status: leadResp.status, email: parent_email, child: child_name,
+          message: leadId ? 'Manage lead + enrollment created for camper' : 'Camp consent saved but lead was NOT created',
+          detail: { lead_id: leadId, team: CAMP_TEAM, class_id: CAMP_CLASS_ID, parent: parent_name, phone: row.parent_phone },
+        });
+      } catch (e) {
+        await logEvent({ req, source: 'consent', event: 'camp_lead_created', level: 'error', ok: false, email: parent_email, child: child_name, message: 'Exception creating camp lead', detail: { error: String(e && e.message || e).slice(0, 500), parent: parent_name, phone: row.parent_phone } });
+      }
     }
 
     res.status(200).json({ ok: true, id });
   } catch (e) {
+    // Last-resort fallback: an unexpected crash must NOT be silent. Log it, and email the
+    // family's details so they can be recovered even if nothing saved.
+    const errDetail = { error: String(e && e.message || e).slice(0, 500), programs: cap(b.programs, 200).trim() || null, camp: cap(b.camp, 120).trim() || null, parent: cap(b.parent_name, 120).trim() || null, phone: cap(b.parent_phone, 40).trim() || null };
+    try {
+      await logEvent({ req, source: 'consent', event: 'handler_exception', level: 'error', ok: false,
+        email: cap(b.parent_email, 160).trim() || null, child: cap(b.child_name, 120).trim() || null,
+        message: 'Consent handler threw — submission may not have saved', detail: errDetail });
+    } catch (_) {}
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: process.env.LEAD_FROM || 'STEM4U <leads@stem4u.com>',
+            to: (process.env.LEAD_TO || 'contact@stem4u.com').split(',').map((x) => x.trim()),
+            subject: '⚠ Registration ERROR — recover this family',
+            html: `<h3 style="font-family:Arial;color:#b02a2a">A registration hit an error and may not have saved — contact this family</h3>`
+              + `<table style="font-family:Arial;font-size:14px">`
+              + `<tr><td>Child</td><td><b>${esc(cap(b.child_name, 120) || ((b.child_first || '') + ' ' + (b.child_last || '')))}</b></td></tr>`
+              + `<tr><td>Parent</td><td><b>${esc(cap(b.parent_name, 120) || ((b.parent_first || '') + ' ' + (b.parent_last || '')))}</b></td></tr>`
+              + `<tr><td>Email</td><td><b>${esc(b.parent_email || '')}</b></td></tr>`
+              + `<tr><td>Phone</td><td><b>${esc(b.parent_phone || '')}</b></td></tr>`
+              + `<tr><td>Program</td><td>${esc(b.programs || b.camp || '')}</td></tr></table>`
+              + `<pre style="font-family:monospace;font-size:12px;color:#666;white-space:pre-wrap">${esc(errDetail.error)}</pre>`,
+          }),
+        });
+      } catch (_) {}
+    }
     res.status(500).json({ ok: false, error: 'Consent handler failed' });
   }
 };
