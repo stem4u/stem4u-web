@@ -373,7 +373,6 @@
     empty.style.display=shown?'none':'block';
     countEl.textContent=shown+' of '+R.length+' resources'+(filter?' matching "'+esc(filter)+'"':'');
   }
-  var DOC_PIN='11223344';
   var _pinOK=false; try{ _pinOK=sessionStorage.getItem('s4u_docs_unlocked')==='1'; }catch(_){}
   var _pinURL=null;
   function unlockDoc(e,url){
@@ -403,10 +402,13 @@
   function closePin(){ var m=document.getElementById('pinModal'); if(m) m.style.display='none'; _pinURL=null; }
   function submitPin(){
     var i=document.getElementById('pinInput'), er=document.getElementById('pinErr');
-    if(i && String(i.value).trim()===DOC_PIN){
-      _pinOK=true; try{ sessionStorage.setItem('s4u_docs_unlocked','1'); }catch(_){}
-      var u=_pinURL; closePin(); if(u) window.open(u,'_blank','noopener');
-    } else { if(er) er.style.display='block'; if(i){ i.value=''; i.focus(); } }
+    var v=i?String(i.value).trim():'';
+    fetch('/api/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:v})})
+      .then(function(r){return r.ok;}).then(function(ok){
+        if(ok){ _pinOK=true; try{ sessionStorage.setItem('s4u_docs_unlocked','1'); }catch(_){}
+          var u=_pinURL; closePin(); if(u) window.open(u,'_blank','noopener'); }
+        else { if(er) er.style.display='block'; if(i){ i.value=''; i.focus(); } }
+      }).catch(function(){ if(er){ er.textContent='Could not verify — try again.'; er.style.display='block'; } });
   }
   q.addEventListener('input',function(){render(q.value);});
   render('');
@@ -427,10 +429,13 @@
   }
   function submitGate(){
     var i=document.getElementById('gateInput'), er=document.getElementById('gateErr');
-    if(i && String(i.value).trim()===DOC_PIN){
-      _pinOK=true; try{ sessionStorage.setItem('s4u_docs_unlocked','1'); }catch(_){}
-      var g=document.getElementById('pageGate'); if(g) g.remove(); document.body.style.overflow='';
-    } else { if(er) er.style.display='block'; if(i){ i.value=''; i.focus(); } }
+    var v=i?String(i.value).trim():'';
+    fetch('/api/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:v})})
+      .then(function(r){return r.ok;}).then(function(ok){
+        if(ok){ _pinOK=true; try{ sessionStorage.setItem('s4u_docs_unlocked','1'); }catch(_){}
+          var g=document.getElementById('pageGate'); if(g) g.remove(); document.body.style.overflow=''; }
+        else { if(er) er.style.display='block'; if(i){ i.value=''; i.focus(); } }
+      }).catch(function(){ if(er){ er.textContent='Could not verify — try again.'; er.style.display='block'; } });
   }
   if(!_pinOK) showPageGate();
 </script>

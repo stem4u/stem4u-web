@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Unlock · STEM4U Coach Resources</title>
+<style>
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#0D2B7A;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .card{background:#fff;border-radius:16px;max-width:360px;width:100%;padding:28px 26px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.4)}
+  h1{color:#0D2B7A;font-size:21px;margin:0 0 4px}
+  p{font-size:13.5px;color:#5a6b86;margin:0 0 16px}
+  input{width:100%;padding:12px 14px;border:1.5px solid #d0d8ee;border-radius:9px;font-size:17px;letter-spacing:5px;text-align:center;outline:none;box-sizing:border-box}
+  button{width:100%;margin-top:16px;padding:13px;border:none;background:#E8651A;color:#fff;font-weight:800;font-size:15px;border-radius:9px;cursor:pointer}
+  .err{display:none;color:#b42318;font-size:12.5px;font-weight:600;margin-top:8px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔒 STEM4U Coach Resources</h1>
+    <p>Enter the coach PIN to open this document.</p>
+    <input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN"
+      onkeydown="if(event.key==='Enter')go()">
+    <div id="err" class="err">Incorrect PIN — check with your coach.</div>
+    <button onclick="go()">Unlock →</button>
+  </div>
+<script>
+  function nextUrl(){
+    var p=new URLSearchParams(location.search).get('next')||'/resourcesx.html';
+    // only allow same-site relative paths
+    if(p.indexOf('/')!==0 || p.indexOf('//')===0) p='/resourcesx.html';
+    return p;
+  }
+  function go(){
+    var v=(document.getElementById('pin').value||'').trim(), er=document.getElementById('err');
+    fetch('/api/unlock',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:v})})
+      .then(function(r){return r.ok;})
+      .then(function(ok){ if(ok){ location.href=nextUrl(); } else { er.style.display='block'; var i=document.getElementById('pin'); i.value=''; i.focus(); } })
+      .catch(function(){ er.style.display='block'; });
+  }
+  document.getElementById('pin').focus();
+</script>
+</body>
+</html>
