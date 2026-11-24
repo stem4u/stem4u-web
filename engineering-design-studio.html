@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Engineering Design Studio — CAD, Mechanical Design & Fabrication for Grades 9–12 in Northern Virginia | STEM4U</title>
+<meta name="description" content="Engineering Design Studio: a hands-on engineering and fabrication program for grades 9–12 in Northern Virginia. Students learn Onshape 3D CAD, mechanical design, assemblies, 3D printing, laser cutting and CNC — taking ideas from concept to a tested physical prototype. Wednesdays in Ashburn."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0D2B7A; --blue:#1A5CD8; --orange:#FF5500; --orange-lt:#FF7733;
+    --light:#F4F7FF; --white:#FFFFFF; --text:#0A1E52; --muted:#4A5A80; --card:#FFFFFF;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
+
+  .page-hero { background: var(--navy); color: var(--white); padding: 46px 24px 40px; text-align: center; position: relative; }
+  .page-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
+  .hero-badge { display:inline-flex; align-items:center; gap:10px; color:#F5C518; font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; }
+  .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); }
+  .page-hero h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; line-height: 1.12; }
+  .page-hero h1 span { color: var(--orange); }
+  .page-hero .tagline { font-size:15px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#F5C518; margin-top:10px; }
+  .page-hero .lede { font-size: 17px; color: rgba(255,255,255,.8); max-width: 660px; margin: 14px auto 24px; line-height: 1.6; }
+  .hero-cta { display:inline-block; background:var(--orange); color:#fff; font-size:15px; font-weight:800; padding:14px 34px; border-radius:6px; text-decoration:none; box-shadow:0 4px 20px rgba(255,85,0,.4); }
+  .hero-cta:hover { background:var(--orange-lt); }
+
+  .facts { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; max-width:980px; margin:-28px auto 0; padding:0 24px; position:relative; z-index:2; }
+  @media (max-width:720px){ .facts { grid-template-columns:repeat(2,1fr); } }
+  .fact { background:#fff; border-radius:10px; padding:18px 14px; text-align:center; box-shadow:0 4px 20px rgba(13,43,122,.1); border-top:3px solid var(--orange); }
+  .fact .n { font-size:16px; font-weight:900; color:var(--navy); line-height:1.15; }
+  .fact .l { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+
+  .prose { max-width: 740px; margin: 44px auto 0; text-align: left; background: var(--white); border-radius: 12px; padding: 36px 40px; box-shadow: 0 2px 18px rgba(13,43,122,.07); }
+  .prose h3 { font-size: 19px; font-weight: 800; color: var(--navy); margin: 30px 0 10px; padding-left: 12px; border-left: 4px solid var(--orange); }
+  .prose h3:first-child { margin-top: 0; }
+  .prose h4.sub { font-size:15px; font-weight:900; color:var(--blue); text-transform:uppercase; letter-spacing:.5px; margin:22px 0 6px; }
+  .prose p { font-size: 16px; color: var(--text); line-height: 1.75; margin-bottom: 16px; }
+  .prose ul { margin: 0 0 16px 4px; list-style: none; }
+  .prose li { font-size: 16px; line-height: 1.7; padding-left: 26px; position: relative; margin-bottom: 8px; }
+  .prose li::before { content: '▸'; position: absolute; left: 4px; color: var(--orange); font-weight: 900; }
+  .kicker { font-size:16px; font-weight:800; color:var(--blue); margin:4px 0 18px; }
+  @media (max-width: 500px) { .prose { padding: 28px 22px; } }
+
+  /* Design-to-fabrication workflow */
+  .workflow { max-width:980px; margin:44px auto 0; padding:0 24px; text-align:center; }
+  .workflow .wlabel { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:6px; }
+  .workflow h2 { font-size:clamp(22px,3.5vw,28px); font-weight:900; color:var(--navy); margin-bottom:6px; }
+  .workflow .wsub { font-size:15px; color:var(--muted); margin-bottom:26px; }
+  .flow { display:flex; align-items:stretch; justify-content:center; gap:0; flex-wrap:wrap; }
+  .fstep { flex:1 1 150px; max-width:170px; background:#fff; border-radius:12px; padding:18px 14px 16px; box-shadow:0 3px 16px rgba(13,43,122,.09); border-top:4px solid var(--orange); position:relative; margin:8px; text-align:center; }
+  .fstep .fn { width:34px; height:34px; margin:0 auto 10px; border-radius:50%; background:var(--navy); color:#fff; font-weight:900; font-size:15px; display:flex; align-items:center; justify-content:center; }
+  .fstep .fh { font-size:14px; font-weight:900; color:var(--navy); text-transform:uppercase; letter-spacing:.5px; }
+  .fstep .fd { font-size:12.5px; color:var(--muted); line-height:1.45; margin-top:5px; }
+  .fstep::after { content:'→'; position:absolute; right:-16px; top:50%; transform:translateY(-50%); color:var(--orange); font-size:22px; font-weight:900; }
+  .fstep:last-child::after { display:none; }
+  @media (max-width:640px){ .fstep::after { content:'↓'; right:50%; top:auto; bottom:-18px; transform:translateX(50%);} .fstep { max-width:100%; flex-basis:100%; } }
+
+  .explore { max-width:740px; margin:20px auto 0; }
+  .xblock { background:var(--light); border-radius:12px; padding:20px 22px; border-left:4px solid var(--orange); margin-bottom:14px; }
+  .xblock h4 { font-size:16px; font-weight:900; color:var(--navy); margin-bottom:4px; }
+  .xblock p { font-size:14px; color:var(--muted); line-height:1.5; margin:0 0 8px; }
+  .xblock ul { margin:0; list-style:none; }
+  .xblock li { font-size:14px; line-height:1.55; padding-left:20px; position:relative; margin-bottom:4px; color:var(--text); }
+  .xblock li::before { content:'▸'; position:absolute; left:2px; color:var(--orange); font-weight:900; }
+
+  .grid2 { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:8px; }
+  @media(max-width:600px){ .grid2 { grid-template-columns:1fr; } }
+  .mini { background:var(--light); border-radius:12px; padding:18px 20px; border-top:3px solid var(--orange); }
+  .mini h4 { font-size:15px; font-weight:900; color:var(--navy); margin-bottom:5px; }
+  .mini p { font-size:13.5px; color:var(--muted); line-height:1.55; margin:0; }
+
+  .note { background:#FFF7F0; border:1px solid #FFD9BF; border-radius:10px; padding:14px 18px; font-size:13.5px; color:var(--muted); line-height:1.6; margin-top:16px; }
+  .note strong { color:var(--navy); }
+
+  .related { max-width:720px; margin:44px auto 0; text-align:center; }
+  .related .section-label { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:14px; }
+  .related-grid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .related-grid a { background:#fff; border-radius:10px; padding:16px 22px; text-decoration:none; color:var(--navy); font-weight:800; font-size:14px; box-shadow:0 2px 14px rgba(13,43,122,.08); border-top:3px solid var(--blue); transition:transform .15s; }
+  .related-grid a:hover { transform:translateY(-3px); }
+
+  .form-section { background: var(--navy); padding: 56px 24px; text-align: center; margin-top:52px; position:relative; }
+  .form-section::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--orange); }
+  .form-wrap { max-width: 520px; margin: 0 auto; }
+  .form-title { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .form-subtitle { font-size: 14px; color: rgba(255,255,255,.7); margin-bottom: 24px; line-height:1.6; }
+  .submit-btn { background:var(--orange); color:#fff; font-size:16px; font-weight:800; padding:15px 40px; border:none; border-radius:8px; cursor:pointer; text-decoration:none; display:inline-block; transition:background .15s; }
+  .submit-btn:hover { background:var(--orange-lt); }
+  .priv { font-size:12px; color:rgba(255,255,255,.55); text-align:center; margin-top:14px; }
+
+  .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; margin-top:52px; }
+  .location-bar a { color: var(--white); text-decoration: underline; }
+  footer { background: #070F2B; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  footer a { color: var(--orange); text-decoration: none; }
+  .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; flex-wrap:wrap; }
+  .areas { background:var(--navy); color:#fff; padding:36px 24px; text-align:center; }
+</style>
+<link rel="canonical" href="https://stem4u.com/engineering-design-studio.html"/>
+<meta property="og:title" content="Engineering Design Studio — CAD, Mechanical Design & Fabrication for Grades 9–12 | STEM4U"/>
+<meta property="og:description" content="A hands-on engineering and fabrication program for grades 9–12. Students learn Onshape 3D CAD, mechanical design, assemblies, 3D printing, laser cutting and CNC — from concept to a tested prototype. Wednesdays in Ashburn."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://stem4u.com/engineering-design-studio.html"/>
+<meta property="og:image" content="https://stem4u.com/STEM4U-Logo-V3-clean.png"/>
+<meta name="geo.region" content="US-VA"/>
+<meta name="geo.placename" content="Loudoun County, Northern Virginia"/>
+<meta name="keywords" content="CAD classes for high school, Onshape classes, mechanical design for students, 3D printing high school, laser cutting class, CNC machining for students, engineering classes Loudoun County, product design Northern Virginia, fabrication class, design for manufacturing, prototyping, STEM grades 9-12, engineering Ashburn, engineering Leesburg, STEM near me"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Course","name":"Engineering Design Studio","description":"A hands-on, project-based engineering program for students in grades 9–12 in Northern Virginia. Students learn Onshape 3D CAD, mechanical design and multi-part assemblies, then fabricate with 3D printing, laser cutting and CNC machining — taking ideas from digital models to tested physical prototypes. In Ashburn.","provider":{"@type":"EducationalOrganization","name":"STEM4U","url":"https://stem4u.com"},"educationalLevel":"Grades 9-12","about":["3D CAD","Onshape","Mechanical Design","Assemblies","3D Printing","Laser Cutting","CNC Machining","Design for Manufacturing","Prototyping"],"areaServed":["Loudoun County, Virginia","Fairfax County, Virginia","Prince William County, Virginia","Northern Virginia"]}
+</script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programs.html" class="nav-link active">Programs</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <a href="waitlist.html" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+
+<section class="page-hero">
+  <div class="hero-badge"><span class="dot"></span>Engineering Design Studio · Grades 9–12<span class="dot"></span></div>
+  <h1>Engineering <span>Design Studio</span></h1>
+  <p class="tagline">Design. Engineer. Prototype. Manufacture.</p>
+  <p class="lede">Go beyond learning CAD. A hands-on, project-based program where high school students learn 3D CAD, mechanical design, prototyping, and fabrication — taking ideas from digital models to physical components and functional assemblies using professional design tools and real-world manufacturing technologies.</p>
+  <a href="#enroll" class="hero-cta">Join the Interest List →</a>
+</section>
+
+<div class="facts">
+  <div class="fact"><div class="n">Grades 9–12</div><div class="l">High school</div></div>
+  <div class="fact"><div class="n">Onshape CAD</div><div class="l">Mechanical design &amp; assemblies</div></div>
+  <div class="fact"><div class="n">Fabrication</div><div class="l">3D print · laser · CNC</div></div>
+  <div class="fact"><div class="n">Project-based</div><div class="l">Engineering, not tutorials</div></div>
+  <div class="fact"><div class="n">Wednesdays</div><div class="l">STEM4U · Ashburn #182</div></div>
+</div>
+
+<div class="prose">
+  <h3>Learn it, then engineer it</h3>
+  <p>Great engineering starts with understanding how things work and figuring out how to make them better. At Engineering Design Studio, students learn to design, develop, and fabricate real-world solutions. Starting with the fundamentals of Onshape 3D CAD, students progress into mechanical components, multi-part assemblies, and functional engineering systems.</p>
+  <p>They then bring their designs into the physical world. Students explore how different manufacturing processes work and how to choose the right process for a particular part or project. Through 3D printing, laser cutting, and CNC machining demonstrations and supervised fabrication activities, they discover how digital designs become physical products.</p>
+  <p>Rather than simply following CAD tutorials, students take on engineering challenges, develop their own solutions, build prototypes, evaluate performance, and refine their designs. <strong>Learn the tools. Understand the engineering. Make your ideas real.</strong></p>
+</div>
+
+<section class="workflow">
+  <p class="wlabel">The STEM4U Workflow</p>
+  <h2>Design-to-Fabrication</h2>
+  <p class="wsub">From an idea to a physical prototype, students experience the full engineering process.</p>
+  <div class="flow">
+    <div class="fstep"><div class="fn">1</div><div class="fh">Define</div><div class="fd">Understand the problem, requirements, and design constraints.</div></div>
+    <div class="fstep"><div class="fn">2</div><div class="fh">Design</div><div class="fd">Develop concepts and create 3D CAD models in Onshape.</div></div>
+    <div class="fstep"><div class="fn">3</div><div class="fh">Engineer</div><div class="fd">Refine components, dimensions, assemblies, and mechanisms.</div></div>
+    <div class="fstep"><div class="fn">4</div><div class="fh">Fabricate</div><div class="fd">Create parts with 3D printing, laser cutting, or CNC machining.</div></div>
+    <div class="fstep"><div class="fn">5</div><div class="fh">Test</div><div class="fd">Assemble the prototype and evaluate how it performs.</div></div>
+    <div class="fstep"><div class="fn">6</div><div class="fh">Improve</div><div class="fd">Identify issues, revise the design, and build a better version.</div></div>
+  </div>
+</section>
+
+<div class="prose" style="margin-top:36px;">
+  <h3>What students will explore</h3>
+  <p class="kicker">A progression from CAD fundamentals to engineering design and fabrication.</p>
+  <div class="explore">
+    <div class="xblock">
+      <h4>CAD Foundations &amp; Product Design</h4>
+      <p>Learn professional 3D CAD using Onshape, from the fundamentals to more advanced modeling.</p>
+      <ul>
+        <li>Sketching, dimensions, and constraints</li>
+        <li>3D modeling and parametric design</li>
+        <li>Design features, patterns, and complex geometries</li>
+        <li>Create functional mechanical components</li>
+      </ul>
+    </div>
+    <div class="xblock">
+      <h4>Mechanical Design &amp; Assemblies</h4>
+      <p>Understand how individual components work together to form mechanical systems.</p>
+      <ul>
+        <li>Gears, shafts, brackets, and mechanical components</li>
+        <li>Multi-part modeling and assemblies</li>
+        <li>Assembly relationships and motion</li>
+        <li>Design functional mechanisms and systems</li>
+      </ul>
+    </div>
+    <div class="xblock">
+      <h4>Fabrication &amp; Manufacturing</h4>
+      <p>Explore how engineering designs are transformed into physical products.</p>
+      <ul>
+        <li>3D printing and additive manufacturing</li>
+        <li>Laser cutting for precision parts, panels, and enclosures</li>
+        <li>Introduction to CNC machining and subtractive manufacturing</li>
+        <li>Materials, tolerances, clearances, and fit</li>
+        <li>Design for manufacturing (DFM)</li>
+        <li>How to select an appropriate fabrication method</li>
+      </ul>
+    </div>
+    <div class="xblock">
+      <h4>Prototyping, Testing &amp; Iteration</h4>
+      <p>Apply engineering principles to build, evaluate, and improve designs.</p>
+      <ul>
+        <li>Translate CAD models into physical prototypes</li>
+        <li>Assemble and test components</li>
+        <li>Identify design limitations and areas for improvement</li>
+        <li>Refine designs based on testing and feedback</li>
+      </ul>
+    </div>
+    <div class="xblock">
+      <h4>Engineering Projects &amp; Capstone</h4>
+      <p>Put engineering skills into practice through larger design challenges.</p>
+      <ul>
+        <li>Understand project requirements and constraints</li>
+        <li>Brainstorm and develop design solutions</li>
+        <li>Create CAD models and mechanical assemblies</li>
+        <li>Fabricate and test prototypes</li>
+        <li>Evaluate performance and improve designs</li>
+        <li>Document and present engineering projects</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prose" style="margin-top:28px;">
+  <h3>What students will create</h3>
+  <p class="kicker">From CAD models to real-world engineering.</p>
+  <div class="grid2">
+    <div class="mini"><h4>Mechanical components</h4><p>Design brackets, mounts, shafts, and precision components.</p></div>
+    <div class="mini"><h4>Mechanical assemblies</h4><p>Build multi-part assemblies with gears, shafts, and moving mechanisms.</p></div>
+    <div class="mini"><h4>3D-printed prototypes</h4><p>Create functional components and prototypes using additive manufacturing.</p></div>
+    <div class="mini"><h4>Laser-cut components</h4><p>Design and fabricate precision panels, structures, enclosures, and project parts.</p></div>
+    <div class="mini"><h4>Engineering systems</h4><p>Develop functional mechanical systems that solve real design challenges.</p></div>
+    <div class="mini"><h4>Engineering capstone</h4><p>Take a project from concept through CAD, fabrication, testing, and refinement.</p></div>
+  </div>
+
+  <h3>Tools, technologies &amp; fabrication resources</h3>
+  <p>An engineering design and fabrication environment where students move from digital concepts to physical creations.</p>
+  <ul>
+    <li><strong>Onshape 3D CAD</strong> — professional cloud-based modeling, parametric design, components, and assemblies</li>
+    <li><strong>3D printing</strong> — additive manufacturing for rapid prototyping and functional components</li>
+    <li><strong>Laser cutting</strong> — precision cutting of sheet materials for panels, enclosures, and structural parts</li>
+    <li><strong>CNC machining</strong> — introduction to subtractive manufacturing and design for manufacturing</li>
+    <li><strong>Mechanical design &amp; assembly</strong> — tools and components for mechanisms, motion, fit, and assemblies</li>
+    <li><strong>Engineering measurement &amp; testing</strong> — tools for evaluating dimensions, fit, functionality, and performance</li>
+  </ul>
+  <div class="note"><strong>A note on equipment access:</strong> some equipment and processes are instructor-demonstrated or used only under direct supervision. We confirm which machines students operate themselves before each project, with safety first.</div>
+
+  <h3>By the end, students will be able to</h3>
+  <ul>
+    <li>Create parametric 3D models using professional CAD tools</li>
+    <li>Design mechanical components using dimensions, constraints, and engineering principles</li>
+    <li>Develop multi-part assemblies and understand how mechanisms work</li>
+    <li>Select appropriate fabrication methods for different design requirements</li>
+    <li>Understand the fundamentals of 3D printing, laser cutting, and CNC machining</li>
+    <li>Apply design-for-manufacturing principles</li>
+    <li>Build, test, evaluate, and improve physical prototypes</li>
+    <li>Document and present engineering projects</li>
+  </ul>
+
+  <h3>Where this leads</h3>
+  <p>Engineering Design Studio helps students develop a foundation in mechanical engineering, product design, prototyping, and manufacturing. The skills built here support students interested in:</p>
+  <ul>
+    <li>Mechanical and manufacturing engineering</li>
+    <li>Robotics and automation</li>
+    <li>Product design and development</li>
+    <li>Aerospace and automotive engineering</li>
+    <li>Advanced STEM programs and engineering competitions</li>
+    <li>College engineering and technology pathways</li>
+  </ul>
+  <p>Students interested in robotics can also apply these skills to FTC and other advanced robotics projects.</p>
+
+  <h3>How the program works</h3>
+  <ul>
+    <li>Designed for high school students in Grades 9–12</li>
+    <li>Weekly hands-on engineering sessions</li>
+    <li>Project-based learning and engineering challenges</li>
+    <li>Onshape CAD fundamentals through more advanced applications</li>
+    <li>Individual design work and guided engineering projects</li>
+    <li>Access to 3D printing, laser cutting, and CNC-related fabrication resources, subject to project needs and supervision</li>
+    <li>No prior CAD experience required</li>
+    <li><strong>Wednesdays</strong> at STEM4U Academy</li>
+    <li>Tuition and enrollment details coming soon</li>
+  </ul>
+</div>
+
+<section style="background:var(--light);padding:30px 24px;text-align:center;">
+  <p style="font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;">Why STEM4U</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:center;max-width:880px;margin:0 auto;font-size:14.5px;font-weight:700;color:var(--navy);">
+    <span><span style="color:var(--orange);">✓</span> A fabrication environment, not just a CAD classroom</span>
+    <span><span style="color:var(--orange);">✓</span> Connect digital CAD designs with real physical parts</span>
+    <span><span style="color:var(--orange);">✓</span> Explore multiple manufacturing technologies</span>
+    <span><span style="color:var(--orange);">✓</span> Build, test, and improve real prototypes</span>
+  </div>
+</section>
+
+<section class="related">
+  <p class="section-label">Explore More Programs</p>
+  <div class="related-grid">
+    <a href="young-inventors-lab.html">💡 Young Inventors Lab</a>
+    <a href="engineering-robotics.html">🤖 Robotics Engineering</a>
+    <a href="ftc.html">🏆 FTC Challenge</a>
+    <a href="programs.html">All programs →</a>
+  </div>
+</section>
+
+<section class="form-section" id="enroll">
+  <div class="form-wrap">
+    <h2 class="form-title">Join the Interest List</h2>
+    <p class="form-subtitle">Go beyond CAD. Think, design, and build like an engineer. Tell us a little about your student and we'll be in touch with session times and the next start date.</p>
+    <a class="submit-btn" href="waitlist.html?program=Engineering%20Design%20Studio">Join the Interest List →</a>
+    <p class="priv">Secure sign-up on our waitlist page. No spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p>
+  </div>
+</section>
+
+<section class="areas">
+  <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
+  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">Engineering Design Studio across Northern Virginia</h2>
+  <p style="max-width:760px;margin:0 auto;font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);">
+    STEM4U runs hands-on engineering and fabrication programs for families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Herndon, Reston, Gainesville, Haymarket, Bristow, Manassas and surrounding Northern Virginia communities.
+  </p>
+</section>
+
+<div class="location-bar">📍 21690 Red Rum Dr #182, Ashburn, VA 20147 &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+<footer>
+  <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
+  <p>© 2026 STEM4U LLC. · Northern Virginia · K-12 STEM Programs</p>
+  <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;">STEM4U is the brand of Stem for You.</p>
+</footer>
+
+<!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
+<script src="camp-promo.js" defer></script>
+</body>
+</html>

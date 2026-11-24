@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Young Inventors Lab — 3D CAD, 3D Printing & Invention for Grades 6–8 in Northern Virginia | STEM4U</title>
+<meta name="description" content="Young Inventors Lab: a hands-on engineering and invention program for grades 6–8 in Northern Virginia. Students learn Onshape 3D CAD, design and 3D-print their own creations, and solve engineering challenges. Wednesdays in Ashburn. Serving Loudoun, Fairfax & Prince William."/>
+<link rel="icon" type="image/png" href="STEM4U-Logo-V3-clean.png"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy:#0D2B7A; --blue:#1A5CD8; --orange:#FF5500; --orange-lt:#FF7733;
+    --light:#F4F7FF; --white:#FFFFFF; --text:#0A1E52; --muted:#4A5A80; --card:#FFFFFF;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--light); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+  .site-nav { position: sticky; top: 0; z-index: 50; background: var(--navy); display: flex; align-items: center; gap: 26px; padding: 14px 30px; border-bottom: 3px solid var(--orange); }
+  .site-nav .nav-logo { font-weight: 900; font-size: 22px; letter-spacing: -1px; color: var(--white); text-decoration: none; }
+  .site-nav a.nav-link { color: rgba(255,255,255,.78); font-size: 14px; font-weight: 600; text-decoration: none; transition: color .15s; }
+  .site-nav a.nav-link:hover, .site-nav a.nav-link.active { color: var(--white); }
+  .site-nav .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+  .site-nav .nav-cta { background: var(--orange); color: var(--white); font-size: 13px; font-weight: 800; padding: 9px 20px; border-radius: 6px; text-decoration: none; transition: background .15s; }
+  .site-nav .nav-cta:hover { background: var(--orange-lt); }
+  .nav-toggle { display: none; }
+  @media (max-width: 720px) {
+    .site-nav { flex-wrap: wrap; gap: 14px; padding: 12px 18px; }
+    .site-nav .nav-links { display: none; flex-basis: 100%; flex-direction: column; align-items: flex-start; gap: 12px; order: 4; }
+    .site-nav .nav-links.open { display: flex; }
+    .site-nav .nav-cta { margin-left: auto; order: 2; }
+    .nav-toggle { display: inline-flex; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; order: 3; margin-left: 8px; }
+  }
+
+  .page-hero { background: var(--navy); color: var(--white); padding: 46px 24px 40px; text-align: center; position: relative; }
+  .page-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: var(--orange); }
+  .hero-badge { display:inline-flex; align-items:center; gap:10px; color:#F5C518; font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; margin-bottom:14px; }
+  .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:var(--orange); }
+  .page-hero h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 900; line-height: 1.12; }
+  .page-hero h1 span { color: var(--orange); }
+  .page-hero .tagline { font-size:15px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:#F5C518; margin-top:10px; }
+  .page-hero .lede { font-size: 17px; color: rgba(255,255,255,.8); max-width: 640px; margin: 14px auto 24px; line-height: 1.6; }
+  .hero-cta { display:inline-block; background:var(--orange); color:#fff; font-size:15px; font-weight:800; padding:14px 34px; border-radius:6px; text-decoration:none; box-shadow:0 4px 20px rgba(255,85,0,.4); }
+  .hero-cta:hover { background:var(--orange-lt); }
+
+  .facts { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; max-width:960px; margin:-28px auto 0; padding:0 24px; position:relative; z-index:2; }
+  @media (max-width:720px){ .facts { grid-template-columns:repeat(2,1fr); } }
+  .fact { background:#fff; border-radius:10px; padding:18px 14px; text-align:center; box-shadow:0 4px 20px rgba(13,43,122,.1); border-top:3px solid var(--orange); }
+  .fact .n { font-size:17px; font-weight:900; color:var(--navy); line-height:1.15; }
+  .fact .l { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+
+  .prose { max-width: 720px; margin: 44px auto 0; text-align: left; background: var(--white); border-radius: 12px; padding: 36px 40px; box-shadow: 0 2px 18px rgba(13,43,122,.07); }
+  .prose h3 { font-size: 19px; font-weight: 800; color: var(--navy); margin: 30px 0 10px; padding-left: 12px; border-left: 4px solid var(--orange); }
+  .prose h3:first-child { margin-top: 0; }
+  .prose p { font-size: 16px; color: var(--text); line-height: 1.75; margin-bottom: 16px; }
+  .prose ul { margin: 0 0 16px 4px; list-style: none; }
+  .prose li { font-size: 16px; line-height: 1.7; padding-left: 26px; position: relative; margin-bottom: 8px; }
+  .prose li::before { content: '▸'; position: absolute; left: 4px; color: var(--orange); font-weight: 900; }
+  .kicker { font-size:16px; font-weight:800; color:var(--blue); margin:4px 0 18px; }
+  @media (max-width: 500px) { .prose { padding: 28px 22px; } }
+
+  .explore { max-width:720px; margin:20px auto 0; display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media(max-width:600px){ .explore { grid-template-columns:1fr; } }
+  .xcard { background:var(--light); border-radius:12px; padding:20px 22px; border-top:3px solid var(--orange); }
+  .xcard .xtag { font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--orange); }
+  .xcard h4 { font-size:16px; font-weight:900; color:var(--navy); margin:5px 0 8px; }
+  .xcard p { font-size:14px; color:var(--muted); line-height:1.6; margin:0; }
+
+  .journey { max-width:760px; margin:24px auto 0; padding:0 24px; }
+  .jstep { display:flex; align-items:flex-start; gap:16px; background:#fff; border-radius:12px; padding:16px 20px; margin-bottom:12px; box-shadow:0 2px 14px rgba(13,43,122,.07); border-left:4px solid var(--orange); }
+  .jstep .jn { flex:0 0 auto; width:38px; height:38px; border-radius:50%; background:var(--navy); color:#fff; font-weight:900; font-size:17px; display:flex; align-items:center; justify-content:center; }
+  .jstep .jt { font-size:15px; font-weight:900; color:var(--navy); text-transform:uppercase; letter-spacing:.5px; }
+  .jstep .jd { font-size:14px; color:var(--muted); line-height:1.55; margin-top:3px; }
+
+  .related { max-width:720px; margin:44px auto 0; text-align:center; }
+  .related .section-label { font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--orange); margin-bottom:14px; }
+  .related-grid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .related-grid a { background:#fff; border-radius:10px; padding:16px 22px; text-decoration:none; color:var(--navy); font-weight:800; font-size:14px; box-shadow:0 2px 14px rgba(13,43,122,.08); border-top:3px solid var(--blue); transition:transform .15s; }
+  .related-grid a:hover { transform:translateY(-3px); }
+
+  .form-section { background: var(--navy); padding: 56px 24px; text-align: center; margin-top:52px; position:relative; }
+  .form-section::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--orange); }
+  .form-wrap { max-width: 520px; margin: 0 auto; }
+  .form-title { font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .form-subtitle { font-size: 14px; color: rgba(255,255,255,.7); margin-bottom: 24px; line-height:1.6; }
+  .submit-btn { background:var(--orange); color:#fff; font-size:16px; font-weight:800; padding:15px 40px; border:none; border-radius:8px; cursor:pointer; text-decoration:none; display:inline-block; transition:background .15s; }
+  .submit-btn:hover { background:var(--orange-lt); }
+  .priv { font-size:12px; color:rgba(255,255,255,.55); text-align:center; margin-top:14px; }
+
+  .location-bar { background: var(--orange); color: var(--white); text-align: center; padding: 18px 24px; font-size: 14px; font-weight: 700; margin-top:52px; }
+  .location-bar a { color: var(--white); text-decoration: underline; }
+  footer { background: #070F2B; color: rgba(255,255,255,.5); text-align: center; padding: 28px 24px; font-size: 13px; margin-top: auto; }
+  footer a { color: var(--orange); text-decoration: none; }
+  .footer-links { display: flex; gap: 20px; justify-content: center; margin-bottom: 10px; flex-wrap:wrap; }
+  .areas { background:var(--navy); color:#fff; padding:36px 24px; text-align:center; }
+</style>
+<link rel="canonical" href="https://stem4u.com/young-inventors-lab.html"/>
+<meta property="og:title" content="Young Inventors Lab — 3D CAD, 3D Printing & Invention for Grades 6–8 | STEM4U"/>
+<meta property="og:description" content="A hands-on engineering and invention program for grades 6–8. Students learn Onshape 3D CAD, design and 3D-print their own creations, and solve engineering challenges. Wednesdays in Ashburn."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://stem4u.com/young-inventors-lab.html"/>
+<meta property="og:image" content="https://stem4u.com/STEM4U-Logo-V3-clean.png"/>
+<meta name="geo.region" content="US-VA"/>
+<meta name="geo.placename" content="Loudoun County, Northern Virginia"/>
+<meta name="keywords" content="3D CAD for kids, Onshape for students, 3D printing classes for kids, invention class, engineering design for middle school, CAD classes Loudoun County, 3D printing Ashburn, maker class Northern Virginia, STEM grades 6-8, young inventors, product design for kids, STEM Leesburg, STEM South Riding, engineering Fairfax, STEM near me"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Course","name":"Young Inventors Lab","description":"A hands-on engineering and invention program for students in grades 6–8 in Northern Virginia. Students learn Onshape 3D CAD, discover how mechanisms work, design and 3D-print their own creations, and solve engineering challenges — ending with an original invention. In Ashburn.","provider":{"@type":"EducationalOrganization","name":"STEM4U","url":"https://stem4u.com"},"educationalLevel":"Grades 6-8","about":["3D CAD","Onshape","3D Printing","Engineering Design","Invention","Prototyping"],"areaServed":["Loudoun County, Virginia","Fairfax County, Virginia","Prince William County, Virginia","Northern Virginia"]}
+</script>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo"><img src="STEM4U-Logo-V3-clean.png" alt="STEM4U" style="height:56px;width:auto;display:block;border-radius:50%;" /></a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="programs.html" class="nav-link active">Programs</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+  </div>
+  <a href="waitlist.html" class="nav-cta">Join Waitlist</a>
+  <button class="nav-toggle" aria-label="Menu" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+</nav>
+
+
+<section class="page-hero">
+  <div class="hero-badge"><span class="dot"></span>Young Inventors Lab · Grades 6–8<span class="dot"></span></div>
+  <h1>Young <span>Inventors</span> Lab</h1>
+  <p class="tagline">Imagine. Design. Build. Innovate.</p>
+  <p class="lede">A hands-on engineering and invention program where students turn creative ideas into real-world creations. Using 3D CAD, 3D printing, and engineering challenges, students learn to design, build, test, and improve their own inventions.</p>
+  <a href="#enroll" class="hero-cta">Join the Interest List →</a>
+</section>
+
+<div class="facts">
+  <div class="fact"><div class="n">Grades 6–8</div><div class="l">Middle school</div></div>
+  <div class="fact"><div class="n">Onshape 3D CAD</div><div class="l">Professional design tools</div></div>
+  <div class="fact"><div class="n">3D printing</div><div class="l">Ideas become real</div></div>
+  <div class="fact"><div class="n">Project-based</div><div class="l">Challenges, not tutorials</div></div>
+  <div class="fact"><div class="n">Wednesdays</div><div class="l">STEM4U · Ashburn #182</div></div>
+</div>
+
+<div class="prose">
+  <h3>Learn it, then make it</h3>
+  <p>Every great invention starts with an idea or a problem worth solving. At Young Inventors Lab, students learn the fundamentals of design and engineering by working on hands-on challenges.</p>
+  <p>Students explore 3D design using Onshape, discover how everyday objects and mechanical systems work, and learn how to turn their ideas into physical creations using 3D printing.</p>
+  <p>Rather than simply following instructions, students develop their own designs, experiment with different approaches, test their creations, and make improvements along the way. Every project is an opportunity to think like an inventor and work like an engineer.</p>
+</div>
+
+<div class="prose" style="margin-top:28px;">
+  <h3>What students will explore</h3>
+  <p class="kicker">A learning journey from creative ideas to working prototypes.</p>
+  <div class="explore">
+    <div class="xcard"><div class="xtag">Imagine &amp; Design</div><h4>Learn 3D CAD</h4><p>Explore ideas and learn 3D CAD fundamentals by designing useful objects such as phone stands, keychains, and desk accessories.</p></div>
+    <div class="xcard"><div class="xtag">Explore Mechanisms</div><h4>How things move</h4><p>Discover gears, linkages, moving parts, and how mechanical systems work.</p></div>
+    <div class="xcard"><div class="xtag">Create &amp; Prototype</div><h4>Print your designs</h4><p>Learn how 3D printers turn digital designs into physical objects, and explore materials, dimensions, and design constraints.</p></div>
+    <div class="xcard"><div class="xtag">Build &amp; Test</div><h4>Make it work</h4><p>Create prototypes, test their functionality, identify problems, and improve their designs.</p></div>
+    <div class="xcard"><div class="xtag">Solve Challenges</div><h4>Engineering challenges</h4><p>Work through creative challenges such as marble runs, mechanical toys, and small functional devices.</p></div>
+    <div class="xcard"><div class="xtag">Invent</div><h4>Something new</h4><p>Apply everything learned to design and present an original invention.</p></div>
+  </div>
+</div>
+
+<div class="prose" style="margin-top:28px;">
+  <h3>What students will be able to do</h3>
+  <p>By the end of the program, students will be able to:</p>
+  <ul>
+    <li>Create original 3D designs using Onshape CAD tools</li>
+    <li>Understand basic mechanical design concepts and how things work</li>
+    <li>Turn digital designs into physical prototypes using 3D printing</li>
+    <li>Apply engineering principles to solve practical design challenges</li>
+    <li>Test, evaluate, and improve their own creations</li>
+    <li>Explain and present their ideas with confidence</li>
+  </ul>
+
+  <h3>What students will create</h3>
+  <p class="kicker">From ideas to real creations.</p>
+  <ul>
+    <li><strong>Creative product designs</strong> — phone stands, desk accessories, and personalized creations</li>
+    <li><strong>Mechanical inventions</strong> — gears, linkages, and moving mechanisms</li>
+    <li><strong>Engineering challenges</strong> — marble runs, structures, and design challenges</li>
+    <li><strong>Original inventions</strong> — student-designed projects and prototypes</li>
+  </ul>
+
+  <h3>Tools and resources</h3>
+  <p>Everything students need to explore design and engineering is here every week:</p>
+  <ul>
+    <li>Onshape 3D CAD software</li>
+    <li>Computers and design resources</li>
+    <li>3D printers and prototyping materials</li>
+    <li>Engineering tools and project components</li>
+    <li>Instructor guidance and project feedback</li>
+  </ul>
+
+  <h3>Where this leads</h3>
+  <p>Young Inventors Lab builds a foundation in engineering design, creative problem-solving, and manufacturing. Students who want to explore engineering further can continue into more advanced programs such as <a href="engineering-design-studio.html" style="color:var(--blue);font-weight:700;text-decoration:none;">Engineering Design Studio</a>, where they develop deeper skills in mechanical design, assemblies, prototyping, and manufacturing. For students interested in robotics, these skills also provide a useful foundation for exploring FTC robotics and other advanced engineering projects.</p>
+
+  <h3>How the program works</h3>
+  <ul>
+    <li>Weekly hands-on sessions at STEM4U Academy</li>
+    <li>Designed for Grades 6–8</li>
+    <li>Small-group instruction and individual project work</li>
+    <li>Learn 3D CAD, design, prototyping, and engineering</li>
+    <li>No prior CAD or engineering experience required</li>
+    <li><strong>Wednesdays</strong> at STEM4U Academy</li>
+    <li>Tuition and enrollment details coming soon</li>
+  </ul>
+</div>
+
+<section style="background:var(--light);padding:30px 24px;text-align:center;">
+  <p style="font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;">Why STEM4U</p>
+  <div style="display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:center;max-width:840px;margin:0 auto;font-size:14.5px;font-weight:700;color:var(--navy);">
+    <span><span style="color:var(--orange);">✓</span> Real projects, not just screen-based lessons</span>
+    <span><span style="color:var(--orange);">✓</span> Learn by designing, building, and experimenting</span>
+    <span><span style="color:var(--orange);">✓</span> Creative freedom to develop original ideas</span>
+    <span><span style="color:var(--orange);">✓</span> Mentor-guided, hands-on learning</span>
+  </div>
+</section>
+
+<section class="related">
+  <p class="section-label">Explore More Programs</p>
+  <div class="related-grid">
+    <a href="engineering-design-studio.html">⚙️ Engineering Design Studio</a>
+    <a href="engineering-robotics.html">🤖 Robotics Engineering</a>
+    <a href="ftc.html">🏆 FTC Challenge</a>
+    <a href="programs.html">All programs →</a>
+  </div>
+</section>
+
+<section class="form-section" id="enroll">
+  <div class="form-wrap">
+    <h2 class="form-title">Join the Interest List</h2>
+    <p class="form-subtitle">Don't just learn how things work — design, build, and invent them. Tell us a little about your child and we'll be in touch with session times and the next start date.</p>
+    <a class="submit-btn" href="waitlist.html?program=Young%20Inventors%20Lab">Join the Interest List →</a>
+    <p class="priv">Secure sign-up on our waitlist page. No spam, ever. See our <a href="privacy.html" style="color:inherit;text-decoration:underline">Privacy Policy</a>.</p>
+  </div>
+</section>
+
+<section class="areas">
+  <p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:10px;">Areas We Serve</p>
+  <h2 style="font-size:clamp(20px,3.5vw,26px);font-weight:800;margin-bottom:14px;color:#fff;">Young Inventors Lab across Northern Virginia</h2>
+  <p style="max-width:760px;margin:0 auto;font-size:14px;line-height:1.8;color:rgba(255,255,255,.75);">
+    STEM4U runs hands-on engineering and invention programs for families throughout <strong style="color:#fff;">Loudoun, Fairfax, Prince William, Fauquier &amp; Arlington counties</strong> — including Ashburn, Aldie, Leesburg, Sterling, South Riding, Brambleton, Stone Ridge, Dulles, Chantilly, Centreville, Herndon, Reston, Gainesville, Haymarket, Bristow, Manassas and surrounding Northern Virginia communities.
+  </p>
+</section>
+
+<div class="location-bar">📍 21690 Red Rum Dr #182, Ashburn, VA 20147 &nbsp;·&nbsp; <a href="mailto:contact@stem4u.com">contact@stem4u.com</a></div>
+<footer>
+  <div class="footer-links"><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="mailto:contact@stem4u.com">contact@stem4u.com</a><a href="https://stem4u.com">stem4u.com</a></div>
+  <p>© 2026 STEM4U LLC. · Northern Virginia · K-12 STEM Programs</p>
+  <p style="font-size:12px;color:rgba(255,255,255,.4);margin-top:8px;">STEM4U is the brand of Stem for You.</p>
+</footer>
+
+<!-- Vercel Web Analytics --><script defer src="/_vercel/insights/script.js"></script>
+<script src="camp-promo.js" defer></script>
+</body>
+</html>
