@@ -1,0 +1,1626 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pollinator Alley</title><style>.mcap{display:none!important}@media (max-width:560px){.stat .v{font-size:20px!important}.stats{align-items:flex-end}}@media (min-width:561px){.vset{top:4px!important}#stats{top:var(--vset-h,44px)!important}}</style><style>@media (max-width:560px){body > header{display:none}}</style><script>window.FIG_A = () => innerWidth <= 560 ? 1.1 : .75;</script><script>window.LBL_U = () => { if (innerWidth > 560) return 0; const s = document.getElementById("fig"); return s && s.clientWidth && s.viewBox.baseVal.width ? s.viewBox.baseVal.width / s.clientWidth : 0; };</script></head><body>
+<script>
+/* ============================================================
+   Colorfigures core: projection, shapes, shading, ink, labels, page shell.
+   A figure page includes this file (scripts/build.py inlines it), then calls mountFigure({...}).
+   See SKILL.md for the drawing contract and conventions.
+   One fixed view (front-left-top) and one fixed light (from above, behind the viewer's right shoulder: the front is lit,
+   the left side is in shade, and cast shadows fall toward the lower left of the screen).
+   ============================================================ */
+
+/* ---------- palettes ---------- */
+const PALS = {
+  mustard: { l:'#f4b829', m:'#d49c1f', d:'#4e4a18' },
+  tomato:  { l:'#ef6a4c', m:'#cf5038', d:'#4a2219' },
+  mint:    { l:'#93d3b0', m:'#71b693', d:'#1f4034' },
+  cobalt:  { l:'#76a0e2', m:'#5a82c6', d:'#1c2948' },
+  blush:   { l:'#f3a6bb', m:'#d8869c', d:'#4b2430' },
+};
+const METAL   = { l:'#eef0f0', m:'#c6ccce', d:'#8f989b' };
+const CLEAR   = { l:'#e4f2f4', m:'#c4dfe4', d:'#97b9c0' };
+const CERAMIC = { l:'#fbfaf3', m:'#e3e0d2', d:'#bdb8a6' };
+const DARK    = { l:'#55504a', m:'#3d3935', d:'#272421' };
+const INK = '#231e16';
+const SHADOW = '#41538f';
+
+/* ---------- projection (x = depth toward viewer-right, y = toward viewer-left, z = up) ---------- */
+const C = Math.cos(Math.PI/6), S = Math.sin(Math.PI/6);
+let OX = 0, OY = 0;
+/* Free orthographic camera (internal names start with CAM_ / cam so they never clash with a figure's own names). YAW turns the viewer around the vertical axis (45° = the classic front-left view),
+   PITCH is how far it looks down (35.26° = true isometric). At the defaults P() is exactly the old isometric
+   projection, so every figure drawn for it still lines up. Drag the figure to orbit; double-click to reset.
+   rotV(n) maps a world direction into the default view's frame, so vis / tone / any "sum of rotV > 0" test keep
+   working at every angle: the viewer is always (1,1,1) and the light stays put relative to the viewer. */
+let VIEW = 0, RC = [0, 0], RCZ = 0;
+const VIEW_NAMES = ['front', 'left side', 'back', 'right side'];
+const TURNS = [0, 2];
+const YAW0 = 45, PITCH0 = Math.atan(1/Math.SQRT2) * 180/Math.PI, CAM_K = Math.sqrt(1.5);
+let YAW = YAW0, PITCH = PITCH0, CAM_R, CAM_U, CAM_V, CAM_D;                       // right, up, toward viewer, screen-down
+const camBasis = (yaw, pitch) => { const t = yaw*Math.PI/180, p = pitch*Math.PI/180, ct = Math.cos(t), st = Math.sin(t), cp = Math.cos(p), sp2 = Math.sin(p);
+  return { R:[st,-ct,0], U:[-sp2*ct,-sp2*st,cp], V:[cp*ct,cp*st,sp2] }; };
+const CAM_B0 = camBasis(YAW0, PITCH0);
+// CAM_LIM: how far (deg) the camera may turn either side of the front view; null = all the way round (set per figure)
+let CAM_LIM = null;
+function setCam(yaw, pitch){ YAW = CAM_LIM == null ? yaw : Math.max(YAW0 - CAM_LIM, Math.min(YAW0 + CAM_LIM, yaw));
+  PITCH = CAM_LIM == null ? Math.max(6, Math.min(78, pitch)) : Math.max(15, Math.min(62, pitch)); const b = camBasis(YAW, PITCH); CAM_R = b.R; CAM_U = b.U; CAM_V = b.V; CAM_D = CAM_U.map(v => -v); }
+setCam(YAW0, PITCH0);
+const camDot = (a,b) => a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const rotV = n => { const r = camDot(n,CAM_R), u = camDot(n,CAM_U), v = camDot(n,CAM_V); return [0,1,2].map(i => CAM_B0.R[i]*r + CAM_B0.U[i]*u + CAM_B0.V[i]*v); };
+// the light's ground direction turns with the viewer's yaw only (shadows always fall toward the lower left of the screen)
+const yawTurn = ([x,y]) => { const t = (YAW - YAW0)*Math.PI/180, c = Math.cos(t), s = Math.sin(t); return [x*c - y*s, x*s + y*c]; };
+const rotXY = (x,y) => [x, y];                                                // kept for old callers
+const P0 = (x,y,z) => [(x-y)*C + OX, (x+y)*S - z + OY];                       // raw iso
+const P  = (x,y,z) => { if (window.WARP) { const w = WARP(x,y,z); x = w[0]; y = w[1]; z = w[2]; } const q = [x-RC[0], y-RC[1], z-RCZ];
+  return [CAM_K*camDot(q,CAM_R) + (RC[0]-RC[1])*C + OX, CAM_K*camDot(q,CAM_D) + (RC[0]+RC[1])*S - RCZ + OY]; };
+const Dv = (x,y,z) => [CAM_K*camDot([x,y,z],CAM_R), CAM_K*camDot([x,y,z],CAM_D)];
+// distance toward the viewer: draw parts with smaller depth first
+const depthOf = p => camDot(p, CAM_V);
+// sort [{at:[x,y,z], svg}] back-to-front for the current camera. A part may also give box:[[x0,y0,z0],[x1,y1,z1]]:
+// when two boxes are separated along x, y or z, the one on the viewer's side goes last (a centre point alone gets long
+// or wrapping parts wrong: a pole beside a row of keys, a spout reaching past a cup).
+const boxMid = b => [0,1,2].map(k => (b[0][k] + b[1][k]) / 2);
+const sepOrder = (p, q) => { if (!p.box || !q.box) return 0;
+  for (let k = 0; k < 3; k++){ if (p.box[1][k] <= q.box[0][k] + 1e-6) return CAM_V[k] >= 0 ? -1 : 1; if (q.box[1][k] <= p.box[0][k] + 1e-6) return CAM_V[k] >= 0 ? 1 : -1; }
+  return 0; };
+const byDepth = parts => parts.filter(Boolean).sort((p,q) => sepOrder(p,q) || (depthOf(p.at || boxMid(p.box)) - depthOf(q.at || boxMid(q.box)))).map(p => p.svg).join('');
+// the half of a vertical ring that faces the viewer / is turned away, as [from, to] angles in degrees (0 = +x, 90 = +y)
+const nearHalf = () => [YAW - 90, YAW + 90], farHalf = () => [YAW + 90, YAW + 270];
+// an open container (cup, bin, cone, drum) between two rings: far inner wall, then its contents, then the near outer wall
+const openShell = (A, B, colour, contents = '') => loft(A, B, colour, true) + contents + loft(A, B, colour);
+const f  = v => v.toFixed(1);
+const pd = (pts, close=true) => 'M' + pts.map(p => { const q = P(p[0],p[1],p[2]); return f(q[0])+' '+f(q[1]); }).join('L') + (close ? 'Z' : '');
+const sp = pts => 'M' + pts.map(q => f(q[0])+' '+f(q[1])).join('L') + 'Z';
+
+/* ---------- 2D shapes in a plane's (u,v) coords (v up), mapped to 3D by a plane ---------- */
+const arcUV  = (cu,cv,r,a0,a1,n=7) => { const o=[]; for (let i=0;i<=n;i++){ const a=(a0+(a1-a0)*i/n)*Math.PI/180; o.push([cu+r*Math.cos(a), cv+r*Math.sin(a)]); } return o; };
+const rrUV   = (u0,v0,u1,v1,r,n=7) => r <= 0 ? rectUV(u0,v0,u1,v1) : [...arcUV(u1-r,v0+r,r,-90,0,n), ...arcUV(u1-r,v1-r,r,0,90,n), ...arcUV(u0+r,v1-r,r,90,180,n), ...arcUV(u0+r,v0+r,r,180,270,n)];
+const rectUV = (u0,v0,u1,v1) => [[u0,v0],[u1,v0],[u1,v1],[u0,v1]];
+const ellUV  = (cu,cv,ru,rv,n=24) => Array.from({length:n}, (_,i) => { const a=i/n*2*Math.PI; return [cu+ru*Math.cos(a), cv+rv*Math.sin(a)]; });
+const PX = x => ([u,v]) => [x,u,v];      // front-facing plane x = const   (u = y, v = z)
+const PY = y => ([u,v]) => [u,y,v];      // side plane y = const           (u = x, v = z)
+const PZ = z => ([u,v]) => [u,v,z];      // horizontal plane z = const     (u = x, v = y)
+const on = (plane, uv) => uv.map(plane);
+
+/* ---------- vectors + shading ---------- */
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]], dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const norm=a=>{ const l=Math.hypot(...a)||1; return a.map(v=>v/l); };
+const avg=ps=>ps.reduce((s,p)=>[s[0]+p[0]/ps.length,s[1]+p[1]/ps.length,s[2]+p[2]/ps.length],[0,0,0]);
+const vis = n => { const r = rotV(n); return r[0]+r[1]+r[2] > 1e-6; };   // viewer looks from (+1,+1,+1) after the turn
+const facing = vis;                                                       // readable alias: is this face toward the viewer?
+const SHADOW_K = 0.85, AZ_MIN = 20, AZ_MAX = 160;
+// cast shadows are drawn shorter than the shading light implies (0.45 × height instead of 0.85 ×): long shadows of tall
+// parts on thin supports (a lamp shade, a fan head) land far from the object and read as separate blobs
+const SHADOW_LEN = 0.45;
+let L = [0,0,1], SH = [0,0];
+function setLight(deg){ const a=deg*Math.PI/180; SH=[SHADOW_K*Math.cos(a), SHADOW_K*Math.sin(a)]; L=norm([-SH[0],-SH[1],1]); }
+const LIN = norm([.6,.2,1]);                       // fixed light for interiors / small props
+// Three flat tones, but blended across a narrow band at each step, so a face that turns past a threshold while the
+// figure rotates fades between tones instead of snapping (at rest almost every face still sits on a pure tone).
+const SOFT = .18;
+const step3 = (d, hi, lo, m) => { const ss = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a)/(b - a))); return k*k*(3 - 2*k); };
+  const a = ss(hi - SOFT, hi + SOFT, d), b = ss(lo - SOFT, lo + SOFT, d);
+  return a >= 1 ? m.l : b <= 0 ? m.d : a > 0 ? mix(m.m, m.l, a) : b < 1 ? mix(m.d, m.m, b) : m.m; };
+const tone  = (n,m) => step3(dot(rotV(n),L),   -.15, -.45, m);   // exterior, follows the sun
+const toneI = (n,m) => step3(dot(rotV(n),LIN),  .6,   .05, m);   // interior / props
+const mix = (a,b,t) => '#' + [1,3,5].map(i => Math.round(parseInt(a.substr(i,2),16)*(1-t) + parseInt(b.substr(i,2),16)*t).toString(16).padStart(2,'0')).join('');
+const matOf = hex => ({ l:hex, m:mix(hex,'#000000',.16), d:mix(hex,'#000000',.42) });
+const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+
+/* ---------- drawing primitives (all return SVG strings) ---------- */
+const ink   = (d,w=1.0) => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"/>`;
+const fill  = (d,c,extra='') => `<path d="${d}" fill="${c}" ${extra}/>`;
+const face  = (d,c) => `<path d="${d}" fill="${c}" stroke="${c}" stroke-width=".7" stroke-linejoin="round"/>`;
+const shape = (pts,c,w=.9) => fill(pd(pts),c) + (w ? ink(pd(pts),w) : '');
+const line  = (pts,w=.9) => ink(pd(pts,false),w);
+// Loft between two rings of equal length (closed). colour(n) picks each strip's fill; flip = seen from inside.
+function loft(A, B, colour, flip=false){
+  const n=A.length, cen=avg(A.concat(B)); let s='';
+  for (let i=0;i<n;i++){
+    const a0=A[i], a1=A[(i+1)%n], b1=B[(i+1)%n], b0=B[i];
+    let nr = norm(cross(sub(a1,a0), sub(b0,a0)));
+    if (!isFinite(nr[0])) continue;
+    if (dot(nr, sub(avg([a0,a1,b1,b0]), cen)) < 0) nr = nr.map(v=>-v);
+    if (flip) nr = nr.map(v=>-v);
+    if (vis(nr)) s += face(pd([a0,a1,b1,b0]), colour(nr));
+  }
+  return s;
+}
+function hull(pts){
+  pts = pts.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+  const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]); const lo=[], up=[];
+  for (const p of pts){ while(lo.length>=2 && cr(lo[lo.length-2],lo[lo.length-1],p)<=0) lo.pop(); lo.push(p); }
+  for (const p of pts.reverse()){ while(up.length>=2 && cr(up[up.length-2],up[up.length-1],p)<=0) up.pop(); up.push(p); }
+  lo.pop(); up.pop(); return lo.concat(up);
+}
+// Silhouette ink, weighted by how thick the part is on screen (like a hand inker): the w you pass is the most it gets.
+// Thickness = 2 × area / perimeter of the outline (a rod's diameter, about half a box's width), as a share of the
+// frame width. A long thin rod, a handle or a knob stays light (~1–1.5); a grinder, kettle or machine body gets the
+// heavy ~2.4–2.8. Thin parts stay thin and parts keep air between them.
+const hullInk = (pts3, w=1.4) => { const h = hull(pts3.map(p=>P(...p))); let a = 0, per = 0;
+  for (let i = 0; i < h.length; i++){ const p = h[i], q = h[(i+1) % h.length]; a += p[0]*q[1] - q[0]*p[1]; per += Math.hypot(q[0]-p[0], q[1]-p[1]); }
+  const thick = per ? Math.abs(a) / per / (INK_K * INK_REF_VB) : 0;
+  return ink(sp(h), Math.min(w, .9 + 20*thick)); };
+// Axis-aligned box: three visible faces, shaded, each outlined. shade = tone (sunlit) or toneI (interior).
+function box(x0,y0,z0,x1,y1,z1,m,shade=toneI,w=.9){
+  // all six faces, drawn only when they face the viewer (sides first, then top) — correct in every VIEW
+  const F = [
+    [[0,1,0],  [[x0,y1,z0],[x1,y1,z0],[x1,y1,z1],[x0,y1,z1]]],
+    [[1,0,0],  [[x1,y0,z0],[x1,y1,z0],[x1,y1,z1],[x1,y0,z1]]],
+    [[0,-1,0], [[x0,y0,z0],[x1,y0,z0],[x1,y0,z1],[x0,y0,z1]]],
+    [[-1,0,0], [[x0,y0,z0],[x0,y1,z0],[x0,y1,z1],[x0,y0,z1]]],
+    [[0,0,1],  [[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]]] ];
+  return F.filter(([n]) => vis(n)).map(([n,q]) => shape(q, shade(n,m), w)).join('');
+}
+// Rounded-profile extrusion: profile (u=y, v=z) swept along x from x0 to x1. Body of most machines.
+function extrude(profileUV, x0, x1, m, shade=tone){ return loft(on(PX(x0),profileUV), on(PX(x1),profileUV), n=>shade(n,m)); }
+// Vertical cylinder (axis z) centred (x,y), radius r from z0 to z1, with top cap.
+function cyl(x,y,z0,z1,r,m,shade=toneI,w=1.2,n=24){
+  const A=on(PZ(z0),ellUV(x,y,r,r,n)), B=on(PZ(z1),ellUV(x,y,r,r,n));
+  return loft(A,B,nr=>shade(nr,m)) + fill(pd(B),shade([0,0,1],m)) + hullInk([...A,...B],w) + ink(pd(B),w*.8);
+}
+// Cylinder lying along x (e.g. a knob or dial sticking out of a front face): centred (y,z), from x0 to x1.
+function cylX(x0,x1,y,z,r,m,shade=toneI,w=1.1,n=20){
+  const A=on(PX(x0),ellUV(y,z,r,r,n)), B=on(PX(x1),ellUV(y,z,r,r,n));
+  // cap on whichever end faces the viewer (the +x end in VIEW 0)
+  const capB = vis([1,0,0]), cap = capB ? B : A, cn = capB ? [1,0,0] : [-1,0,0];
+  return loft(A,B,nr=>shade(nr,m)) + (vis(cn) ? fill(pd(cap),shade(cn,m)) : '') + hullInk([...A,...B],w) + (vis(cn) ? ink(pd(cap),w*.8) : '');
+}
+// Cylinder between any two 3D points a and b (a lamp arm, a rod, a pipe at an angle, a handle bar), radius r.
+// The end facing the viewer gets a cap. For a tapered part (a cone, a lamp shade) pass r1 for the radius at b.
+function rod(a, b, r, m, shade=toneI, w=1, r1=r, n=16){
+  const d = norm(sub(b, a)), u = norm(cross(d, Math.abs(d[2]) < .9 ? [0,0,1] : [1,0,0])), v = cross(d, u);
+  const ring = (p, rr) => Array.from({length:n}, (_,i) => { const t = i/n*2*Math.PI, c = Math.cos(t)*rr, s2 = Math.sin(t)*rr;
+    return [p[0] + u[0]*c + v[0]*s2, p[1] + u[1]*c + v[1]*s2, p[2] + u[2]*c + v[2]*s2]; });
+  const A = ring(a, r), B = ring(b, r1), capB = vis(d), cap = capB ? B : A, cn = capB ? d : d.map(x => -x);
+  return loft(A, B, nr => shade(nr, m)) + (Math.max(r, r1) > 0 ? fill(pd(cap), shade(cn, m)) + ink(pd(cap), w*.8) : '') + hullInk([...A, ...B], w);
+}
+// Text lying flat on a front plane x = const, centred at (y,z) baseline; reads left-to-right on screen.
+// text sits on a face: if its reading direction comes out mirrored (or edge-on), that face is turned away, so the text is hidden
+const txM = (o, U, V) => (U[0]*V[1] - U[1]*V[0]) <= .02 * Math.hypot(...U) * Math.hypot(...V) ? `matrix(0 0 0 0 ${f(o[0])} ${f(o[1])})` : `matrix(${U[0].toFixed(4)} ${U[1].toFixed(4)} ${V[0].toFixed(4)} ${V[1].toFixed(4)} ${f(o[0])} ${f(o[1])})`;
+const tx = (x,y,z,str,size,col=INK,weight=700) => { const o=P(x,y,z);
+  return `<text transform="${txM(o, Dv(0,-1,0), Dv(0,0,-1))}" font-size="${size}" fill="${col}" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="${weight}" letter-spacing=".04em">${str}</text>`; };
+// Text on a side plane y = const, centred at (x,z).
+const txY = (x,y,z,str,size,col=INK,weight=700) => { const o=P(x,y,z);
+  return `<text transform="${txM(o, Dv(1,0,0), Dv(0,0,-1))}" font-size="${size}" fill="${col}" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="${weight}" letter-spacing=".04em">${str}</text>`; };
+// Cast shadow of a set of 3D points (any outline of the object), pushed along the light onto z = 0.
+// the light stays put relative to the viewer, so the shadow is cast in turned coordinates
+// z0: the surface it falls on (a board, a counter); clip it to that surface with clipTo(...) if it could spill off.
+// clip: the 3D outline of the surface it falls on (e.g. boardTop(...)), so it can't spill over the edge.
+const castShadow = (pts3, z0=0, clip=null) => { const k = SHADOW_LEN / SHADOW_K, [sx, sy] = yawTurn(SH);
+  const s = fill(sp(hull(pts3.map(([x,y,z]) => P(x+(z-z0)*sx*k, y+(z-z0)*sy*k, z0)))), SHADOW);
+  return clip ? clipTo(clip, s) : s; };
+// A board for the object to stand on (a tray, a desk top, a counter): a rounded slab from (x0,y0) to (x1,y1), h thick.
+// Draw it first; then castShadow(points, h, boardTop(x0,y0,x1,y1,h,r)) so shadows lie on it and stop at its edge.
+const BOARD = { l:'#e6e1d4', m:'#cfc8b8', d:'#aaa293' }, WOOD = { l:'#d9a86c', m:'#bf8a4f', d:'#8e6236' };
+const boardTop = (x0,y0,x1,y1,h=3,r=5) => on(PZ(h), rrUV(x0,y0,x1,y1,r));
+function board(x0,y0,x1,y1,h=3,r=5,m=BOARD){
+  const A = on(PZ(0), rrUV(x0,y0,x1,y1,r)), B = boardTop(x0,y0,x1,y1,h,r);
+  return loft(A, B, n => toneI(n, m)) + fill(pd(B), m.l) + ink(pd(B), 1) + hullInk([...A, ...B], 1.8);
+}
+// Group helpers: clickable target, clip to an opening.
+const act  = (name, inner, data='') => `<g data-act="${name}" ${data}>${inner}</g>`;
+let _clipN = 0;
+// Part label (for "how does it work" figures): a cream pill with a leader line to a 3D point on the part.
+// dx, dy = where the pill sits, in screen units at the reference zoom (they scale with the figure like stroke widths).
+// on = that part is working right now (the pill turns the accent colour). Labels can be hidden with the Labels switch.
+function tag(p3, dx, dy, text, on=false){
+  // on a phone (LBL_U = drawing units per screen px) the pill is a numbered badge and the names go in a legend under the figure
+  const u = window.LBL_U ? LBL_U() : 0, n = ((window.__ln || (window.__ln = {}))[text] || (__ln[text] = Object.keys(__ln).length + 1));
+  const k = INK_K, [X,Y] = P(...p3), fs = u ? 10*u : 8.6*k, h = u ? 17*u : fs*1.8, w = u ? h*(n > 9 ? 1.3 : 1) : text.length*fs*.62 + fs*1.5, cx = X + dx*k, cy = Y + dy*k;
+  return `<g class="tag${on ? ' on' : ''}" data-n="${n}" data-t="${text}"><path d="M${f(X)} ${f(Y)}L${f(cx)} ${f(cy)}" fill="none" stroke="${INK}" stroke-width="1"/>`
+    + `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(1.3*k)}" fill="${INK}"/>`
+    + `<rect x="${f(cx-w/2)}" y="${f(cy-h/2)}" width="${f(w)}" height="${f(h)}" rx="${f(h/2)}" fill="${on ? 'var(--accent,#f4b829)' : '#fff4d6'}" stroke="${INK}" stroke-width="1.2"/>`
+    + `<text x="${f(cx)}" y="${f(cy+fs*.36)}" font-size="${f(fs)}" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="800" letter-spacing=".04em" fill="${INK}">${u ? n : text}</text></g>`;
+}
+const clipTo = (pts3, inner) => { const id = 'k' + (++_clipN); return `<clipPath id="${id}"><path d="${pd(pts3)}"/></clipPath><g clip-path="url(#${id})">${inner}</g>`; };
+
+/* ---------- constant on-screen line weight ----------
+   Stroke widths are written in model units, and each figure is zoomed to fill the frame, so a small
+   object would get fat lines. INK_K rescales every stroke-width (and the wobble/grain filter) so all
+   figures match the reference zoom of the booth / vending machine (viewBox ≈ 585 units wide). */
+const INK_REF_VB = 585;
+let INK_K = 1;
+const inkScale = svg => INK_K === 1 ? svg : svg.replace(/stroke-width="([\d.]+)"/g, (_, w) => `stroke-width="${(+w * INK_K).toFixed(2)}"`);
+
+/* ---------- page shell ---------- */
+const CORE_CSS = `
+  :root{--paper:#f2efe7;--ink:#231e16;--muted:#857d6e;--rule:#ddd6c8}
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background-color:var(--paper);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42  0 0 0 0 .39  0 0 0 0 .33  .16 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>");
+    overflow-x:hidden;color:var(--ink);font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;display:flex;flex-direction:column;align-items:center;padding:24px 16px 32px}
+  header{width:100%;max-width:760px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  header h1{font-size:13px;font-weight:600;margin:0;letter-spacing:.02em} header span{color:var(--muted)}
+  #fig{width:100%;max-width:760px;height:auto;display:block;margin:4px 0 8px;user-select:none;overflow:visible}
+  #fig{cursor:grab;touch-action:pan-y} #fig.drag{cursor:grabbing} #fig [data-act]{cursor:pointer}
+  #readout, .idea{display:none}   /* status line + big idea are off: the buttons and motion tell the story */
+  .idea{width:100%;max-width:760px;margin:-6px 0 16px;font-size:12.5px;line-height:1.5;text-align:center;color:var(--ink)}
+  .idea strong{letter-spacing:.12em;text-transform:uppercase;font-size:11px;margin-right:8px}
+  #readout{position:relative;min-height:1.4em;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;text-align:center;text-shadow:0 0 3px var(--paper),0 0 6px var(--paper),0 0 10px var(--paper)}
+  .stage{position:relative;width:100%;max-width:760px}
+  .actions{position:absolute;top:4px;left:0;display:flex;flex-direction:column;align-items:flex-start;gap:8px;z-index:2;max-width:220px}
+  .actions .cap{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 2px}
+  html.nolabels #fig .tag{display:none}
+  .ctl[hidden]{display:none}
+  /* ui.flash(text): a short note under the buttons ("the can is empty — refill it"); the status line itself stays hidden */
+  .toast{position:absolute;left:0;z-index:3;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;background:var(--paper);
+    border:1.5px solid var(--ink);border-radius:8px;padding:4px 9px;box-shadow:2px 2px 0 var(--ink);opacity:0;transition:opacity .2s;pointer-events:none;max-width:240px}
+  .toast.show{opacity:1}
+  .made-with{width:100%;max-width:760px;margin-top:18px;text-align:right;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  .made-with a{color:var(--muted);text-decoration:none} .made-with a:hover{color:var(--ink)}
+  .stats{position:absolute;top:4px;right:0;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:2;text-align:right}
+  .stat .k{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .stat .v{font-size:34px;font-weight:800;line-height:1.05;letter-spacing:-.01em;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .stat.small .v{font-size:20px}
+  .stat .v.bump{animation:bump .35s ease-out}
+  @keyframes bump{0%{transform:scale(1.18)}100%{transform:none}}
+  .stepwrap{position:relative;display:flex;align-items:center;gap:8px}
+  .act{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--ink);border-radius:999px;padding:5px 14px;cursor:pointer;white-space:nowrap}
+  .act:hover{background:color-mix(in srgb,var(--paper) 92%,var(--ink))}
+  .act .car{margin-left:6px;font-size:10px}
+  .act:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+  .chips{display:none;flex-wrap:wrap;gap:6px;background:var(--paper);border:2px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);
+    padding:8px;width:max-content;max-width:min(300px,62vw);position:absolute;left:calc(100% + 10px);top:-4px;z-index:3}
+  .stepwrap.open .chips{display:flex}
+  .chip{white-space:nowrap;font:inherit;font-size:11.5px;font-weight:700;color:var(--ink);background:var(--paper);border:1.5px solid var(--ink);border-radius:8px;padding:4px 8px;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+  .chip:hover{background:var(--accent,#f4b829);transform:translate(-1px,-1px)}
+  .chip.current{background:var(--ink);color:var(--paper)} .chip.current:hover{background:var(--ink);transform:none}
+  .chip.off{opacity:.45} .chip.off:hover{transform:none;background:var(--paper)}
+  
+  @media (max-width:560px){body{padding:14px 12px 24px}header span,.actions .cap{display:none}.actions{flex-direction:row;flex-wrap:wrap;gap:6px}.act{font-size:12px;padding:4px 11px}.stats{position:static;flex-direction:row;justify-content:flex-end;gap:18px;margin-bottom:4px}.actions{position:static;max-width:none;margin:6px 0 4px}.chips{left:0;top:calc(100% + 8px)}}
+  .controls{width:100%;max-width:760px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 28px;border-top:1px solid var(--rule);padding-top:16px}
+  .ctl{display:flex;flex-direction:column;gap:6px}
+  .ctl label{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  input[type=range]{width:100%;accent-color:var(--ink)}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  button{font:inherit;color:var(--ink);background:transparent;border:1.5px solid var(--ink);border-radius:999px;padding:5px 14px;cursor:pointer}
+  button:hover{background:#0000000d}
+  button[aria-pressed=true]:not(.sw){background:var(--ink);color:var(--paper)}
+  .sw{width:26px;height:26px;padding:0;border-radius:50%} .sw[aria-pressed=true]{outline:2px solid var(--ink);outline-offset:2px}`;
+
+const filterFor = k => `<filter id="hand" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency="${(0.045/k).toFixed(4)}" numOctaves="2" seed="4" result="warp"/>
+  <feDisplacementMap id="wob" in="SourceGraphic" in2="warp" scale="${(2.4*k).toFixed(2)}" xChannelSelector="R" yChannelSelector="G" result="wob"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${(0.9/k).toFixed(4)}" numOctaves="3" seed="11" result="n1"/>
+  <feColorMatrix in="n1" type="matrix" values=".3 0 0 0 .84  .3 0 0 0 .84  .3 0 0 0 .84  0 0 0 0 1" result="grain"/>
+  <feTurbulence type="fractalNoise" baseFrequency="${(0.012/k).toFixed(4)}" numOctaves="2" seed="7" result="n2"/>
+  <feColorMatrix in="n2" type="matrix" values=".3 0 0 0 .85  .3 0 0 0 .85  .3 0 0 0 .85  0 0 0 0 1" result="blot"/>
+  <feBlend in="wob" in2="grain" mode="multiply" result="g1"/><feBlend in="g1" in2="blot" mode="multiply" result="g2"/>
+  <feComposite in="g2" in2="wob" operator="in"/></filter>`;
+
+/* mountFigure({
+     fig:'03', title:'Photo booth', hint:'click the curtain…',
+     size:[W,D,H],                 // bounding box, used to frame the view (shadow range included)
+     palette:'mustard',            // default PALS key
+     state:{...},                  // figure state (st.pal is built in)
+     scene: (st, m) => svgString,  // m = current palette {l,m,d}
+     readout: st => 'text',        // status line under the figure
+     buttons: [{label, onClick(st, ui)}      // listed in the order the user should do them
+               | {label, choices: st => [{label, onClick(st,ui), current?, disabled?, why?}]}],   // opens a picker
+     stats: st => [{label, value, small?}],   // optional: big numbers top-right (credit, change, score)
+     credit: false,                // optional: hide the small "Made with Colorfigures" link
+     acts: { name(st, el, ui){} },  // clicks on act(name, …) groups; el has dataset
+     params(st, q){}               // optional: read URLSearchParams for screenshot states
+   })  -> ui = { st, render, animate(stepFn), flash(text,ms) }
+   animate(step): calls step(dt seconds) every frame and re-renders until step returns false. */
+addEventListener('error', e => { document.documentElement.dataset.errors = (document.documentElement.dataset.errors || '') + ' ' + e.message + ';'; });
+/* The hand-drawn filter's noise never changes, but browsers recompute every feTurbulence each time the drawing changes
+   (on phones SVG filters run on the CPU, so this is most of the cost of a frame). bakeNoise renders each noise layer once
+   into an image and swaps it in: coarse layers as one small image over the whole view (they are smooth, so scaling up
+   is invisible), fine grain as a seamless tile. If anything fails (an old browser), the live filter simply stays. */
+function bakeNoise(svg){
+  const fl = document.getElementById('hand'); if (!fl || typeof Image === 'undefined') return;
+  const NS = 'http://www.w3.org/2000/svg', vb = svg.viewBox.baseVal;
+  const x0 = vb.x - vb.width*.35, y0 = vb.y - vb.height*.35, w0 = vb.width*1.7, h0 = vb.height*1.7;
+  for (const t of [...fl.querySelectorAll('feTurbulence')]){
+    const fq = parseFloat(t.getAttribute('baseFrequency')), oct = +(t.getAttribute('numOctaves') || 1);
+    if (!(fq > 0)) continue;
+    const fine = fq * Math.max(w0, h0) > 80;
+    if (fine) continue;   // fine grain stays live: a repeated tile leaves faint seams on some GPUs
+    const rx = fine ? 0 : x0, ry = fine ? 0 : y0, rw = fine ? 48 / fq : w0, rh = fine ? 48 / fq : h0;
+    const ppu = fq * (fine ? 7 : 5) * Math.pow(2, Math.max(0, oct - 1) * .5), PW = Math.ceil(rw * ppu), PH = Math.ceil(rh * ppu);
+    if (PW * PH > 1200 * 1200) continue;
+    const tb = t.cloneNode(); tb.removeAttribute('result'); if (fine) tb.setAttribute('stitchTiles', 'stitch');
+    const src = `<svg xmlns="${NS}" width="${PW}" height="${PH}" viewBox="${rx} ${ry} ${rw} ${rh}"><filter id="n" filterUnits="userSpaceOnUse" x="${rx}" y="${ry}" width="${rw}" height="${rh}" color-interpolation-filters="sRGB">${tb.outerHTML}</filter><rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" filter="url(#n)"/></svg>`;
+    const img = new Image();
+    img.onload = () => { try {
+      const c = document.createElement('canvas'); c.width = PW; c.height = PH; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+      // store the noise's colour values fully opaque: the filter reads its colour channels, and an image with
+      // see-through pixels would be read premultiplied (darker) by some browsers
+      const px = g.getImageData(0, 0, PW, PH); for (let i = 3; i < px.data.length; i += 4) px.data[i] = 255; g.putImageData(px, 0, 0);
+      const url = c.toDataURL('image/png'), res = t.getAttribute('result');
+      const im = document.createElementNS(NS, 'feImage');
+      // a tile must sit inside the filter's region (the drawing's box) or it gets clipped: anchor it at the drawing's
+      // centre, snapped to whole tiles so the grain keeps the same phase as the live noise would
+      let ox = rx, oy = ry;
+      if (fine){ const bb = svg.getElementById ? document.getElementById('art').getBBox() : { x: 0, y: 0, width: 0, height: 0 };
+        ox = Math.floor((bb.x + bb.width/2) / rw) * rw; oy = Math.floor((bb.y + bb.height/2) / rh) * rh; }
+      for (const [k, v] of [['x', ox], ['y', oy], ['width', rw], ['height', rh], ['preserveAspectRatio', 'none']]) im.setAttribute(k, v);
+      im.setAttribute('href', url); im.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url);
+      if (!t.isConnected) return;
+      if (fine){ im.setAttribute('result', res + '_tile'); const tl = document.createElementNS(NS, 'feTile'); tl.setAttribute('in', res + '_tile'); tl.setAttribute('result', res); t.replaceWith(im, tl); }
+      else { im.setAttribute('result', res); t.replaceWith(im); }
+    } catch (e) {} };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(src);
+  }
+}
+function mountFigure(cfg){
+  document.title = cfg.title;
+  const style = document.createElement('style'); style.textContent = CORE_CSS; document.head.appendChild(style);
+  document.body.innerHTML = `
+    <header><h1>Fig. ${cfg.fig} — ${cfg.title}</h1></header>
+    <div class="stage">
+      ${cfg.buttons && cfg.buttons.length ? `<div class="actions" id="btns"></div>` : ''}
+      ${cfg.stats ? '<div class="stats" id="stats"></div>' : ''}
+      <div class="toast" id="toast" role="status"></div>
+      <svg id="fig" role="img" aria-label="${cfg.title}"><defs id="fdefs"></defs><g id="art" filter="url(#hand)"></g></svg>
+    </div>
+    <div id="readout"></div>
+    ${cfg.idea ? `<p class="idea"><strong>The big idea</strong>${cfg.idea}</p>` : ''}
+    <div class="controls">
+      <div class="ctl"><label for="wb">Hand-drawn wobble</label><input id="wb" type="range" min="0" max="7" step="0.1" value="2.4"></div>
+      <div class="ctl"><label>Colour</label><div class="row" id="pals"></div></div>
+      <div class="ctl"><label>View</label><div class="row"><button id="vreset">Front view</button><button id="vspin" aria-pressed="false">Turntable</button></div></div>
+      <div class="ctl" id="lblctl" hidden><label>Labels</label><div class="row"><button id="lbl" aria-pressed="true">On</button></div></div>
+    </div>
+    ${cfg.credit === false ? '' : '<footer class="made-with"><a href="https://april-zhu.com/colorfigures" target="_blank" rel="noopener">Made with Colorfigures ↗</a></footer>'}`;
+  const st = cfg.state || {};            // kept as the same object, so a figure may hold on to it
+  if (!st.pal) st.pal = cfg.palette || 'mustard';
+  if (st.az == null) st.az = 105;
+  const q = new URLSearchParams(location.search);
+  // a figure turns all the way round only once it has been checked from every side (turn:'full'); otherwise it turns
+  // +-60 deg around the front, where it was drawn. ?free=1 unlocks it for testing.
+  CAM_LIM = cfg.turn === 'full' || q.get('free') === '1' ? null : 60;
+  if (PALS[q.get('pal')]) st.pal = q.get('pal');
+  if (cfg.params) cfg.params(st, q);
+
+  // frame on the object itself: centred, filling ~60% of the width / ~78% of the height of a 4:3 view.
+  // The cast shadow is allowed to spill outside the frame (svg overflow is visible).
+  const [W,D,H] = cfg.size, pts = [];
+  OX = OY = 0; RC = cfg.center || [W/2, D/2]; RCZ = H/2;
+  VIEW = 0; setCam(YAW0, PITCH0);
+  for (const x of [0,W]) for (const y of [0,D]) for (const z of [0,H]) pts.push(P(x,y,z));
+  const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]);
+  const bw = Math.max(...xs)-Math.min(...xs), bh = Math.max(...ys)-Math.min(...ys);
+  // the object fills ~74% of the width / ~88% of the height, nudged right of centre so the buttons (top left) stay clear
+  // on a phone (FIG_A, from the gallery) the frame grows taller than 4:3, as far as the object needs, so tall machines fill it;
+  // the spare height goes mostly below; the object stays centred (its shadow may run off the edge, by the owner's call)
+  const PA = window.FIG_A ? FIG_A() : .75, A = PA === .75 ? .75 : Math.min(PA, Math.max(.75, bh/.88/(bw/.74)*1.08)), vbW = Math.max(bw/.74, bh/.88/A), vbH = vbW*A;
+  OX = (vbW-bw)/2 + (PA === .75 ? vbW*.06 : 0) - Math.min(...xs); OY = (PA === .75 ? vbH*.04 : (vbH - bh)*.3) - Math.min(...ys);   // sit a little high: shadows fall downward
+  const svg = document.getElementById('fig');
+  svg.setAttribute('viewBox', `0 0 ${f(vbW)} ${f(vbH)}`);
+  INK_K = vbW / INK_REF_VB;
+  document.getElementById('fdefs').innerHTML = filterFor(INK_K);
+  bakeNoise(svg);
+
+  const art = document.getElementById('art'), readout = document.getElementById('readout');
+  const ui = { st };
+  ui.render = () => { _clipN = 0; document.documentElement.style.setProperty('--accent', PALS[st.pal].l); art.innerHTML = inkScale(cfg.scene(st, PALS[st.pal])); if (!ui._flash) readout.textContent = cfg.readout ? cfg.readout(st) : ''; if (ui.drawStats) ui.drawStats(); };
+  // big numbers in the top-right corner (credit, change, score…); a value that changes gets a little bump
+  const statsEl = document.getElementById('stats'), prevStats = {};
+  ui.drawStats = () => { if (!statsEl) return;
+    const list = cfg.stats(st).filter(Boolean), html = list.map(x => `<div class="stat${x.small ? ' small' : ''}"><div class="k">${x.label}</div><div class="v" data-k="${x.label}">${x.value}</div></div>`).join('');
+    if (statsEl._html !== html){ statsEl._html = html; statsEl.innerHTML = html;
+      statsEl.querySelectorAll('.v').forEach(v => { if (prevStats[v.dataset.k] != null && prevStats[v.dataset.k] !== v.textContent) v.classList.add('bump'); prevStats[v.dataset.k] = v.textContent; }); } };
+  let flashT = 0;
+  const toast = document.getElementById('toast');
+  ui.flash = (text, ms=1600) => { ui._flash = true; readout.textContent = text; toast.textContent = text;
+    toast.style.top = ((document.getElementById('btns') ? document.getElementById('btns').offsetTop + document.getElementById('btns').offsetHeight : 0) + 8) + 'px'; toast.classList.add('show');
+    clearTimeout(flashT); flashT = setTimeout(() => { ui._flash = false; toast.classList.remove('show'); ui.render(); }, ms); };
+  // One frame driver for every running animation: each frame runs all the steps, then draws once (two animations at
+  // the same time no longer draw twice). It follows the screen's frames, with a timer fallback for when frames don't
+  // come (headless shots, a hidden tab). ui.invalidate() asks for one redraw on the next frame (used while dragging).
+  const steps = new Set(); let driving = false, lastT = 0, fbT = 0;
+  const frame = () => { if (!driving) return; driving = false; clearTimeout(fbT);
+    const now = performance.now(), dt = Math.max(0, Math.min(.05, (now - lastT) / 1000)); lastT = now;
+    for (const s of [...steps]) if (s(dt) === false) steps.delete(s);
+    ui.render(); if (steps.size) drive(); };
+  const drive = () => { if (driving) return; driving = true; requestAnimationFrame(frame); fbT = setTimeout(frame, 60); };
+  ui.animate = step => { if (!steps.size && !driving) lastT = performance.now(); steps.add(step); drive(); };
+  ui.invalidate = () => drive();
+
+  // clickable parts react on press, not on click: while something animates, the scene is redrawn every frame, so the
+  // element under the pointer is replaced between press and release and a 'click' would never fire
+  svg.addEventListener('pointerdown', e => { if (e.button) return; const a = e.target.closest('[data-act]'); if (!a || !cfg.acts || !cfg.acts[a.dataset.act]) return;
+    e.preventDefault(); cfg.acts[a.dataset.act](st, a, ui); ui.render(); });
+  // orbit: drag anywhere that is not a clickable part (the machine turns the way the finger moves); arrow keys nudge; double-click eases back to the front view
+  let drag = null, spin = false, camAnim = 0;
+  const camTo = (y, p, ms=700) => { const y0 = YAW, p0 = PITCH, dy = ((y - y0 + 540) % 360) - 180, id = ++camAnim; let t = 0;
+    ui.animate(dt => { if (id !== camAnim) return false; t += dt*1000; const k = Math.min(1, t / ms), e = ease(k); setCam(y0 + dy*e, p0 + (p - p0)*e); return k < 1; }); };
+  ui.camTo = camTo;
+  svg.addEventListener('pointerdown', e => { if (e.button || e.target.closest('[data-act]')) return;
+    camAnim++; drag = { x:e.clientX, y:e.clientY, yaw:YAW, pitch:PITCH }; svg.classList.add("drag"); try { svg.setPointerCapture(e.pointerId); } catch {} });
+  svg.addEventListener('pointermove', e => { if (!drag) return; const k = 300 / svg.getBoundingClientRect().width;
+    setCam(drag.yaw + (e.clientX - drag.x)*.55*k, drag.pitch + (e.clientY - drag.y)*.35*k); ui.invalidate(); });
+  const endDrag = () => { drag = null; svg.classList.remove('drag'); };
+  svg.addEventListener('pointerup', endDrag); svg.addEventListener('pointercancel', endDrag);
+  svg.addEventListener('dblclick', e => { if (!e.target.closest('[data-act]')) camTo(YAW0, PITCH0); });
+  addEventListener('keydown', e => { const k = { ArrowLeft:[-15,0], ArrowRight:[15,0], ArrowUp:[0,8], ArrowDown:[0,-8] }[e.key];
+    if (!k || window.GAME_KEYS || /input|textarea/i.test(e.target.tagName)) return; e.preventDefault(); camTo(YAW + k[0], PITCH + k[1], 260); });   // a game figure keeps the arrows for play
+  document.getElementById('vreset').onclick = () => { spin = false; vsp.setAttribute('aria-pressed', false); camTo(YAW0, PITCH0); };
+  const vsp = document.getElementById('vspin');
+  vsp.onclick = () => { spin = !spin; vsp.setAttribute('aria-pressed', spin); camAnim++;
+    let dir = 1;   // with a turning limit, the turntable swings back and forth inside it
+    if (spin) ui.animate(dt => { if (!spin) return false; if (!drag){ let y = YAW + dir*dt*18;
+      if (CAM_LIM != null && Math.abs(y - YAW0) >= CAM_LIM - .5){ dir = -dir; y = YAW + dir*dt*18; } setCam(y, PITCH); } return true; }); };
+  if (q.has('yaw') || q.has('pitch')) setCam(+(q.get('yaw') ?? YAW0), +(q.get('pitch') ?? PITCH0));
+  const btns = document.getElementById('btns');
+  const stepEls = [];
+  if (btns) cfg.buttons.forEach((b, i) => {
+    const wrap = document.createElement('div'); wrap.className = 'stepwrap';
+    const el = document.createElement('button'); el.className = 'act';
+    el.innerHTML = `${b.label}${b.choices ? '<span class="car">▾</span>' : ''}`;
+    wrap.appendChild(el); btns.appendChild(wrap); stepEls.push(el);
+    if (!b.choices){ el.onclick = () => { closeChips(); b.onClick(st, ui); ui.render(); }; return; }
+    const chips = document.createElement('div'); chips.className = 'chips'; wrap.appendChild(chips);
+    el.onclick = e => { e.stopPropagation(); const open = !wrap.classList.contains('open'); closeChips();
+      if (!open) return;
+      chips.innerHTML = '';
+      // every choice stays clickable, so nothing silently ignores a press:
+      //   current:true  = the one in use (shown selected); a press just says so
+      //   disabled:true = not possible right now (shown faded); a press says why (c.why, or a generic note)
+      for (const c of b.choices(st)){ const ch = document.createElement('button'); ch.className = 'chip' + (c.current ? ' current' : c.disabled ? ' off' : ''); ch.textContent = c.label;
+        if (c.current) ch.setAttribute('aria-pressed', 'true');
+        ch.onclick = ev => { ev.stopPropagation(); closeChips();
+          if (c.current) return ui.flash(`${c.label} — already set`);
+          if (c.disabled) return ui.flash(c.why || `${c.label} isn't possible right now`);
+          c.onClick(st, ui); ui.render(); }; chips.appendChild(ch); }
+      wrap.classList.add('open'); };
+  });
+  function closeChips(){ document.querySelectorAll('.stepwrap.open').forEach(w => w.classList.remove('open')); }
+  document.addEventListener('click', closeChips);
+
+  document.getElementById('wb').oninput = e => document.getElementById('wob').setAttribute('scale', (e.target.value * INK_K).toFixed(2));
+  const pals = document.getElementById('pals');
+  for (const [k,p] of Object.entries(PALS)){
+    const b = document.createElement('button'); b.className='sw'; b.title=k; b.style.background=p.l; b.setAttribute('aria-pressed', k===st.pal);
+    b.onclick = () => { st.pal=k; [...pals.children].forEach(c=>c.setAttribute('aria-pressed', c===b)); ui.render(); };
+    pals.appendChild(b);
+  }
+  // labels: the switch appears when the figure draws any tag(); ?labels=0 starts with them hidden
+  const lblctl = document.getElementById('lblctl'), lbl = document.getElementById('lbl');
+  const setLabels = on => { document.documentElement.classList.toggle('nolabels', !on); lbl.textContent = on ? 'On' : 'Off'; lbl.setAttribute('aria-pressed', on); };
+  lbl.onclick = () => setLabels(document.documentElement.classList.contains('nolabels'));
+  if (q.get('labels') === '0') setLabels(false);
+  // testing: ?press=Label@ms,Label@ms clicks the buttons whose text starts with Label at those times after load
+  // (any order, repeats allowed); Label>Choice picks a choice from a picker button (?press=Speed>3@300).
+  // Script errors and unknown labels are recorded on <html data-errors="…">
+  window.__st = st;
+  const noteErr = m => { document.documentElement.dataset.errors = (document.documentElement.dataset.errors || '') + ' ' + m + ';'; };
+  const starts = (el, t) => el.textContent.trim().toLowerCase().startsWith(t.trim().toLowerCase());
+  if (q.has('press')) q.get('press').split(',').forEach(item => { const [what, ms] = item.split('@'), [label, choice] = what.split('>');
+    setTimeout(() => { const b = [...document.querySelectorAll('.act')].find(b => starts(b, label));
+      if (!b) return noteErr(`no button "${label}"`);
+      b.click(); if (choice == null) return;
+      const c = [...b.parentElement.querySelectorAll('.chip')].find(c => starts(c, choice));
+      if (c && !c.disabled) c.click(); else noteErr(`no choice "${choice}" in "${label}"`); }, +ms || 0); });
+  setLight(st.az); ui.render();
+  if (art.querySelector('.tag')) lblctl.hidden = false;
+  return ui;
+}
+
+/* ---------- see-through + labels kit (shared; the figure supplies its own working parts) ----------
+   xrCallouts(items, B): pills in two columns either side of the object, sorted top to bottom so leaders never cross.
+     items: [{ at:[x,y,z], text, on }], B: the object's bounds [x0, x1, y0, y1, z0, z1].
+   xrGhost(body, mech, k, OUTp, x0, x1, m): far walls faintly, the working parts, then the case as a ghost over them.
+   xrMount(getUI, caption): the See-through / Labels switches (top right), the caption under the figure, label hiding. */
+function xrCallouts(items, B){
+  const pts = []; for (const x of [B[0], B[1]]) for (const y of [B[2], B[3]]) for (const z of [B[4], B[5]]) pts.push(P(x, y, z));
+  const xmin = Math.min(...pts.map(p => p[0])), xmax = Math.max(...pts.map(p => p[0])), cx = (xmin + xmax)/2;
+  // on a phone (LBL_U = drawing units per screen px) each label is a numbered badge and the names go in a legend under the figure
+  const k = INK_K, u = window.LBL_U ? LBL_U() : 0, fs = u ? 10*u : 8.6*k, hgt = u ? 17*u : fs*1.8, gap = hgt + (u ? 3*u : 3*k);
+  const L = [], R = [];
+  const svgEl = document.getElementById('fig'), vb = svgEl.viewBox.baseVal, btn = document.getElementById('btns');
+  const wMax = u ? hgt*1.3 + 12*k : Math.max(...items.map(it => it.text.length))*fs*.62 + fs*1.5 + 12*k;
+  const roomL = xmin - vb.x >= wMax, roomR = vb.x + vb.width - xmax >= wMax;
+  for (const it of items){ const [X, Y] = P(...it.at); ((X < cx && roomL) || !roomR ? L : R).push({ ...it, X, Y }); }
+  let s = '';
+  let top = { [-1]: fs, [1]: fs + 30*k };
+  if (btn && svgEl.getScreenCTM()){ const r = btn.getBoundingClientRect(), q = new DOMPoint(r.right, r.bottom + 50).matrixTransform(svgEl.getScreenCTM().inverse());
+    if (q.y > 0) top[-1] = q.y + hgt; }
+  for (const [col, side] of [[L, -1], [R, 1]]){
+    col.sort((a, b) => a.Y - b.Y);
+    let y = -1e9; for (const c of col){ c.py = Math.max(c.Y, y + gap, top[side]); y = c.py; }
+    const shift = col.length ? Math.max(0, col.reduce((a, c) => a + c.py - c.Y, 0) / col.length) : 0;
+    const room = col.length ? col[0].py - top[side] : 0; for (const c of col) c.py -= Math.min(shift, room);
+    for (const c of col){
+      c.n = ((window.__ln || (window.__ln = {}))[c.text] || (__ln[c.text] = Object.keys(__ln).length + 1)); const w = u ? hgt*(c.n > 9 ? 1.3 : 1) : c.text.length*fs*.62 + fs*1.5;
+      let px = side < 0 ? xmin - 10*k - w/2 : xmax + 10*k + w/2; px = Math.max(vb.x + w/2 + 2*k, Math.min(vb.x + vb.width - w/2 - 2*k, px));
+      const ex = px - side*w/2;
+      s += `<g class="tag${c.on ? ' on' : ''}" data-n="${c.n}" data-t="${c.text}"><path d="M${f(c.X)} ${f(c.Y)}L${f(ex + side*-4*k)} ${f(c.py)}L${f(ex)} ${f(c.py)}" fill="none" stroke="${INK}" stroke-width="1"/>`
+        + `<circle cx="${f(c.X)}" cy="${f(c.Y)}" r="${f(1.4*k)}" fill="${INK}"/>`
+        + `<rect x="${f(px - w/2)}" y="${f(c.py - hgt/2)}" width="${f(w)}" height="${f(hgt)}" rx="${f(hgt/2)}" fill="${c.on ? 'var(--accent,#f4b829)' : '#fff4d6'}" stroke="${INK}" stroke-width="1.2"/>`
+        + `<text x="${f(px)}" y="${f(c.py + fs*.36)}" font-size="${f(fs)}" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="800" letter-spacing=".04em" fill="${INK}">${u ? c.n : c.text}</text></g>`;
+    }
+  }
+  return s;
+}
+function xrGhost(body, mech, k, OUTp, x0, x1, m){
+  const fF = facing([1,0,0]), fB = facing([-1,0,0]);
+  const far = `<g opacity="${f(.5*k)}">` + loft(on(PX(x0), OUTp), on(PX(x1), OUTp), n => mix(toneI(n.map(v => -v), m), '#f2efe7', .55), true)
+    + (fF ? fill(pd(on(PX(x0), OUTp)), mix(m.d, '#f2efe7', .5)) : '') + (fB ? fill(pd(on(PX(x1), OUTp)), mix(m.d, '#f2efe7', .5)) : '') + `</g>`;
+  return far + mech + `<g opacity="${f(1 - .8*k)}">${body}</g>` + `<g opacity="${f(.6*k)}">` + hullInk([...on(PX(x0), OUTp), ...on(PX(x1), OUTp)], 2.8) + `</g>`;
+}
+function xrMount(getUI, caption, opt = {}){   // opt.labelsOnly: only the Labels switch (the insides are on show already)
+  const ui = getUI(), q = new URLSearchParams(location.search), html = document.documentElement;
+  if (q.get('labels') !== '1') html.classList.add('nolabels');
+  if (ui.st.xr == null){ ui.st.xr = 0; ui.st.xrT = 0; }
+  if (q.get('xr') === '1') ui.st.xr = ui.st.xrT = 1;
+  const old = document.getElementById('lblctl'); if (old) old.style.display = 'none';
+  const vset = document.createElement('div'); vset.className = 'vset';
+  vset.innerHTML = '<div class="vrow">' + (opt.labelsOnly ? '' : '<button class="act" id="xrb" aria-pressed="false">See-through</button>') + '<button class="act" id="lblb" aria-pressed="false">Labels</button></div>';
+  document.querySelector('.stage').appendChild(vset);
+  // pages with a stats panel in the top right: the switches go just under it
+  const place = () => { const sp = document.getElementById('stats'); vset.style.top = sp ? (sp.offsetTop + sp.offsetHeight + 10) + 'px' : ''; };
+  place(); new ResizeObserver(place).observe(document.getElementById('stats') || vset);
+  const xrb = document.getElementById('xrb'), lblb = document.getElementById('lblb');
+  const sync = () => { if (xrb) xrb.setAttribute('aria-pressed', !!getUI().st.xrT); lblb.setAttribute('aria-pressed', !html.classList.contains('nolabels')); };
+  if (xrb) xrb.onclick = () => { const u = getUI(), st = u.st; st.xr = st.xr || 0; st.xrT = st.xrT ? 0 : 1; sync();
+    u.animate(dt => { const g = Math.sign(st.xrT - st.xr); st.xr = Math.min(1, Math.max(0, st.xr + g*dt/.7)); return st.xr !== st.xrT; }); };
+  lblb.onclick = () => { html.classList.toggle('nolabels'); sync(); };
+  sync();
+  const cap = document.createElement('p'); cap.className = 'mcap'; document.querySelector('.stage').after(cap);
+  const css = document.createElement('style');
+  css.textContent = '.vset{position:absolute;top:4px;right:0;z-index:2}.vrow{display:flex;gap:6px}.vset .act[aria-pressed=true]{background:var(--ink);color:var(--paper)}'
+    + 'html.nolabels #fig .tag{display:none}.mcap{width:100%;max-width:760px;min-height:3em;margin:0 0 14px;font-size:12.5px;line-height:1.5;text-align:center;transition:opacity .3s}'
+    + '@media (max-width:560px){.vset{position:static;margin:4px 0}}';
+  document.head.appendChild(css);
+  const r0 = ui.render; ui.render = () => { r0(); const st = getUI().st; cap.style.opacity = st.xr > .5 ? 1 : 0; cap.textContent = caption(st); };
+  ui.render();
+}
+// same, for a body lofted between two horizontal rings A (bottom) and B (top)
+function xrGhostRings(body, mech, k, A, B, m){
+  const far = `<g opacity="${f(.5*k)}">` + loft(A, B, n => mix(toneI(n.map(v => -v), m), '#f2efe7', .55), true) + fill(pd(A), mix(m.d, '#f2efe7', .5)) + `</g>`;
+  return far + mech + `<g opacity="${f(1 - .8*k)}">${body}</g>` + `<g opacity="${f(.6*k)}">` + hullInk([...A, ...B], 2.8) + `</g>`;
+}
+// generic see-through for any figure: the whole drawing fades back and the inside parts show over it.
+//   opts: { mech(st, k) -> svg, inside(st) -> label items, surface(st) -> label items (optional), B: bounds, getSt() }
+// washer-style ghost for an object without a single box case: its inside parts first, then the object pale over them
+const xrUnder = (svg, mech, k) => `<g opacity="${f(k)}">${mech}</g><g opacity="${f(1 - .62*k)}">${svg}</g>`;
+function xrWrap(sceneFn, opts){
+  return function(){
+    let s = sceneFn.apply(this, arguments);
+    const st = opts.getSt(), k = ease(st.xr || 0);
+    if (k > 0 && opts.under) s = xrUnder(s, opts.mech(st, k), k);   // the whole drawing is the object
+    else if (k > 0 && !opts.inline) s = `<g opacity="${f(1 - .5*k)}">${s}</g><g opacity="${f(k)}">${opts.mech(st, k)}</g>`;   // inline: the figure ghosts its own case
+    const items = k > .6 ? opts.inside(st) : opts.surface ? opts.surface(st) : [];
+    return s + (items.length ? xrCallouts(items, opts.B) : '');
+  };
+}
+
+/* ---------- game keypad: mountKeypad({ rows, hub:[col,row], action:'DROP', keys:[{ key:'ArrowLeft', glyph:'\u25c0', name, at:[col,row] }] })
+   An inked pad under the buttons that sends the same keyboard events as the arrows and space (set window.GAME_KEYS = true
+   so the arrows play instead of turning the camera). ---------- */
+function mountKeypad(spec){
+  const host = document.getElementById('btns'); if (!host) return;
+  const css = document.createElement('style');
+  css.textContent = `.kpad{display:flex;align-items:center;gap:16px;margin-top:6px;padding:10px 12px;border:1.5px solid var(--ink);border-radius:14px;
+      background:var(--paper);box-shadow:0 3px 0 var(--ink);touch-action:none;user-select:none;-webkit-user-select:none}
+    .kpad .dp{display:grid;grid-template-columns:repeat(3,34px);grid-template-rows:repeat(var(--rows),34px);gap:3px}
+    .kpad .k{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:34px;height:34px;cursor:pointer;
+      background:#fbf7ea;border:1.5px solid var(--ink);border-radius:7px;box-shadow:0 3px 0 var(--ink);color:var(--ink);font:700 13px ui-monospace,Menlo,monospace;
+      transition:transform .05s,box-shadow .05s,background .05s}
+    .kpad .hub{width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+    .kpad .hub i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ink);background:#e6e0d1}
+    .kpad .go{all:unset;box-sizing:border-box;width:62px;height:62px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;
+      background:#e2483d;border:1.5px solid var(--ink);box-shadow:0 4px 0 var(--ink),inset 0 -5px 0 rgba(0,0,0,.18);color:#fff;font:800 12px ui-monospace,Menlo,monospace;letter-spacing:.06em;
+      transition:transform .05s,box-shadow .05s}
+    .kpad .go small{font:700 8px ui-monospace,Menlo,monospace;opacity:.85;letter-spacing:.08em;margin-top:2px}
+    .kpad .down{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+    .kpad .k.down{background:var(--accent,#f4b829)}
+    .kpad .go.down{transform:translateY(3px);box-shadow:0 1px 0 var(--ink),inset 0 -3px 0 rgba(0,0,0,.18)}
+    @media (max-width:560px){.kpad{gap:22px;padding:10px 16px}.kpad .dp{grid-template-columns:repeat(3,44px);grid-template-rows:repeat(var(--rows),44px)}
+      .kpad .k,.kpad .hub{width:44px;height:44px;font-size:15px}.kpad .go{width:74px;height:74px}}`;
+  document.head.appendChild(css);
+  const pad = document.createElement('div'); pad.className = 'kpad'; pad.setAttribute('role', 'group'); pad.setAttribute('aria-label', 'Keypad');
+  const dp = document.createElement('div'); dp.className = 'dp'; dp.style.setProperty('--rows', spec.rows);
+  const els = {};
+  for (const k of spec.keys){
+    const b = document.createElement('button'); b.className = 'k'; b.textContent = k.glyph; b.setAttribute('aria-label', k.name);
+    b.style.gridColumn = k.at[0] + 1; b.style.gridRow = k.at[1] + 1; dp.appendChild(b); els[k.key] = b; }
+  if (spec.hub){ const h = document.createElement('div'); h.className = 'hub'; h.innerHTML = '<i></i>'; h.style.gridColumn = spec.hub[0] + 1; h.style.gridRow = spec.hub[1] + 1; dp.appendChild(h); }
+  const go = document.createElement('button'); go.className = 'go'; go.innerHTML = `${spec.action}<small>SPACE</small>`; go.setAttribute('aria-label', spec.action);
+  els[' '] = go;
+  pad.append(dp, go); host.appendChild(pad);
+  const send = (type, key) => dispatchEvent(new KeyboardEvent(type, { key, bubbles: true }));
+  for (const [key, el] of Object.entries(els)){
+    let held = null;
+    el.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); if (held != null) return; held = e.pointerId;
+      try { el.setPointerCapture(e.pointerId); } catch (_) {} send('keydown', key); });
+    const release = e => { if (held == null || (e && e.pointerId !== held)) return; held = null; send('keyup', key); };
+    el.addEventListener('pointerup', release); el.addEventListener('pointercancel', release); el.addEventListener('lostpointercapture', release);
+    el.addEventListener('click', e => e.preventDefault());
+    el.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); send('keydown', key); setTimeout(() => send('keyup', key), 120); } });
+  }
+  // space belongs to the game: a button that still has the focus from a click must not be pressed by it too
+  addEventListener('keydown', e => { if (e.key === ' ' && e.target && e.target.closest && e.target.closest('button')) e.preventDefault(); }, true);
+  addEventListener('keyup', e => { if (e.key === ' ' && e.target && e.target.closest && e.target.closest('button')) e.preventDefault(); }, true);
+  // light the keys for real key presses too (and for the pad's own, which arrive the same way)
+  addEventListener('keydown', e => { const el = els[e.key]; if (el) el.classList.add('down'); });
+  addEventListener('keyup', e => { const el = els[e.key]; if (el) el.classList.remove('down'); });
+  addEventListener('blur', () => Object.values(els).forEach(el => el.classList.remove('down')));
+}
+
+</script>
+<script>
+/* ============================================================
+   POLLINATORS HOLD IT TOGETHER: four copies of the same patch of land, side by side, same weather.
+
+   1 PERFECT MEADOW (the control). Wildflowers, an apple orchard, a pumpkin field, a pond, homes and a
+     market stall. Honeybees, bumblebees, ground-nesting mining bees, butterflies, a hummingbird; at night
+     moths, fireflies and bats. Flowers feed the pollinators; the pollinators turn blossoms into fruit.
+   2 DATA CENTER ALLEY MOVES IN. Two long data center halls with rooftop chillers, backup generators, a
+     substation, a highway with streetlights, mowed lawns. Some meadow is left at the edge. Fewer
+     flowers means fewer pollinators, and the harvest drops.
+   3 FOOD AND POLLINATORS GONE. The same build-out plus a downtown and parking: the last flowers go, paving
+     seals the ground where most native bees nest, pesticide is sprayed, the pond dries as less rain soaks
+     in, bright lights pull moths away from flowers at night. Pollinators vanish; apple trees blossom but
+     set little fruit, so people pollinate by hand with brushes, and the market stall empties.
+   4 POLLINATOR ALLEY. The same build-out, built for pollinators: flowering green roofs, native plants
+     around the data centers, a tree row and a flowering bridge across the highway, bee hotels and a bare
+     nesting patch, a rain garden, flower gardens instead of lawns, and shielded dark-sky lights.
+     Pollinators come back and the harvest holds.
+
+   Model: each plot is a flat block (x = depth, the front x = W faces the viewer; y = width; z = up). The
+   plots stand side by side along y (PLOT_Y, applied inside the engine's P by WARP).
+   Zones (x depth, y width): orchard x 8-32 y 8-46 | pumpkin field x 8-32 y 54-92 | meadow / development
+   x 38-66 | highway x 68-74 | homes, market stall and pond x 76-98.
+
+   PARTS (each plot): soil block; wildflowers (coneflower, goldenrod, milkweed, aster, clover); nine apple
+   trees (trunk, crown, fruit or blossom); pumpkin vines, flowers and fruit; pond with reeds; three houses with
+   gardens or lawns; market stall with awning and fruit crates; family. Development: two data center halls
+   (walls, louvres, doors, rooftop chillers with fans), generator yard, substation (transformers, fence),
+   transmission tower, highway with lane marks and cars, streetlights; downtown towers and parking; spray
+   tractor and mist; hand pollinators on ladders. Pollinator alley: green roofs with flowers, tree row,
+   flowering bridge, bee hotels, nesting patch, rain garden, dark-sky lamps. See-through: server racks,
+   cooling loops, ground-nesting bee tunnels with brood cells, sealed soil under paving.
+   ============================================================ */
+const MW = 100, MD = 100, MG = 6, GAPM = 40, SP = MD + GAPM;
+const clamp01 = v => Math.max(0, Math.min(1, v));
+let PLOT_X = 0, PLOT_Y = 0;
+window.WARP = (x, y, z) => [x + PLOT_X, y + PLOT_Y, z];
+const fRng = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const fAdd = (a, b) => [a[0]+b[0], a[1]+b[1], a[2]+b[2]], fScl = (a, k) => [a[0]*k, a[1]*k, a[2]*k];
+const fBox = (pts, e = .05) => [[0,1,2].map(i => Math.min(...pts.map(p => p[i])) - e), [0,1,2].map(i => Math.max(...pts.map(p => p[i])) + e)];
+const lerp = (a, b, t) => a + (b - a)*t;
+const mw = w => `style="stroke-width:${f(w)}"`;
+const strokeP = (d, col, w, cap = 'round', extra = '') => `<path d="${d}" fill="none" stroke="${col}" ${mw(w)} stroke-linecap="${cap}" stroke-linejoin="round" ${extra}/>`;
+const rectX = (X, y0, y1, z0, z1) => [[X, y0, z0], [X, y1, z0], [X, y1, z1], [X, y0, z1]];
+const rectY = (Y, x0, x1, z0, z1) => [[x0, Y, z0], [x1, Y, z0], [x1, Y, z1], [x0, Y, z1]];
+const rectZ = (Z, x0, y0, x1, y1) => [[x0, y0, Z], [x1, y0, Z], [x1, y1, Z], [x0, y1, Z]];
+const win = (pts, c = '#cfe8f2') => shape(pts, c, .6);
+let BALLN = 0;
+const MEMO = new Map();
+const camKey = () => `${ST.season},${YAW.toFixed(2)},${PITCH.toFixed(2)},${PLOT_X},${PLOT_Y},${INK_K.toFixed(4)}`;
+function memo(key, fn){ const k = camKey() + '|' + key; let v = MEMO.get(k); if (v === undefined){ v = fn(); if (MEMO.size > 8000) MEMO.clear(); MEMO.set(k, v); } return v; }
+function memoPut(key, put, draw){ const arr = memo(key, () => { const a = []; draw((b, v) => { if (v) a.push([b, v]); }); return a; }); for (const [b, v] of arr) put(b, v); }
+function ball(c, r, M, seed = 0){
+  const [X, Y] = P(...c), R0 = r*CAM_K, id = 'b' + (++BALLN);
+  let s = `<clipPath id="${id}"><circle cx="${f(X)}" cy="${f(Y)}" r="${f(R0)}"/></clipPath><circle cx="${f(X)}" cy="${f(Y)}" r="${f(R0)}" fill="${M.d}"/>`
+    + `<g clip-path="url(#${id})"><circle cx="${f(X + .17*R0)}" cy="${f(Y - .2*R0)}" r="${f(.9*R0)}" fill="${M.m}"/><circle cx="${f(X + .36*R0)}" cy="${f(Y - .42*R0)}" r="${f(.54*R0)}" fill="${M.l}"/></g>`;
+  let tk = ''; for (let i = 0; i < 4; i++){ const a = (seed*2.3 + i*1.7) % (2*Math.PI), rr = .35 + ((seed*7 + i*3) % 5)/10, x = X + Math.cos(a)*rr*R0*.8 - .1*R0, y = Y + Math.sin(a)*rr*R0*.7 + .1*R0;
+    tk += `M${f(x - .12*R0)} ${f(y)}q${f(.12*R0)} ${f(.09*R0)} ${f(.24*R0)} 0`; }
+  return s + `<path d="${tk}" fill="none" stroke="${M.d}" stroke-width=".8" stroke-linecap="round" opacity=".8"/><circle cx="${f(X)}" cy="${f(Y)}" r="${f(R0)}" fill="none" stroke="${INK}" stroke-width="1.2"/>`; }
+const ballBox = (c, r) => [[c[0] - r, c[1] - r, c[2] - r], [c[0] + r, c[1] + r, c[2] + r]];
+const rodBox = (a, b, r) => fBox([a, b], r);
+const dot2 = (X, Y, r, c, w = .4) => `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(r)}" fill="${c}"${w ? ` stroke="${INK}" stroke-width="${w}"` : ''}/>`;
+function person(x, y, sc, shirt, pants, hair, z0 = MG, armUp = 0){
+  const Q = (dx, dy, dz) => [x + dx*sc, y + dy*sc, z0 + dz*sc], SK = matOf('#e8b48a'), parts = [];
+  const add = (a, b, r, M, r1 = r) => parts.push({ box: rodBox(a, b, Math.max(r, r1)), svg: rod(a, b, r, M, tone, .8, r1, 7) });
+  add(Q(0, -.55, 0), Q(0, -.5, 4), .5*sc, matOf(pants)); add(Q(0, .55, 0), Q(0, .5, 4), .5*sc, matOf(pants));
+  add(Q(0, 0, 3.8), Q(0, 0, 7), 1.25*sc, matOf(shirt), .95*sc);
+  add(Q(0, -1.3, 6.6), Q(.4, -1.8, 4), .38*sc, matOf(shirt));
+  add(Q(0, 1.3, 6.6), armUp ? Q(.6, 1.9, 9.6) : Q(.4, 1.8, 4), .38*sc, matOf(shirt));
+  const hc = Q(0, 0, 8.4);
+  parts.push({ box: ballBox(hc, 1.2*sc), svg: ball(fAdd(hc, [-.3*sc, 0, .45*sc]), 1.05*sc, matOf(hair)) + ball(hc, 1.1*sc, SK) });
+  return byDepth(parts); }
+
+/* ---------- layout ---------- */
+const ORCH = []; for (const x of [13, 22.5, 32]) for (const y of [12, 25, 38]) ORCH.push([x, y]);
+const ROWS = [12, 17, 22, 27, 32].map(x => ({ x, y0: 56, y1: 92 }));
+const HALLS = [{ x0:40, x1:62, y0:8, y1:27, h:11 }, { x0:40, x1:62, y0:31, y1:50, h:11 }];
+const SUBST = { x0:40, x1:48, y0:54, y1:61 };
+const TOWERS = [{ x0:42, x1:52, y0:66, y1:76, h:30 }, { x0:42, x1:51, y0:80, y1:91, h:22 }, { x0:55, x1:64, y0:74, y1:86, h:38 }];
+const PARK = { x0:54, x1:65, y0:88, y1:96 };
+const HWY = [68, 74];
+const HOUSES = [{ x0:79, x1:87, y0:6, y1:15 }, { x0:79, x1:87, y0:20, y1:29 }, { x0:79, x1:87, y0:34, y1:43 }];
+const STALL = { x0:88, x1:95, y0:49, y1:56 };
+const PONDC = [87, 76], PONDR = [8, 12];
+const LAMPS = [10, 30, 50, 70, 90].map(y => [76, y]);
+const BRIDGE = { x0:65, x1:77, y0:57, y1:63 };
+const HOTELS = [[35.5, 50], [64.5, 29], [93, 46]];
+const NESTP = [35.5, 58];
+const RAING = { x0:50, x1:62, y0:54, y1:61 };
+const TREEROW = [8, 22, 36, 70, 84, 96].map(y => [66.2, y]);
+const CARS = [{ lane:69.5, sp:13, ph:0, c:'#e2483d' }, { lane:72.5, sp:-11, ph:.4, c:'#3d6fc4' }, { lane:69.5, sp:13, ph:.55, c:'#f2c43c' }];
+const FCOL = ['#9b59b6', '#f2c43c', '#ffffff', '#4a7bd0', '#e8609a', '#f08a3c'];
+const MEADOWF = (() => { const R = fRng(11), o = []; while (o.length < 230){ const x = 37 + R()*29, y = 3 + R()*94; o.push({ x, y, c: FCOL[Math.floor(R()*6)], h: 1.2 + R()*1.6, r: R() }); } return o; })();
+const EDGEF = (() => { const R = fRng(12), o = []; for (let i = 0; i < 70; i++){ const zone = i % 3; const x = zone === 0 ? 34 + R()*3 : zone === 1 ? 88 + R()*9 : 77 + R()*1.5; o.push({ x, y: 3 + R()*94, c: FCOL[Math.floor(R()*6)], h: 1 + R()*1.3, r: R() }); } return o; })();
+const inRect = (Rr, x, y, m = 0) => x > Rr.x0 - m && x < Rr.x1 + m && y > Rr.y0 - m && y < Rr.y1 + m;
+const inPond = (x, y, k = 1) => ((x - PONDC[0])/(PONDR[0]*k))**2 + ((y - PONDC[1])/(PONDR[1]*k))**2 < 1;
+
+/* ---------- plots and state ---------- */
+const KINDS = ['meadow', 'alley', 'gone', 'green'];
+const PILL = { meadow:'PERFECT MEADOW', alley:'DATA CENTER ALLEY MOVES IN', gone:'FOOD AND POLLINATORS GONE', green:'POLLINATOR ALLEY' };
+const PILLC = { meadow:'#bfe6b0', alley:'#f6d77a', gone:'#f2a08e', green:'#a9dccf' };
+// a 2 x 2 block that the view turns into a diamond: scene 1 left, 2 top, 3 bottom, 4 right
+const GRID = [[0, SP], [0, 0], [SP, SP], [SP, 0]];
+const newPlot = (i) => ({ i, kind: KINDS[i], ox: GRID[i][0], oy: GRID[i][1], dev:0, green:0, poll:1, flowers:1, fruit:1, pond:1, spray:0, hand:0, found:new Set() });
+let PLOTS = KINDS.map((k, i) => newPlot(i));
+const plots = () => PLOTS;
+const sceneName = pl => 'Scene ' + (pl.i + 1);
+// what scene 4 builds for pollinators (all of it unless the viewer designs their own) and how much each part helps
+const PLAN = { roofs:{ t:'Flowering green roofs', c:30, w:.15 }, native:{ t:'Native plants round the buildings', c:25, w:.3 }, nests:{ t:'Bee hotels and a bare nesting patch', c:10, w:.15 },
+  dark:{ t:'Dark-sky lights', c:10, w:.08 }, bridge:{ t:'Pollinator bridge and tree row', c:25, w:.1 }, rain:{ t:'Rain garden', c:10, w:.04 }, solar:{ t:'Solar panels over a meadow', c:20, w:.1 },
+  cooling:{ t:'Water-saving cooling', c:15, w:0 }, nospray:{ t:'No pesticides', c:5, w:.08 } };
+let PICK = Object.fromEntries(Object.keys(PLAN).map(k => [k, true]));
+const gk = (pl, k) => pl.kind === 'green' && PICK[k] ? pl.green : 0;
+const planK = () => Object.entries(PLAN).reduce((a, [k, o]) => a + (PICK[k] ? o.w : 0), 0);
+const flK = () => Math.min(1, (PICK.native ? .75 : 0) + (PICK.solar ? .15 : 0) + (PICK.bridge ? .1 : 0));
+// seasons: what is in bloom, how busy the pollinators are, what the orchard and field look like
+const SEASONS = { spring:{ act:.8, fly:.4, bloom: c => c === '#ffffff' || c === '#4a7bd0' || c === '#e8609a', orch:'bloom', pump:0, grass:'#8fc45e' },
+  summer:{ act:1, fly:1, bloom: () => true, orch:'fruit', pump:.6, grass:'#86b95a' }, fall:{ act:.55, fly:.7, bloom: c => c === '#f2c43c' || c === '#9b59b6', orch:'fruit', pump:1, grass:'#a3b45a' },
+  winter:{ act:0, fly:0, bloom: () => false, orch:'bare', pump:0, grass:'#b8b48c' } };
+const SEA = () => SEASONS[ST.season];
+const ST = { season:'summer', time:0, T:-1, play:false, year:0, y0T:9, night:0, nightGoal:0, find:false, hist:[], result:null, storyNight:false };
+let FUI = null;
+const note = (t, ms = 2800) => FUI && FUI.flash(t, ms);
+const built = pl => pl.kind !== 'meadow' ? pl.dev : 0;
+const hasTowers = pl => pl.kind === 'gone' || pl.kind === 'green';
+// is (x, y) covered by something built (so no flowers and no nests there)?
+function coveredAt(pl, x, y){ const d = built(pl); if (d < .05) return false;
+  if (HALLS.some(H => inRect(H, x, y, 1))) return true;
+  if (inRect(SUBST, x, y, .5)) return true;
+  if (x > HWY[0] - .5 && x < HWY[1] + .5) return true;
+  if (hasTowers(pl) && (TOWERS.some(T => inRect(T, x, y, 1)) || (inRect(PARK, x, y) && !(pl.kind === 'green' && PICK.solar)))) return true;
+  if (pl.kind === 'gone' && x > 37 && x < 66) return true;           // the rest of the meadow becomes parking and lawn
+  if (pl.kind === 'green' && PICK.rain && inRect(RAING, x, y)) return true;
+  return false; }
+// how much of each plot is still in flower, and which wildflowers show
+const flowerOn = (pl, q) => { if (coveredAt(pl, q.x, q.y) || !SEA().bloom(q.c)) return false;
+  if (pl.kind === 'meadow') return true;
+  if (pl.kind === 'alley') return q.r < 1 - .7*pl.dev;
+  if (pl.kind === 'gone') return q.r < 1 - pl.dev;
+  return q.r < Math.max(1 - .8*pl.dev, .95*pl.green*flK()); };
+const edgeOn = (pl, q) => !SEA().bloom(q.c) ? false : pl.kind === 'meadow' ? true : pl.kind === 'green' ? q.r < Math.max(1 - pl.dev, pl.green*flK()) : q.r < (pl.kind === 'alley' ? .35 : .05) + (1 - pl.dev)*.6;
+const nightLit = pl => pl.kind === 'meadow' ? 0 : pl.dev*(pl.kind === 'green' && PICK.dark ? .25 : 1);
+const heatOf = pl => pl.kind === 'meadow' ? 0 : pl.kind === 'alley' ? 3*pl.dev : pl.kind === 'gone' ? 6*pl.dev : lerp(6*pl.dev, 2, pl.green*Math.min(1, (PICK.roofs ? .5 : 0) + (PICK.native ? .3 : 0) + (PICK.bridge ? .2 : 0)));
+const nestsOK = pl => pl.kind === 'meadow' ? 1 : pl.kind === 'alley' ? 1 - .5*pl.dev : pl.kind === 'gone' ? 1 - pl.dev : Math.max(1 - .6*pl.dev, pl.green*(PICK.nests ? 1 : PICK.native ? .5 : 0));
+// sixteen kinds of living things, each needing something
+const SPECIES = [
+  ['Honeybee', pl => pl.poll > .1 && pl.spray < .5], ['Bumblebee', pl => pl.poll > .25], ['Mining bee (nests in the ground)', pl => pl.poll > .3 && nestsOK(pl) > .5],
+  ['Mason bee (nests in hollow stems)', pl => pl.poll > .35 && (pl.kind === 'meadow' || gk(pl, 'nests') > .4)], ['Squash bee', pl => pl.poll > .4 && pl.spray < .5],
+  ['Monarch butterfly', pl => pl.flowers > .5 && pl.spray < .5], ['Swallowtail butterfly', pl => pl.flowers > .35], ['Hummingbird', pl => pl.flowers > .45],
+  ['Hoverfly', pl => pl.poll > .2], ['Night moth', pl => pl.poll > .3 && nightLit(pl) < .5], ['Bat', pl => nightLit(pl) < .5 && pl.poll > .3], ['Firefly', pl => nightLit(pl) < .3 && pl.spray < .5 && pl.pond > .4],
+  ['Frog', pl => pl.pond > .4], ['Dragonfly', pl => pl.pond > .5], ['Songbird', pl => pl.flowers > .3 || pl.fruit > .6], ['Ladybug', pl => pl.spray < .5 && pl.flowers > .2] ];
+const speciesOf = pl => SPECIES.filter(([, ok]) => ok(pl)).length;
+
+/* ---------- the land: soil block, ground cover, water ---------- */
+const SOIL = [[0, 3, '#b0703d'], [3, MG, '#6a4a2e']];
+const CORN = []; for (const x of [0, MW]) for (const y of [0, MD]) for (const z of [0, MG]) CORN.push([x, y, z]);
+function blockSides(pl, k){
+  let s = '';
+  const sides = [[[1,0,0], [MW, 0], [MW, MD]], [[-1,0,0], [0, MD], [0, 0]], [[0,1,0], [MW, MD], [0, MD]], [[0,-1,0], [0, 0], [MW, 0]]];
+  for (const [n, a, b] of sides) if (vis(n)){
+    for (const [z0, z1, c] of SOIL) s += face(pd([[a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], z1], [a[0], a[1], z1]]), tone(n, matOf(c)));
+    // stones and roots in the cut face
+    const R = fRng(Math.round(a[0]*7 + a[1]*3 + 5));
+    for (let i = 0; i < 9; i++){ const u = .05 + R()*.9, z = .6 + R()*4.6, p = [a[0] + (b[0] - a[0])*u, a[1] + (b[1] - a[1])*u, z], [X, Y] = P(...p);
+      s += i % 3 ? `<ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(.55*CAM_K)}" ry="${f(.35*CAM_K)}" fill="#a5a198" stroke="${INK}" stroke-width=".4"/>` : `<path d="M${f(X)} ${f(Y)}l${f(1.2*CAM_K)} ${f(.5*CAM_K)}" stroke="#e8d3a6" stroke-width="1.1" stroke-linecap="round"/>`; }
+    s += ink(pd([[a[0], a[1], 0], [b[0], b[1], 0], [b[0], b[1], MG], [a[0], a[1], MG]]), 1.1); }
+  return k > 0 ? `<g opacity="${f(1 - .7*k)}">${s}</g>` : s; }
+const zq = (x0, y0, x1, y1, z = MG + .02) => pd(rectZ(z, x0, y0, x1, y1));
+const LAWN0 = '#a9c86a', MEAD = '#86b95a', PAVE = '#bdb8ae', ASPH = '#5d5a55', SOILC = '#8a6440';
+function groundTop(pl){ const WI = ST.season === 'winter', LAWN = WI ? '#c9c39a' : LAWN0;
+  const d = built(pl), g = gk(pl, 'native'), MEADS = SEA().grass;
+  let s = fill(zq(0, 0, MW, MD, MG), MEADS);
+  // mown orchard floor and the pumpkin field
+  s += fill(zq(8, 6, 37, 50, MG + .01), WI ? '#c2bb92' : '#97c463') + fill(zq(9.5, 53, 34.5, 95), pl.spray > .1 ? mix(SOILC, '#9a8a6a', .35*pl.spray) : SOILC);
+  // the development: lawn, pads, gravel, asphalt
+  if (d > .02){ const op = f(clamp01(d*1.4));
+    let dv = '';
+    if (pl.kind === 'alley') dv += fill(zq(37, 3, 66.5, 52.5), LAWN);
+    if (pl.kind === 'gone') dv += fill(zq(37, 3, 66.5, 97), LAWN) + fill(zq(53, 62, 66.5, 97), '#8d8a84');
+    for (const H of HALLS) dv += fill(zq(H.x0 - 1.5, H.y0 - 1.5, H.x1 + 1.5, H.y1 + 1.5), PAVE);
+    dv += fill(zq(SUBST.x0 - .8, SUBST.y0 - .8, SUBST.x1 + .8, SUBST.y1 + .8), '#cfcac0');
+    if (hasTowers(pl)){ for (const T of TOWERS) dv += fill(zq(T.x0 - 1.4, T.y0 - 1.4, T.x1 + 1.4, T.y1 + 1.4), PAVE); if (!gk(pl, 'solar')) dv += fill(zq(PARK.x0, PARK.y0, PARK.x1, PARK.y1), '#8d8a84'); }
+    dv += fill(zq(HWY[0], 0, HWY[1], MD), ASPH);
+    s += `<g opacity="${op}">${dv}</g>`;
+    // lane marks and parking lines
+    let lm = ''; for (let y = 2; y < MD; y += 6) lm += pd([[71, y, MG + .04], [71, y + 3, MG + .04]], false);
+    if (hasTowers(pl) && !gk(pl, 'solar')) for (let y = PARK.y0 + 1; y < PARK.y1; y += 2.2) lm += pd([[PARK.x0 + 1, y, MG + .04], [PARK.x0 + 4, y, MG + .04]], false);
+    s += `<path d="${lm}" stroke="#f4efe0" stroke-width="${f(.35*CAM_K)}" fill="none" opacity="${op}"/>`;
+  } else s += fill(zq(70, 0, 72.2, MD), '#c9a66b');   // a farm lane
+  // front yards: wildflowers, mown lawn, or flower gardens
+  const yard = pl.kind === 'meadow' ? MEADS : pl.kind === 'green' ? mix(LAWN, MEADS, g) : mix(MEADS, LAWN, clamp01(d*1.4));
+  s += fill(zq(77, 2, 98.5, 47), yard);
+  if (yard !== MEADS && pl.kind !== 'green' || (pl.kind === 'green' && g < .5 && d > .3)){ let st = ''; for (let x = 89; x < 98; x += 1.6) st += pd([[x, 3, MG + .03], [x, 46, MG + .03]], false); s += `<path d="${st}" stroke="#c2da86" stroke-width="${f(.5*CAM_K)}" fill="none" opacity=".7"/>`; }
+  // the pond (shrinks, then dries and cracks)
+  const w = pl.pond, mud = on(PZ(MG + .03), ellUV(PONDC[0], PONDC[1], PONDR[0], PONDR[1], 30));
+  s += fill(pd(mud), mix('#7a6a4a', '#b59a6e', clamp01(1 - w))) + ink(pd(mud), .8);
+  if (w > .04){ const wa = on(PZ(MG + .05), ellUV(PONDC[0], PONDC[1], PONDR[0]*(.25 + .75*w), PONDR[1]*(.25 + .75*w), 30)); s += act('fact', fill(pd(wa), '#5aa6e2') + ink(pd(wa), .7), 'data-k="water"'); }
+  if (w < .5){ let cr = ''; const R = fRng(77); for (let i = 0; i < 10; i++){ const a = R()*6.28, r0 = R()*.5, r1 = r0 + .3 + R()*.35;
+      cr += pd([[PONDC[0] + Math.cos(a)*PONDR[0]*r0, PONDC[1] + Math.sin(a)*PONDR[1]*r0, MG + .06], [PONDC[0] + Math.cos(a + .3)*PONDR[0]*r1, PONDC[1] + Math.sin(a + .3)*PONDR[1]*r1, MG + .06]], false); }
+    s += `<path d="${cr}" stroke="#6a5536" stroke-width=".8" fill="none" opacity="${f(clamp01((.5 - w)*2.5))}"/>`; }
+  // pollinator alley: rain garden and a bare nesting patch
+  if (gk(pl, 'rain') > .05){ const g = gk(pl, 'rain'), rg = on(PZ(MG + .04), ellUV((RAING.x0 + RAING.x1)/2, (RAING.y0 + RAING.y1)/2, 5.5, 3.2, 24)); s += `<g opacity="${f(clamp01(g*2))}">${fill(pd(rg), '#6fb3a8')}${ink(pd(rg), .7)}</g>`; }
+  const nestK = pl.kind === 'meadow' ? 1 : pl.kind === 'green' ? gk(pl, 'nests') : pl.kind === 'alley' ? 1 - d : 0;
+  if (nestK > .05){ const np = on(PZ(MG + .04), ellUV(NESTP[0], NESTP[1], 1.8, 3.2, 18)); let h = fill(pd(np), '#e2c58e');
+    const R = fRng(3); for (let i = 0; i < 7; i++){ const [X, Y] = P(NESTP[0] + (R() - .5)*2, NESTP[1] + (R() - .5)*4.4, MG + .05); h += `<ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(.28*CAM_K)}" ry="${f(.16*CAM_K)}" fill="#4a3524"/>`; }
+    s += act('fact', `<g opacity="${f(nestK)}">${h}</g>`, 'data-k="nests"'); }
+  return s + ink(zq(0, 0, MW, MD, MG), 1.2); }
+
+/* ---------- plants ---------- */
+const flowerSvg = (q, sc = 1) => { const top = [q.x, q.y, MG + q.h*sc], [X, Y] = P(...top);
+  return strokeP(pd([[q.x, q.y, MG], top], false), '#4f7d2e', .3*CAM_K) + dot2(X, Y, .75*CAM_K*sc, q.c, .35); };
+// flowers grouped by 10 x 10 cells so each group sorts with the buildings around it
+function flowerItems(pl, put){
+  const groups = new Map(), add = (q) => { const k = Math.floor(q.x/10) + ',' + Math.floor(q.y/10); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(q); };
+  for (const q of MEADOWF) if (flowerOn(pl, q)) add(q);
+  for (const q of EDGEF) if (edgeOn(pl, q) && !coveredAt(pl, q.x, q.y) && !inPond(q.x, q.y, 1.05) && !HOUSES.some(H => inRect(H, q.x, q.y, 1.2)) && !inRect(STALL, q.x, q.y, 1)) add(q);
+  for (const [k, qs] of groups){ const key = `fl|${k}|${qs.length}|${qs[0].x.toFixed(1)}`, b = fBox(qs.map(q => [q.x, q.y, MG]).concat(qs.map(q => [q.x, q.y, MG + q.h])), .8);
+    put(b, memo(key, () => qs.map(q => flowerSvg(q)).join(''))); } }
+const APPLE = matOf('#5e9c3b'), TRUNK = matOf('#7d5d3d');
+function orchardItems(pl, put){ const sea = SEA().orch, CR = ST.season === 'spring' ? matOf('#8cc75a') : ST.season === 'fall' ? matOf('#9aa84a') : APPLE;
+  const nf = sea === 'fruit' ? Math.round(7*pl.fruit) : 0, nb = sea === 'bloom' ? 7 : sea === 'fruit' && pl.kind === 'gone' && pl.poll < .5 ? 6 : 0;
+  ORCH.forEach(([x, y], i) => {
+    put(rodBox([x, y, MG], [x, y, MG + 5.4], .7), memo(`trunk${i}`, () => rod([x, y, MG], [x, y, MG + 5.4], .55, TRUNK, tone, 1, .45, 10)));
+    const c = [x, y, MG + 9];
+    if (sea === 'bare'){ put([[x - 4, y - 4, MG + 5], [x + 4, y + 4, MG + 13]], memo(`bare${i}`, () => [[3, 2, 11], [-3, 2, 12], [2, -3, 12.5], [-2, -2, 10.5], [0, 3.5, 13]].map(([dx, dy, z]) => rod([x, y, MG + 5.2], [x + dx, y + dy, MG + z], .25, TRUNK, tone, .6, .1, 6)).join(''))); return; }
+    put(ballBox(c, 4.4), memo(`crown${i}|${nf}|${nb}`, () => { let s = ball(c, 4.4, CR, i);
+      const [X, Y] = P(...c), R0 = 4.4*CAM_K;
+      for (let j = 0; j < 7; j++){ const a = j*2.4 + i, rr = .25 + (j % 3)*.22, px = X + Math.cos(a)*rr*R0, py = Y + Math.sin(a)*rr*R0*.85;
+        if (j < nf) s += dot2(px, py, .55*CAM_K, '#d8342c', .4); else if (j < nf + nb) s += dot2(px, py, .42*CAM_K, '#fbe6ee', .3); }
+      return s; })); }); }
+function fieldItems(pl, put){
+  const np = Math.round(4*pl.fruit*SEA().pump), wint = ST.season === 'winter';
+  ROWS.forEach((R0, ri) => {
+    put([[R0.x - 1.5, R0.y0, MG], [R0.x + 1.5, R0.y1, MG + 1.6]], memo(`row${ri}|${np}|${pl.spray > .3}|${wint}`, () => {
+      let s = strokeP(pd([[R0.x, R0.y0, MG + .3], [R0.x, R0.y1, MG + .3]], false), '#3e7a2c', .6*CAM_K);
+      if (!wint) for (let y = R0.y0 + 1.5; y < R0.y1; y += 3.2){ const [X, Y] = P(R0.x + Math.sin(y)*.6, y, MG + .7); s += dot2(X, Y, .95*CAM_K, pl.spray > .3 ? '#7f9a4a' : '#5e9c3b', .35); }
+      if (ST.season === 'summer') for (let j = 0; j < 5; j++){ const y = R0.y0 + 4 + j*7 + ri, [X, Y] = P(R0.x + .4, y, MG + 1.2); s += dot2(X, Y, .45*CAM_K, '#f6c531', .3); }
+      for (let j = 0; j < np; j++){ const y = R0.y0 + 6 + j*8.5 + ri*1.3, [X, Y] = P(R0.x - .6, y, MG + 1); s += `<ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(1.25*CAM_K)}" ry="${f(.95*CAM_K)}" fill="#f08a2a" stroke="${INK}" stroke-width=".6"/><path d="M${f(X)} ${f(Y - .9*CAM_K)}v${f(1.8*CAM_K)}" stroke="#c9661a" stroke-width=".6"/>`; }
+      return s; })); }); }
+// three houses with gardens, the market stall and the family
+const HOUSEM = { l:'#e2483d', m:'#b83a32', d:'#7e2722' };
+function houseItem(H){ const z0 = MG, z1 = MG + 6, zr = z1 + 3.6, yc = (H.y0 + H.y1)/2, WALL = CERAMIC, o = .8;
+  let s = box(H.x0, H.y0, z0, H.x1, H.y1, z1, WALL, tone, 1);
+  if (vis([1,0,0])){ const X = H.x1 + .05; s += shape(rectX(X, yc - 1, yc + 1, z0, z0 + 3.6), '#8a5a3a', .7) + win(rectX(X, H.y0 + 1.2, H.y0 + 3.2, z0 + 2.4, z0 + 4.4)) + win(rectX(X, H.y1 - 3.2, H.y1 - 1.2, z0 + 2.4, z0 + 4.4)); }
+  for (const [Y, n] of [[H.y1 + .05, [0,1,0]], [H.y0 - .05, [0,-1,0]]]) if (vis(n)) s += win(rectY(Y, H.x0 + 2, H.x0 + 4, z0 + 2.4, z0 + 4.4));
+  for (const [x, n] of [[H.x1, [1,0,0]], [H.x0, [-1,0,0]]]) if (vis(n)) s += shape([[x, H.y0, z1], [x, H.y1, z1], [x, yc, zr]], tone(n, WALL), .9);
+  const rA = [[H.x0 - o, H.y0 - o, z1 - .5], [H.x1 + o, H.y0 - o, z1 - .5], [H.x1 + o, yc, zr], [H.x0 - o, yc, zr]], nA = norm([0, -(zr - z1 + .5), yc - H.y0 + o]);
+  const rB = [[H.x0 - o, H.y1 + o, z1 - .5], [H.x1 + o, H.y1 + o, z1 - .5], [H.x1 + o, yc, zr], [H.x0 - o, yc, zr]], nB = norm([0, zr - z1 + .5, H.y1 + o - yc]);
+  const a = vis(nA) ? shape(rA, tone(nA, HOUSEM), 1.1) : '', b = vis(nB) ? shape(rB, tone(nB, HOUSEM), 1.1) : '';
+  s += CAM_V[1] >= 0 ? a + b : b + a;
+  return { box:[[H.x0 - o, H.y0 - o, z0], [H.x1 + o, H.y1 + o, zr]], svg: s }; }
+const CRATE = matOf('#c99a62');
+function stallItem(pl){ const S = STALL, z0 = MG, zt = MG + 3, za = MG + 6.4, n = Math.round(6*pl.fruit);
+  let parts = [];
+  parts.push({ box:[[S.x0, S.y0, z0], [S.x1, S.y1, zt]], svg: box(S.x0, S.y0, z0 + 2.4, S.x1, S.y1, zt, matOf('#d9a86c'), tone, .9) + [[S.x0 + .4, S.y0 + .4], [S.x1 - .4, S.y0 + .4], [S.x0 + .4, S.y1 - .4], [S.x1 - .4, S.y1 - .4]].map(([x, y]) => rod([x, y, z0], [x, y, z0 + 2.4], .2, WOOD, toneI, .6, .2, 6)).join('') });
+  for (let i = 0; i < 3; i++){ const y0 = S.y0 + .8 + i*2.1, x0 = S.x0 + 1.4; let c = box(x0, y0, zt, x0 + 4.4, y0 + 1.8, zt + 1, CRATE, toneI, .7);
+    for (let j = 0; j < 2; j++) if (i*2 + j < n){ const col = i === 1 ? '#ee8a2a' : '#d8342c'; for (let q = 0; q < 3; q++){ const [X, Y] = P(x0 + .8 + q*1.4, y0 + .5 + j*.8, zt + 1.15); c += dot2(X, Y, .45*CAM_K, col, .35); } }
+    parts.push({ box:[[x0, y0, zt], [x0 + 4.4, y0 + 1.8, zt + 1.6]], svg: c }); }
+  const aw = [[S.x0 - .8, S.y0 - .4, za], [S.x1 + 1.2, S.y0 - .4, za - 1.6], [S.x1 + 1.2, S.y1 + .4, za - 1.6], [S.x0 - .8, S.y1 + .4, za]];
+  let awn = ''; for (const [x, y] of [[S.x0 + .2, S.y0 + .2], [S.x0 + .2, S.y1 - .2]]) awn += rod([x, y, zt], [x, y, za], .18, WOOD, toneI, .6, .18, 6);
+  let st = ''; for (let i = 0; i < 5; i++){ const u0 = i/5, u1 = (i + .5)/5, A = aw[0], B = aw[1], C = aw[2], D = aw[3], at = (p, q, u) => [p[0] + (q[0] - p[0])*u, p[1] + (q[1] - p[1])*u, p[2] + (q[2] - p[2])*u];
+    st += fill(pd([at(A, D, u0), at(B, C, u0), at(B, C, u1), at(A, D, u1)]), '#e2483d'); }
+  awn += fill(pd(aw), '#fff4d6') + st + ink(pd(aw), .9);
+  parts.push({ box:[[S.x0 - .8, S.y0 - .4, zt + 1.6], [S.x1 + 1.2, S.y1 + .4, za]], svg: awn });
+  if (pl.fruit < .35 && vis([1,0,0])) parts.push({ box:[[S.x1 + 1.3, S.y0, z0], [S.x1 + 1.4, S.y1, zt]], svg: shape(rectX(S.x1 + 1.3, S.y0 + 1, S.y1 - 1, z0 + .8, zt - .2), '#fff4d6', .6) + tx(S.x1 + 1.35, (S.y0 + S.y1)/2, z0 + 1.6, 'SOLD OUT', .9) });
+  return act('fact', byDepth(parts), 'data-k="food"'); }
+const REEDS = [[80, 70], [80.5, 82], [94, 69], [93.5, 84], [86, 64.6]];
+function reedItems(pl, put){ if (pl.pond < .3) return; for (const [x, y] of REEDS){ let d = ''; for (let i = 0; i < 4; i++) d += pd([[x + i*.35, y, MG], [x + i*.35 + (i - 1.5)*.3, y + .2, MG + 2.6 + (i % 2)]], false);
+  put([[x - .5, y - .5, MG], [x + 1.8, y + .5, MG + 3.6]], `<path d="${d}" stroke="#5e8a35" stroke-width="1" fill="none" stroke-linecap="round"/>`); } }
+function familyItems(pl, put){ for (const [x, y, sc, sh, pa, ha] of [[92, 58.5, 1, '#3d6fc4', '#3a3a48', '#5a3a22'], [92.5, 61, .66, '#f2c43c', '#4a6fa0', '#c98a3a']])
+  put([[x - 1.6, y - 1.8, MG], [x + 1.6, y + 1.8, MG + 10*sc]], memo(`fam${x}`, () => person(x, y, sc, sh, pa, ha))); }
+
+/* ---------- the development ---------- */
+const HALLM = matOf('#dcdfe0'), GLASS = matOf('#a9cfdc'), STEEL = matOf('#9aa0a6'), GEN = matOf('#5f7f5a');
+const rise = pl => ease(clamp01(built(pl)*1.12));
+const roofFlowers = (x0, y0, x1, y1, z, g, seed) => { if (g < .05) return ''; if (ST.season === 'winter') return fill(pd(rectZ(z + .02, x0 + .4, y0 + .4, x1 - .4, y1 - .4)), mix('#c9c9c2', '#b5ad8a', clamp01(g*1.6))); const R = fRng(seed); let s = fill(pd(rectZ(z + .02, x0 + .4, y0 + .4, x1 - .4, y1 - .4)), mix('#c9c9c2', '#7fb55a', clamp01(g*1.6)));
+  const n = Math.round((x1 - x0)*(y1 - y0)/7*g); for (let i = 0; i < n; i++){ const [X, Y] = P(x0 + 1 + R()*(x1 - x0 - 2), y0 + 1 + R()*(y1 - y0 - 2), z + .3); s += dot2(X, Y, .5*CAM_K, FCOL[i % 6], .25); }
+  return act('fact', s, 'data-k="roofs"'); };
+function hallItems(pl, put, k){ const e = rise(pl); if (e < .02) return; const g = gk(pl, 'roofs'), ghost = 1 - .8*k;
+  HALLS.forEach((H, hi) => { const z1 = MG + H.h*e;
+    put([[H.x0, H.y0, MG], [H.x1, H.y1, z1]], `<g opacity="${f(ghost)}">` + memo(`hall${hi}|${e.toFixed(2)}|${g.toFixed(2)}`, () => {
+      let s = box(H.x0, H.y0, MG, H.x1, H.y1, z1, HALLM, tone, 1.2);
+      // louvres along the long walls and a loading door on the front
+      for (const [Y, n] of [[H.y0 - .04, [0,-1,0]], [H.y1 + .04, [0,1,0]]]) if (vis(n)){ let l = ''; for (let x = H.x0 + 1.5; x < H.x1 - 1; x += 1.4) l += pd([[x, Y, MG + 1.5], [x, Y, Math.max(MG + 1.6, z1 - 1.5)]], false); s += `<path d="${l}" stroke="#9aa0a6" stroke-width=".6" fill="none"/>`; }
+      if (vis([1,0,0]) && e > .5){ const X = H.x1 + .04, yc = (H.y0 + H.y1)/2; s += shape(rectX(X, yc - 2.2, yc + 2.2, MG, MG + 4.5), '#7d858c', .7) + shape(rectX(X, H.y0 + 1.2, H.y0 + 5.5, z1 - 2.6, z1 - 1.2), '#2f6fb0', .5) + tx(X + .02, H.y0 + 3.35, z1 - 2.25, 'DATA', .8, '#ffffff'); }
+      if (vis([0,0,1])) s += roofFlowers(H.x0, H.y0, H.x1, H.y1, z1, g, 40 + hi);
+      return s; }) + `</g>`);
+    // rooftop chillers: boxes with a fan each
+    if (e > .97) for (let i = 0; i < 4; i++){ const x = H.x0 + 2.5 + i*4.6, y = H.y0 + (g > .3 ? 2.6 : 6.5), zc = z1 + 1.6;
+      put([[x, y, z1], [x + 3.4, y + 3.4, zc]], `<g opacity="${f(ghost)}">` + memo(`chill${hi}${i}|${g > .3}`, () => box(x, y, z1, x + 3.4, y + 3.4, zc, STEEL, tone, .8) + (vis([0,0,1]) ? fill(pd(on(PZ(zc + .02), ellUV(x + 1.7, y + 1.7, 1.25, 1.25, 16))), '#3b3f44') + ink(pd(on(PZ(zc + .02), ellUV(x + 1.7, y + 1.7, 1.25, 1.25, 16))), .5) : '')) + `</g>`); }
+    // inside (see-through): rows of server racks with status lights
+    if (k > .05) for (let r = 0; r < 4; r++){ const y = H.y0 + 2.5 + r*4.2;
+      put([[H.x0 + 2, y, MG], [H.x1 - 2, y + 1.8, MG + Math.min(7, H.h*e - .5)]], `<g opacity="${f(k)}">` + memo(`rack${hi}${r}|${e.toFixed(2)}`, () => { const zt = MG + Math.min(7, H.h*e - .5); let s = box(H.x0 + 2, y, MG, H.x1 - 2, y + 1.8, zt, matOf('#2e3236'), toneI, .7);
+        const n = vis([0,-1,0]) ? [0,-1,0] : [0,1,0], Y = n[1] < 0 ? y - .03 : y + 1.83; if (vis(n)) for (let x = H.x0 + 3; x < H.x1 - 2.5; x += 1.6) for (let z = MG + 1.2; z < zt - .5; z += 1.4){ const [X, Yy] = P(x, Y, z); s += dot2(X, Yy, .22*CAM_K, (x*7 + z) % 3 < 1 ? '#8af0ae' : '#43c25c', 0); }
+        return s; }) + `</g>`); }
+  });
+  // backup generators between the halls
+  if (e > .9) for (let i = 0; i < 3; i++){ const x = 44 + i*5.5; put([[x, 28, MG], [x + 4, 30.2, MG + 2.4]], memo(`gen${i}`, () => box(x, 28, MG, x + 4, 30.2, MG + 2.4, GEN, tone, .8) + (vis([0,0,1]) ? line([[x + .6, 29.1, MG + 2.42], [x + 3.4, 29.1, MG + 2.42]], .5) : ''))); }
+}
+function substationItems(pl, put){ const e = rise(pl); if (e < .3) return; const S = SUBST, op = f(clamp01((e - .3)/.4));
+  put([[S.x0, S.y0, MG], [S.x1, S.y1, MG + 3]], `<g opacity="${op}">` + memo('subst', () => { let s = '';
+    for (const [x, y] of [[S.x0 + 1.5, S.y0 + 1.5], [S.x0 + 4.6, S.y0 + 3.6]]) s += box(x, y, MG, x + 2.2, y + 2.2, MG + 2.6, matOf('#8a9a8a'), tone, .8) + rod([x + 1.1, y + 1.1, MG + 2.6], [x + 1.1, y + 1.1, MG + 3.6], .25, CERAMIC, toneI, .6, .15, 6);
+    let fz = ''; for (const [a, b] of [[[S.x0, S.y0], [S.x1, S.y0]], [[S.x1, S.y0], [S.x1, S.y1]], [[S.x1, S.y1], [S.x0, S.y1]], [[S.x0, S.y1], [S.x0, S.y0]]]){ fz += pd([[a[0], a[1], MG + 2], [b[0], b[1], MG + 2]], false); for (let u = 0; u <= 1; u += .25) fz += pd([[a[0] + (b[0] - a[0])*u, a[1] + (b[1] - a[1])*u, MG], [a[0] + (b[0] - a[0])*u, a[1] + (b[1] - a[1])*u, MG + 2]], false); }
+    return s + `<path d="${fz}" stroke="#6a6f74" stroke-width=".6" fill="none"/>`; }) + `</g>`);
+  // a transmission tower and lines to the halls
+  const t = [S.x0 + 6.5, S.y1 - 1.2];
+  put([[t[0] - 1.5, t[1] - 1.5, MG], [t[0] + 1.5, t[1] + 1.5, MG + 20]], `<g opacity="${op}">` + memo('pylon', () => { let s = ''; const zt = MG + 20;
+    for (const [dx, dy] of [[-1.3, -1.3], [1.3, -1.3], [1.3, 1.3], [-1.3, 1.3]]) s += pd([[t[0] + dx, t[1] + dy, MG], [t[0] + dx*.25, t[1] + dy*.25, zt]], false);
+    for (let z = MG + 4; z < zt; z += 4){ const r = 1.3*(1 - .75*(z - MG)/20); s += pd([[t[0] - r, t[1] - r, z], [t[0] + r, t[1] + r, z + 4]], false) + pd([[t[0] + r, t[1] - r, z], [t[0] - r, t[1] + r, z + 4]], false); }
+    s += pd([[t[0], t[1] - 4, zt - 2], [t[0], t[1] + 4, zt - 2]], false);
+    const Hc = HALLS[1]; s += pd([[t[0], t[1] - 4, zt - 2], [(Hc.x0 + Hc.x1)/2, Hc.y1, MG + 9], [(Hc.x0 + Hc.x1)/2 + 2, Hc.y1, MG + 11]], false);
+    return `<path d="${s}" stroke="${INK}" stroke-width=".7" fill="none"/>`; }) + `</g>`); }
+function towerItems(pl, put, k){ if (!hasTowers(pl)) return; const e = rise(pl); if (e < .02) return; const g = gk(pl, 'roofs'), ghost = 1 - .75*k;
+  TOWERS.forEach((T, ti) => { const z1 = MG + T.h*e;
+    put([[T.x0, T.y0, MG], [T.x1, T.y1, z1]], `<g opacity="${f(ghost)}">` + memo(`tower${ti}|${e.toFixed(2)}|${g.toFixed(2)}`, () => {
+      let s = box(T.x0, T.y0, MG, T.x1, T.y1, z1, GLASS, tone, 1.2);
+      for (const [n, mk] of [[[1,0,0], z => rectX(T.x1 + .03, T.y0, T.y1, z, z)], [[0,-1,0], z => rectY(T.y0 - .03, T.x0, T.x1, z, z)], [[0,1,0], z => rectY(T.y1 + .03, T.x0, T.x1, z, z)], [[-1,0,0], z => rectX(T.x0 - .03, T.y0, T.y1, z, z)]])
+        if (vis(n)){ let l = ''; for (let z = MG + 3; z < z1 - .5; z += 3) { const q = mk(z); l += pd([q[0], q[1]], false); } s += `<path d="${l}" stroke="#6f95a6" stroke-width=".6" fill="none"/>`; }
+      if (vis([0,0,1])) s += roofFlowers(T.x0, T.y0, T.x1, T.y1, z1, g, 60 + ti);
+      return s; }) + `</g>`); });
+  // parked cars
+  if (e > .6 && !gk(pl, 'solar')) for (let i = 0; i < 4; i++){ const y = PARK.y0 + 1.2 + i*2.2, c = ['#e2483d', '#f4efe0', '#3d6fc4', '#5a5650'][i]; put([[PARK.x0 + 1, y, MG], [PARK.x0 + 4, y + 1.5, MG + 1.3]], memo(`pk${i}`, () => box(PARK.x0 + 1, y, MG, PARK.x0 + 4, y + 1.5, MG + 1.3, matOf(c), tone, .6))); } }
+function lampItems(pl, put){ const e = rise(pl); if (e < .8) return; const ds = gk(pl, 'dark') > .5;
+  for (const [x, y] of LAMPS){ put([[x - 1.6, y - .4, MG], [x + .3, y + .4, MG + 7.4]], memo(`lamp${y}|${ds}`, () => rod([x, y, MG], [x, y, MG + 7], .18, STEEL, toneI, .6, .14, 6) + rod([x, y, MG + 7], [x - 1.4, y, MG + 7.2], .12, STEEL, toneI, .5, .12, 6)
+    + (ds ? box(x - 1.9, y - .45, MG + 6.8, x - 1, y + .45, MG + 7.4, matOf('#3b3f44'), tone, .5) : box(x - 1.9, y - .35, MG + 6.9, x - 1.1, y + .35, MG + 7.3, STEEL, tone, .5)))); } }
+function carItems(pl, put){ if (built(pl) < .6) return;
+  for (const C of CARS){ const y = ((ST.time*C.sp/100 + C.ph) % 1 + 1) % 1*(MD - 4) + 2, x = C.lane;
+    put([[x - .9, y - 1.6, MG], [x + .9, y + 1.6, MG + 1.6]], box(x - .9, y - 1.6, MG, x + .9, y + 1.6, MG + 1, matOf(C.c), tone, .6) + box(x - .75, y - .8, MG + 1, x + .75, y + .9, MG + 1.6, matOf('#cfe8f2'), tone, .5)); } }
+// scene 3: a tractor sprays the field; people pollinate apple flowers by hand
+function sprayItems(pl, put){ if (pl.spray < .05) return; const yy = 58 + ((ST.time*5) % 32), x = 15.5;
+  put([[x - 1.6, yy - 1.4, MG], [x + 1.6, yy + 1.4, MG + 3.2]], box(x - 1.4, yy - 1.2, MG + .8, x + 1.4, yy + 1.2, MG + 2.4, matOf('#3f8f4a'), tone, .7) + box(x - 1, yy - .2, MG + 2.4, x + .4, yy + 1, MG + 3.4, matOf('#cfe8f2'), tone, .5)
+    + cylX(x - 1.2, x + 1.2, yy - 1.2, MG + .9, .9, matOf('#2a2420'), toneI, .6, 12) + cylX(x - 1.2, x + 1.2, yy + 1.1, MG + .7, .7, matOf('#2a2420'), toneI, .6, 12));
+  let m = ''; const R = fRng(Math.floor(ST.time*6)); for (let i = 0; i < 14; i++){ const [X, Y] = P(x - 6 + R()*16, yy - 4 - R()*6, MG + 1 + R()*3); m += `<circle cx="${f(X)}" cy="${f(Y)}" r="${f((.8 + R())*CAM_K)}" fill="#e9f2d0" opacity=".45"/>`; }
+  put([[x - 6, yy - 10, MG + 1], [x + 10, yy - 4, MG + 4]], act('fact', m, 'data-k="spray"')); }
+function handItems(pl, put){ if (pl.hand < .05) return; const op = f(pl.hand);
+  for (const [i, sh] of [[1, '#3d6fc4'], [5, '#e8609a']]){ const [tx0, ty0] = ORCH[i], x = tx0 + 3.6, y = ty0 + 1.2;
+    put([[x - 1.6, y - 1.8, MG], [x + 1.6, y + 1.8, MG + 13]], `<g opacity="${op}">` + memo(`hand${i}`, () => { let s = rod([x + 1.2, y - .8, MG], [tx0 + 1.2, ty0 - .6, MG + 7.5], .14, WOOD, toneI, .5, .14, 6) + rod([x + 1.2, y + .8, MG], [tx0 + 1.2, ty0 + .9, MG + 7.5], .14, WOOD, toneI, .5, .14, 6);
+      for (let u = .15; u < 1; u += .17){ const a = [x + 1.2 + (tx0 - x)*u, y - .8 + (ty0 - .6 - y + .8)*u, MG + 7.5*u], b = [x + 1.2 + (tx0 - x)*u, y + .8 + (ty0 + .9 - y - .8)*u, MG + 7.5*u]; s += line([a, b], .5); }
+      return s + person(x, y, .85, sh, '#3a3a48', '#2a2420', MG + 2.2, 1); }) + `</g>`); } }
+/* ---------- pollinator alley ---------- */
+function greenItems(pl, put){ if (pl.kind !== 'green' || pl.green < .03) return; const g = pl.green;
+  // tree row along the highway
+  if (PICK.bridge) TREEROW.forEach(([x, y], i) => { const r = .8 + 2.2*g; put([[x - r, y - r, MG], [x + r, y + r, MG + 4 + 2*r]], memo(`tr${i}|${g.toFixed(2)}`, () => rod([x, y, MG], [x, y, MG + 3 + r], .3 + .2*g, TRUNK, tone, .8, .2, 8) + (ST.season === 'winter' ? '' : ball([x, y, MG + 3 + 1.4*r], r, matOf(ST.season === 'fall' ? '#c98a3a' : '#4f9a3c'), i)))); });
+  // a flowering bridge across the highway for pollinators (and people)
+  if (g > .2 && PICK.bridge){ const B = BRIDGE, zt = MG + 4.2, op = f(clamp01((g - .2)*2.5));
+    put([[B.x0, B.y0, MG + 3.2], [B.x1, B.y1, zt + 1.6]], `<g opacity="${op}">` + memo(`bridge|${g > .6}|${ST.season === 'winter'}`, () => { let s = box(B.x0, B.y0, MG + 3.2, B.x1, B.y1, zt, matOf('#c9c4b8'), tone, 1);
+      if (vis([0,0,1])){ s += fill(pd(rectZ(zt + .03, B.x0 + .3, B.y0 + .3, B.x1 - .3, B.y1 - .3)), '#7fb55a'); const R = fRng(9); for (let i = 0; i < (ST.season === 'winter' ? 0 : g > .6 ? 26 : 10); i++){ const q = { x: B.x0 + .8 + R()*(B.x1 - B.x0 - 1.6), y: B.y0 + .6 + R()*(B.y1 - B.y0 - 1.2), h: 1 + R(), c: FCOL[i % 6] }; const top = [q.x, q.y, zt + q.h], [X, Y] = P(...top); s += strokeP(pd([[q.x, q.y, zt], top], false), '#4f7d2e', .3*CAM_K) + dot2(X, Y, .7*CAM_K, q.c, .3); } }
+      return act('fact', s, 'data-k="bridge"'); }) + `</g>`);
+    for (const x of [B.x0 + .4, B.x1 - 1.4]) put([[x, B.y0, MG], [x + 1, B.y1, MG + 3.2]], `<g opacity="${op}">` + memo(`pier${x}`, () => box(x, B.y0 + .5, MG, x + 1, B.y1 - .5, MG + 3.2, matOf('#b5b0a4'), tone, .8)) + `</g>`); }
+  // bee hotels: bundles of hollow stems on a post
+  if (g > .35 && PICK.nests) HOTELS.forEach(([x, y], i) => put([[x - 1, y - 1.2, MG], [x + 1, y + 1.2, MG + 5.4]], memo(`hotel${i}`, () => { let s = rod([x, y, MG], [x, y, MG + 3.4], .2, WOOD, toneI, .6, .2, 6) + box(x - .9, y - 1.1, MG + 3.4, x + .9, y + 1.1, MG + 5.3, WOOD, tone, .8);
+    const n = vis([1,0,0]) ? 1 : vis([-1,0,0]) ? -1 : 0; if (n){ const X = n > 0 ? x + .93 : x - .93; for (let a = 0; a < 3; a++) for (let b = 0; b < 2; b++){ const [Xs, Ys] = P(X, y - .6 + a*.6, MG + 3.9 + b*.8); s += `<circle cx="${f(Xs)}" cy="${f(Ys)}" r="${f(.2*CAM_K)}" fill="#3a2a1c"/>`; } }
+    return act('fact', s, 'data-k="nests"'); })));
+}
+// see-through: ground-nesting bees dig tunnels with brood cells; paving seals the soil
+const NESTS = (() => { const R = fRng(31), o = []; while (o.length < 26){ const x = 4 + R()*92, y = 4 + R()*92; if (inPond(x, y, 1.1) || HOUSES.some(H => inRect(H, x, y, 1)) || inRect(STALL, x, y, 1)) continue; o.push([x, y]); } return o; })();
+function nestItems(pl, put, k){ if (k < .05) return;
+  for (const [x, y] of NESTS){ if (coveredAt(pl, x, y)) continue; const okK = pl.kind === 'meadow' ? 1 : pl.kind === 'green' ? nestsOK(pl) : pl.kind === 'alley' ? 1 - .5*pl.dev : 1 - pl.dev; if ((x*13 + y*7) % 10 > okK*10) continue;
+    put([[x - .8, y - .8, 1], [x + .8, y + .8, MG]], `<g opacity="${f(k)}">` + memo(`nest${x.toFixed(1)}`, () => { let s = strokeP(pd([[x, y, MG], [x + .2, y, MG - 2], [x - .3, y + .2, 1.6]], false), '#3a2a1c', .45*CAM_K);
+      for (const [dx, z] of [[.9, MG - 2.2], [-.9, MG - 3.4], [.7, 2]]){ const [X, Y] = P(x + dx, y, z); s += `<ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(.55*CAM_K)}" ry="${f(.36*CAM_K)}" fill="#f2c43c" stroke="${INK}" stroke-width=".4"/>`; }
+      return s; }) + `</g>`); } }
+
+/* ---------- pollinators, and the night ---------- */
+function targetsOf(pl){ const t = [];
+  for (const q of MEADOWF) if (t.length < 26 && flowerOn(pl, q)) t.push([q.x, q.y, MG + q.h + .6]);
+  for (const q of EDGEF) if (t.length < 40 && edgeOn(pl, q) && !coveredAt(pl, q.x, q.y)) t.push([q.x, q.y, MG + q.h + .6]);
+  if (gk(pl, 'roofs') > .3) for (const H of HALLS) t.push([(H.x0 + H.x1)/2, (H.y0 + H.y1)/2, MG + H.h + 1.2]);
+  for (const R0 of ROWS) t.push([R0.x + .4, R0.y0 + 10, MG + 1.6]);
+  for (const [x, y] of ORCH) t.push([x + 2, y, MG + 9]);
+  return t; }
+const findWrap = (pl, kind, svg, X, Y) => ST.find ? act('find', `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(2.6*CAM_K)}" fill="#ffffff" fill-opacity=".01"${pl.found.has(kind) ? ` stroke="#43c25c" stroke-width="1.2"` : ''}/>` + svg, `data-p="${pl.i}" data-k="${kind}"`) : svg;
+function beeSvg(X, Y, r, big, wing){ return `<ellipse cx="${f(X - r*.4)}" cy="${f(Y - r*(.7 + .4*wing))}" rx="${f(r*.75)}" ry="${f(r*.45)}" fill="#ffffff" opacity=".85" stroke="${INK}" stroke-width=".3"/><ellipse cx="${f(X + r*.3)}" cy="${f(Y - r*(.7 + .4*wing))}" rx="${f(r*.7)}" ry="${f(r*.42)}" fill="#ffffff" opacity=".85" stroke="${INK}" stroke-width=".3"/>`
+  + `<ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(r*1.1)}" ry="${f(r*.75)}" fill="${big ? '#f2b81e' : '#f6d34a'}" stroke="${INK}" stroke-width=".5"/><path d="M${f(X - r*.25)} ${f(Y - r*.7)}v${f(r*1.4)}M${f(X + r*.35)} ${f(Y - r*.7)}v${f(r*1.4)}" stroke="${INK}" stroke-width="${f(r*.32)}"/>`; }
+function butterflySvg(X, Y, w, fl, c1, c2){ const wing = sg => `<path d="M${f(X)} ${f(Y)}L${f(X + sg*w)} ${f(Y - w*fl)}L${f(X + sg*w*.9)} ${f(Y + w*.35)}Z" fill="${c1}" stroke="${INK}" stroke-width=".5" stroke-linejoin="round"/><circle cx="${f(X + sg*w*.6)}" cy="${f(Y - w*fl*.45)}" r="${f(w*.15)}" fill="${c2}"/>`;
+  return wing(-1) + wing(1) + `<path d="M${f(X)} ${f(Y - w*.35)}L${f(X)} ${f(Y + w*.45)}" stroke="${INK}" stroke-width="1" stroke-linecap="round"/>`; }
+function pollinatorSvg(pl){ const t = targetsOf(pl), day = 1 - ST.night, SE = SEA(); if (!t.length || SE.act === 0) return ''; let s = '';
+  const nB = Math.round(16*pl.poll*day*(1 - .5*pl.spray)*SE.act);
+  for (let i = 0; i < nB; i++){ const A = t[(i*5) % t.length], B = t[(i*7 + 3) % t.length], u = (Math.sin(ST.time*.45 + i*1.9) + 1)/2;
+    const p = [A[0] + (B[0] - A[0])*u + Math.sin(ST.time*5 + i)*.6, A[1] + (B[1] - A[1])*u + Math.cos(ST.time*4.3 + i)*.6, A[2] + (B[2] - A[2])*u + 5*Math.sin(Math.PI*u)];
+    const [X, Y] = P(...p), big = i % 4 === 0; s += findWrap(pl, big ? 'bumblebee' : 'honeybee', beeSvg(X, Y, (big ? .95 : .7)*CAM_K, big, Math.abs(Math.sin(ST.time*30 + i))), X, Y); }
+  const nF = Math.round(5*clamp01(pl.flowers*1.4)*day*(1 - pl.spray)*SE.fly);
+  for (let i = 0; i < nF; i++){ const T = t[(i*11 + 2) % t.length], a = ST.time*(.5 + i*.07) + i;
+    const p = [T[0] + 3*Math.sin(a), T[1] + 3*Math.cos(a*1.3), T[2] + 2 + 1.5*Math.sin(a*1.7)], [X, Y] = P(...p), mon = i % 2 === 0;
+    s += findWrap(pl, mon ? 'monarch' : 'swallowtail', butterflySvg(X, Y, 1.9*CAM_K, Math.abs(Math.sin(ST.time*9 + i))*.8 + .2, mon ? '#f08a2a' : '#f6d34a', mon ? '#2a2420' : '#3d5fb4'), X, Y); }
+  if (pl.flowers > .45 && day > .5 && ST.season !== 'fall'){ const T = t[3 % t.length], p = [T[0] + 1.5, T[1] + 1, T[2] + 2.4 + .4*Math.sin(ST.time*3)], [X, Y] = P(...p), r = .9*CAM_K, w = Math.sin(ST.time*40)*r*2.4;
+    s += findWrap(pl, 'hummingbird', `<path d="M${f(X)} ${f(Y)}l${f(-1.6*r)} ${f(w)}M${f(X)} ${f(Y)}l${f(1.6*r)} ${f(w)}" stroke="#9fc6c0" stroke-width="${f(r*.6)}" stroke-linecap="round"/><ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(r*1.2)}" ry="${f(r*.7)}" fill="#3f9a6a" stroke="${INK}" stroke-width=".5"/><circle cx="${f(X + r*1.1)}" cy="${f(Y - r*.4)}" r="${f(r*.5)}" fill="#c2413a" stroke="${INK}" stroke-width=".4"/><path d="M${f(X + r*1.5)} ${f(Y - r*.4)}l${f(r*1.8)} ${f(r*.2)}" stroke="${INK}" stroke-width=".7"/>`, X, Y); }
+  if (ST.night > .05){ const lit = nightLit(pl), n = ST.night;
+    // moths at flowers where it is dark; moths trapped circling the lamps where it is bright
+    const nM = Math.round(8*pl.poll*n*(1 - lit)*SE.act);
+    for (let i = 0; i < nM; i++){ const T = t[(i*3 + 1) % t.length], a = ST.time*1.3 + i*2, [X, Y] = P(T[0] + 1.5*Math.sin(a), T[1] + 1.5*Math.cos(a*1.2), T[2] + 1);
+      s += findWrap(pl, 'moth', `<path d="M${f(X - 1.4*CAM_K)} ${f(Y - .6*CAM_K)}L${f(X)} ${f(Y + .3*CAM_K)}L${f(X + 1.4*CAM_K)} ${f(Y - .6*CAM_K)}Z" fill="#e9e1cf" stroke="${INK}" stroke-width=".4"/>`, X, Y); }
+    if (lit > .3 && built(pl) > .8) for (const [x, y] of LAMPS) for (let i = 0; i < 3; i++){ const a = ST.time*4 + i*2.1 + y, [X, Y] = P(x - 1.5 + Math.cos(a)*1.4, y + Math.sin(a)*1.4, MG + 7 + .6*Math.sin(a*1.7)); s += `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(.35*CAM_K)}" fill="#f4efe0" opacity="${f(n)}"/>`; }
+    if (lit < .3 && pl.spray < .5 && pl.pond > .4 && ST.season === 'summer') for (let i = 0; i < 14; i++){ const on = Math.sin(ST.time*3 + i*1.7) > .4; if (!on) continue; const [X, Y] = P(40 + (i*37) % 56, 6 + (i*53) % 88, MG + 2 + (i % 3)); s += findWrap(pl, 'firefly', `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(1.1*CAM_K)}" fill="#f6f08a" opacity="${f(.35*n)}"/><circle cx="${f(X)}" cy="${f(Y)}" r="${f(.35*CAM_K)}" fill="#fffbc4" opacity="${f(n)}"/>`, X, Y); }
+    if (lit < .5 && pl.poll > .3) for (let i = 0; i < 2; i++){ const a = ST.time*.8 + i*3, [X, Y] = P(50 + 12*Math.cos(a), 50 + 30*Math.sin(a), MG + 22), w = 2.2*CAM_K, fl = Math.sin(ST.time*12 + i)*.6;
+      s += findWrap(pl, 'bat', `<path d="M${f(X)} ${f(Y)}q${f(-w*.5)} ${f(-w*fl)} ${f(-w)} 0q${f(w*.3)} ${f(w*.2)} ${f(w)} ${f(w*.3)}q${f(w*.7)} ${f(-w*.1)} ${f(w)} ${f(-w*.3)}q${f(-w*.5)} ${f(-w*fl)} ${f(-w)} 0Z" fill="#2a2420" opacity="${f(n)}"/>`, X, Y); } }
+  return s; }
+const FINDK = ['honeybee', 'bumblebee', 'monarch', 'swallowtail', 'hummingbird', 'moth', 'firefly', 'bat'];
+const FINDN = { honeybee:'honeybee', bumblebee:'bumblebee', monarch:'monarch butterfly', swallowtail:'swallowtail butterfly', hummingbird:'hummingbird', moth:'night moth', firefly:'firefly', bat:'bat' };
+// light at night: lamps, windows and the glow over the town
+function nightSvg(){ if (ST.night < .02) return ''; const vb = document.getElementById('fig').viewBox.baseVal, n = ST.night;
+  let s = `<rect x="${f(vb.x - 10)}" y="${f(vb.y - 10)}" width="${f(vb.width + 20)}" height="${f(vb.height + 20)}" fill="#06102a" opacity="${f(.7*n)}" style="pointer-events:none"/>`;
+  for (const pl of plots()){ PLOT_X = pl.ox; PLOT_Y = pl.oy; const lit = nightLit(pl), ds = gk(pl, 'dark') > .5;
+    for (const H of HOUSES){ const [X, Y] = P(H.x1 + .1, (H.y0 + H.y1)/2 - 2, MG + 3.4); s += `<rect x="${f(X - .8*CAM_K)}" y="${f(Y - .8*CAM_K)}" width="${f(1.6*CAM_K)}" height="${f(1.4*CAM_K)}" fill="#ffd36b" opacity="${f(n)}"/>`; }
+    if (built(pl) > .8){
+      for (const [x, y] of LAMPS){ const [X, Y] = P(x - 1.5, y, MG + 6.8), [GX, GY] = P(x - 1.5, y, MG);
+        if (ds) s += `<ellipse cx="${f(GX)}" cy="${f(GY)}" rx="${f(2.6*CAM_K)}" ry="${f(1.4*CAM_K)}" fill="#ffb347" opacity="${f(.35*n)}"/><circle cx="${f(X)}" cy="${f(Y + .3*CAM_K)}" r="${f(.4*CAM_K)}" fill="#ffcf7a" opacity="${f(n)}"/>`;
+        else s += `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(6*CAM_K)}" fill="#fff6c8" opacity="${f(.16*n)}"/><circle cx="${f(X)}" cy="${f(Y)}" r="${f(2.6*CAM_K)}" fill="#fffbe6" opacity="${f(.3*n)}"/><ellipse cx="${f(GX)}" cy="${f(GY)}" rx="${f(5*CAM_K)}" ry="${f(2.8*CAM_K)}" fill="#fff3b0" opacity="${f(.25*n)}"/><circle cx="${f(X)}" cy="${f(Y)}" r="${f(.6*CAM_K)}" fill="#ffffff" opacity="${f(n)}"/>`; }
+      if (hasTowers(pl)) for (const T of TOWERS){ const h = T.h*rise(pl); for (let z = MG + 2; z < MG + h - 1; z += 3) for (let j = 0; j < 3; j++){ if ((z*7 + j*3 + T.y0) % 5 < 2) continue; const [X, Y] = P(T.x1 + .05, T.y0 + 1.6 + j*(T.y1 - T.y0 - 3)/2, z + 1.2);
+        s += `<rect x="${f(X - .6*CAM_K)}" y="${f(Y - .5*CAM_K)}" width="${f(1.2*CAM_K)}" height="${f(.9*CAM_K)}" fill="${ds ? '#f2c46b' : '#fff3b0'}" opacity="${f(n*(ds ? .6 : 1))}"/>`; } }
+      if (lit > .5){ const [X, Y] = P(52, 50, MG + 30); s += `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(34*CAM_K)}" fill="#ffd9a0" opacity="${f(.09*n*lit)}"/>`; } } }
+  PLOT_X = PLOT_Y = 0; return s; }
+
+/* ---------- one plot ---------- */
+function drawPlot(pl, k){
+  PLOT_X = pl.ox; PLOT_Y = pl.oy;
+  try {
+    let s = castShadow(CORN, 0) + blockSides(pl, k) + groundTop(pl);
+    const items = [], put = (box, svg) => svg && items.push({ box, svg });
+    flowerItems(pl, put); orchardItems(pl, put); fieldItems(pl, put); reedItems(pl, put);
+    HOUSES.forEach((H, i) => { const it = memo('house' + i, () => houseItem(H)); put(it.box, act('fact', it.svg, 'data-k="home"')); });
+    put([[STALL.x0 - 1, STALL.y0 - 1, MG], [STALL.x1 + 1.5, STALL.y1 + 1, MG + 6.5]], memo(`stall|${Math.round(6*pl.fruit)}|${pl.fruit < .35}`, () => stallItem(pl)));
+    familyItems(pl, put);
+    hallItems(pl, put, k); substationItems(pl, put); towerItems(pl, put, k); lampItems(pl, put); carItems(pl, put);
+    sprayItems(pl, put); handItems(pl, put); greenItems(pl, put); nestItems(pl, put, k); hiveItems(pl, put); solarItems(pl, put); coolingItems(pl, put, k);
+    s += byDepth(items);
+    s += pollinatorSvg(pl) + wildSvg(pl);
+    if (pl.kind !== 'meadow' && heatOf(pl) > 4.5 && ST.night < .5){ let hz = ''; for (let i = 0; i < 6; i++){ const x = 42 + i*4, y = 60 + (i % 3)*8, ph = ST.time*2 + i; hz += pd([[x, y, MG + 4 + (ph % 6)], [x, y + 1, MG + 5.5 + (ph % 6)], [x, y, MG + 7 + (ph % 6)]], false); }
+      s += `<path d="${hz}" stroke="#e8743a" stroke-width=".8" fill="none" opacity=".45"/>`; }
+    return s;
+  } finally { PLOT_X = PLOT_Y = 0; }
+}
+function namePill(pl){ const PA_ = pl.i < 2 ? [-3, MD/2, 0] : pl.i === 3 ? [MW + 3, MD/2, 0] : [MW/2, MD + 3, 0], up = pl.i < 2 ? -1 : 1, text = PILL[pl.kind], [X, Y] = P(...PA_), u = window.LBL_U ? LBL_U() : 0, fs = u ? 8.5*u : 9*INK_K, h = fs*2, w = text.length*fs*.62 + fs*1.8, cy = Y + up*h*1.1;
+  return `<g><rect x="${f(X - w/2)}" y="${f(cy - h/2)}" width="${f(w)}" height="${f(h)}" rx="${f(h/2)}" fill="${PILLC[pl.kind]}" stroke="${INK}" style="stroke-width:${f(u ? 1.5*u : 1.5*INK_K)}"/><text x="${f(X)}" y="${f(cy + fs*.36)}" font-size="${f(fs)}" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="800" letter-spacing=".06em" fill="${INK}">${text}</text></g>`; }
+
+/* ---------- labels ---------- */
+function labelItems(k){ const out = [], inside = k > .6;
+  for (const pl of plots()){ const side = pl.i === 0 || pl.i === 2 ? -1 : 1, add = (p, text, on = false) => out.push({ at:[p[0] + pl.ox, p[1] + pl.oy, p[2]], text, on, side }), d = built(pl), g = pl.kind === 'green' ? pl.green : 0;
+    if (inside){
+      if (d > .5 && pl.kind === 'alley'){ add([HALLS[0].x0 + 6, HALLS[0].y0 + 4, MG + 6], 'SERVER RACKS'); }
+      if (pl.kind === 'meadow' || g > .5) add([NESTS[3][0], NESTS[3][1], 2], 'GROUND-NEST BEES');
+      if (pl.kind === 'gone' && d > .6) add([55, 40, MG - 2], 'SEALED SOIL', true);
+      continue; }
+    if (pl.kind === 'meadow'){ add([50, 60, MG + 2.5], 'WILDFLOWER MEADOW'); add([ORCH[4][0], ORCH[4][1], MG + 12], 'APPLE ORCHARD'); add([PONDC[0], PONDC[1], MG], 'POND'); add([NESTP[0], NESTP[1], MG], 'BEE NESTS'); add([HIVES[0][0], HIVES[0][1], MG + 3], 'BEEHIVES'); if (ST.season === 'summer') add([MILK.x, MILK.y, MG + MILK.h], 'MILKWEED'); }
+    if (pl.kind === 'alley' && d > .3){ add([HALLS[0].x0 + 4, HALLS[0].y0, MG + 11*rise(pl)], 'DATA CENTER', d < 1); add([71, 90, MG], 'HIGHWAY'); add([45, 75, MG + 2], 'LAST WILDFLOWERS'); add([93, 20, MG], 'MOWED LAWN');
+      if (ST.night > .5) add([LAMPS[2][0] - 1.5, LAMPS[2][1], MG + 7], 'BRIGHT STREETLIGHTS', true); }
+    if (pl.kind === 'gone' && d > .3){       if (pl.spray > .3) add([15.5, 70, MG + 3], 'PESTICIDE SPRAY', true); if (pl.hand > .3) add([ORCH[1][0] + 3.6, ORCH[1][1] + 1.2, MG + 11], 'HAND POLLINATION', true);
+      if (pl.pond < .3) add([PONDC[0], PONDC[1], MG], 'DRY POND', true); if (pl.fruit < .35) add([STALL.x1 + 1.3, (STALL.y0 + STALL.y1)/2, MG + 2], 'EMPTY MARKET STALL', true);
+      if (pl.poll < .2) add([ORCH[7][0], ORCH[7][1], MG + 13], 'BLOSSOMS, NO FRUIT', true); }
+    if (pl.kind === 'green' && g > .2){ const G = x => PICK[x]; if (G('roofs')) add([HALLS[1].x0 + 6, HALLS[1].y0 + 9, MG + 11.5], 'GREEN ROOF'); if (G('bridge')) add([BRIDGE.x0 + 6, BRIDGE.y0 + 3, MG + 5], 'POLLINATOR BRIDGE');
+      if (g > .35 && G('nests')) add([HOTELS[1][0], HOTELS[1][1], MG + 5.5], 'BEE HOTEL'); if (G('nests')) add([NESTP[0], NESTP[1], MG], 'NESTING PATCH'); if (G('rain')) add([(RAING.x0 + RAING.x1)/2, (RAING.y0 + RAING.y1)/2, MG], 'RAIN GARDEN');
+      if (G('solar') && g > .3) add([59, 92, MG + 3], 'SOLAR MEADOW'); if (G('cooling') && g > .3) add([COOLT[0], COOLT[1], MG + 5], 'WATER-SAVING COOLING');
+      if (ST.night > .5 && G('dark')) add([LAMPS[1][0] - 1.5, LAMPS[1][1], MG + 7], 'DARK-SKY LIGHTS'); }
+  }
+  return out; }
+// labels in two columns: scenes 1 and 2 on the left, 3 and 4 on the right, each sorted so leaders never cross
+function sideCallouts(items){
+  const k = INK_K, u = window.LBL_U ? LBL_U() : 0, fs = u ? 10*u : 8.6*k, hgt = u ? 17*u : fs*1.8, gap = hgt + (u ? 3*u : 3*k);
+  const svgEl = document.getElementById('fig'), vb = svgEl.viewBox.baseVal, ctm = svgEl.getScreenCTM();
+  const pts = []; for (const x of [0, SP + MW]) for (const y of [0, SP + MD]) for (const z of [0, 40]) pts.push(P(x, y, z));
+  const xmin = Math.min(...pts.map(p => p[0])); let xmax = Math.max(...pts.map(p => p[0]));
+  for (const pl of plots()){ PLOT_X = pl.ox; PLOT_Y = pl.oy; const [X] = P(...(pl.i < 2 ? [-3, MD/2, 0] : pl.i === 3 ? [MW + 3, MD/2, 0] : [MW/2, MD + 3, 0])), pf = u ? 10.5*u : 9*INK_K; xmax = Math.max(xmax, X + (PILL[pl.kind].length*pf*.62 + pf*1.8)/2); } PLOT_X = PLOT_Y = 0;
+  const below = el => { if (!el || !ctm) return null; const r = el.getBoundingClientRect(); if (!r.height) return null; return new DOMPoint(r.left, r.bottom + 8).matrixTransform(ctm.inverse()).y; };
+  const top = u ? { [-1]: vb.y + hgt, [1]: vb.y + hgt } : { [-1]: Math.max(vb.y + fs, below(document.getElementById('btns')) ?? -1e9) + hgt/2, [1]: Math.max(vb.y + fs, below(document.getElementById('stats')) ?? -1e9, below(document.querySelector('.vset')) ?? -1e9) + hgt/2 };
+  const cols = { [-1]: [], [1]: [] };
+  for (const it of items){ const [X, Y] = P(...it.at); cols[it.side].push({ ...it, X, Y }); }
+  let s = '';
+  for (const side of [-1, 1]){ const col = cols[side].sort((a, b) => a.Y - b.Y);
+    let y = -1e9; for (const c of col){ c.py = Math.max(c.Y, y + gap, top[side]); y = c.py; }
+    const over = col.length ? col[col.length - 1].py - (vb.y + vb.height - hgt) : 0; if (over > 0){ const room = col.length ? col[0].py - top[side] : 0; for (const c of col) c.py -= Math.min(over, room); }
+    for (const c of col){
+      c.n = ((window.__ln || (window.__ln = {}))[c.text] || (__ln[c.text] = Object.keys(__ln).length + 1)); const w = u ? hgt*(c.n > 9 ? 1.3 : 1) : c.text.length*fs*.62 + fs*1.5;
+      let px = side < 0 ? xmin - 8*k - w/2 : xmax + 8*k + w/2; px = Math.max(vb.x + w/2 + 2*k, Math.min(vb.x + vb.width - w/2 - 2*k, px));
+      const ex = px - side*w/2, fk = typeof LABEL_FACT !== 'undefined' ? LABEL_FACT[c.text] : null;
+      s += `<g class="tag${c.on ? ' on' : ''}" data-n="${c.n}" data-t="${c.text}"${fk ? ` data-act="fact" data-k="${fk}"` : ''}><path d="M${f(c.X)} ${f(c.Y)}L${f(ex + side*-4*k)} ${f(c.py)}L${f(ex)} ${f(c.py)}" fill="none" stroke="${INK}" stroke-width="1"/>`
+        + `<circle cx="${f(c.X)}" cy="${f(c.Y)}" r="${f(1.4*k)}" fill="${INK}"/>`
+        + `<rect x="${f(px - w/2)}" y="${f(c.py - hgt/2)}" width="${f(w)}" height="${f(hgt)}" rx="${f(hgt/2)}" fill="${c.on ? 'var(--accent,#f4b829)' : '#fff4d6'}" stroke="${INK}" stroke-width="1.2"/>`
+        + `<text x="${f(px)}" y="${f(c.py + fs*.36)}" font-size="${f(fs)}" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="800" letter-spacing=".04em" fill="${INK}">${u ? c.n : c.text}</text></g>`; } }
+  return s; }
+const sceneD = () => SP + MD;
+function scene(st, m){
+  const k = ease(st.xr || 0); let s = '';
+  const ord = plots().slice().sort((a, b) => (a.ox*CAM_V[0] + a.oy*CAM_V[1]) - (b.ox*CAM_V[0] + b.oy*CAM_V[1]));
+  for (const pl of ord) s += drawPlot(pl, k);
+  s += nightSvg();
+  let pills = ''; for (const pl of plots()){ PLOT_X = pl.ox; PLOT_Y = pl.oy; pills += namePill(pl); } PLOT_X = PLOT_Y = 0;
+  const items = labelItems(k);
+  return s + (items.length ? sideCallouts(items) : '') + pills; }
+
+/* ---------- more life: beehives, frog, dragonfly, ladybug, songbird, monarch caterpillar on milkweed ---------- */
+const HIVES = [[4.2, 50.6], [4.2, 54.4]];
+const MILK = (() => { const q = MEADOWF.find(q => q.c === '#f08a3c' && q.x > 44 && q.x < 60 && q.y > 60 && q.y < 90) || MEADOWF.find(q => q.c === '#f08a3c'); return q; })();
+const COOLT = [64.6, 41.5];
+const honeyOK = pl => pl.poll > .1 && pl.spray < .5;
+function hiveItems(pl, put){ if (!honeyOK(pl)) return; const WH = matOf('#f2ead2');
+  HIVES.forEach(([x, y], i) => put([[x - 1.5, y - 1.5, MG], [x + 1.5, y + 1.5, MG + 4.4]], memo(`hive${i}`, () => act('fact',
+    box(x - 1.5, y - 1.5, MG, x + 1.5, y + 1.5, MG + .8, matOf('#7b5b3f'), tone, .7) + box(x - 1.3, y - 1.3, MG + .8, x + 1.3, y + 1.3, MG + 2.4, WH, tone, .8) + box(x - 1.3, y - 1.3, MG + 2.45, x + 1.3, y + 1.3, MG + 3.7, WH, tone, .8)
+    + box(x - 1.6, y - 1.6, MG + 3.7, x + 1.6, y + 1.6, MG + 4.3, matOf('#9aa0a6'), tone, .8) + (vis([1,0,0]) ? shape(rectX(x + 1.32, y - .7, y + .7, MG + .9, MG + 1.2), '#2a2420', .3) : ''), 'data-k="crops"')))); }
+function solarItems(pl, put){ const g = gk(pl, 'solar'); if (g < .2) return; const op = f(clamp01((g - .2)*2.5));
+  for (const x of [55.5, 59.2, 62.9]) put([[x - 1.5, PARK.y0, MG], [x + 1.5, PARK.y1, MG + 3.6]], `<g opacity="${op}">` + memo(`solar${x}`, () => {
+    const y0 = PARK.y0 + .4, y1 = PARK.y1 - .4, A = [x - 1.4, y0, MG + 2.1], B = [x + 1.4, y0, MG + 3.4], C = [x + 1.4, y1, MG + 3.4], D = [x - 1.4, y1, MG + 2.1];
+    let s = ''; for (const yy of [y0 + .6, (y0 + y1)/2, y1 - .6]) s += rod([x + 1, yy, MG], [x + 1, yy, MG + 3.2], .14, STEEL, toneI, .5, .14, 6) + rod([x - 1, yy, MG], [x - 1, yy, MG + 1.9], .14, STEEL, toneI, .5, .14, 6);
+    const n = norm(cross(sub(B, A), sub(D, A))), up = n[2] < 0 ? n.map(v => -v) : n;
+    if (vis(up)){ s += shape([A, B, C, D], '#2b4a7a', .8); let gl = ''; for (let u = 1; u < 6; u++){ const t = u/6; gl += pd([[A[0], A[1] + (D[1] - A[1])*t, A[2]], [B[0], B[1] + (C[1] - B[1])*t, B[2]]], false); } s += `<path d="${gl}" stroke="#8fb1d6" stroke-width=".5" fill="none"/>`; }
+    else s += shape([A, B, C, D], '#9aa0a6', .8);
+    return act('fact', s, 'data-k="native"'); }) + `</g>`); }
+function coolingItems(pl, put, k){ const g = gk(pl, 'cooling'); if (g < .2) return; const [x, y] = COOLT;
+  put([[x - 1.7, y - 1.7, MG], [x + 1.7, y + 1.7, MG + 5.4]], `<g opacity="${f(clamp01((g - .2)*2.5))}">` + memo('coolt', () => act('fact', cyl(x, y, MG, MG + 5, 1.6, matOf('#8fb6c8'), tone, 1, 20)
+    + rod([x - 1.4, y, MG + 3.6], [HALLS[1].x1, y, MG + 3.6], .3, matOf('#5aa6e2'), toneI, .6, .3, 8) + (vis([1,0,0]) ? '' : ''), 'data-k="cooling"')) + `</g>`); }
+// small animals that the species count includes
+function wildSvg(pl){ let s = ''; const sea = ST.season, warm = sea !== 'winter', day = 1 - ST.night;
+  if (warm && pl.pond > .4){ const [X, Y] = P(PONDC[0] - PONDR[0]*.8, PONDC[1] + 2, MG + .5), r = .9*CAM_K;
+    s += findWrap(pl, 'frog', `<ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(r*1.3)}" ry="${f(r)}" fill="#5e9c3b" stroke="${INK}" stroke-width=".5"/><circle cx="${f(X - r*.6)}" cy="${f(Y - r*.8)}" r="${f(r*.42)}" fill="#e8f2d0" stroke="${INK}" stroke-width=".4"/><circle cx="${f(X + r*.4)}" cy="${f(Y - r*.85)}" r="${f(r*.42)}" fill="#e8f2d0" stroke="${INK}" stroke-width=".4"/><circle cx="${f(X - r*.55)}" cy="${f(Y - r*.8)}" r="${f(r*.18)}" fill="${INK}"/><circle cx="${f(X + r*.45)}" cy="${f(Y - r*.85)}" r="${f(r*.18)}" fill="${INK}"/>`, X, Y); }
+  if (warm && pl.pond > .5 && day > .5){ const a = ST.time*.9, [X, Y] = P(PONDC[0] + 4*Math.cos(a), PONDC[1] + 6*Math.sin(a*1.3), MG + 3 + Math.sin(a*2)), w = 1.6*CAM_K, fl = Math.abs(Math.sin(ST.time*25));
+    s += findWrap(pl, 'dragonfly', `<path d="M${f(X - w)} ${f(Y - w*.3*fl)}L${f(X + w)} ${f(Y + w*.3*fl)}M${f(X - w)} ${f(Y + w*.3*fl)}L${f(X + w)} ${f(Y - w*.3*fl)}" stroke="#cfe8f2" stroke-width="${f(.5*CAM_K)}" stroke-linecap="round" opacity=".9"/><path d="M${f(X - w*.2)} ${f(Y - w*.9)}L${f(X + w*.2)} ${f(Y + w*.9)}" stroke="#2f6fb0" stroke-width="${f(.35*CAM_K)}" stroke-linecap="round"/>`, X, Y); }
+  if (warm && pl.spray < .5 && pl.flowers > .2){ const q = MEADOWF.find(q => flowerOn(pl, q) && q.x > 40) || EDGEF.find(q => edgeOn(pl, q) && !coveredAt(pl, q.x, q.y));
+    if (q){ const [X, Y] = P(q.x + .5, q.y, MG + q.h + .3), r = .55*CAM_K; s += findWrap(pl, 'ladybug', `<circle cx="${f(X)}" cy="${f(Y)}" r="${f(r)}" fill="#e2483d" stroke="${INK}" stroke-width=".4"/><path d="M${f(X)} ${f(Y - r)}V${f(Y + r)}" stroke="${INK}" stroke-width=".3"/><circle cx="${f(X - r*.4)}" cy="${f(Y)}" r="${f(r*.2)}" fill="${INK}"/><circle cx="${f(X + r*.4)}" cy="${f(Y + r*.2)}" r="${f(r*.2)}" fill="${INK}"/>`, X, Y); } }
+  if ((pl.flowers > .3 || pl.fruit > .6) && day > .3){ const [tx0, ty0] = ORCH[2], [X, Y] = P(tx0, ty0, MG + 13.6 + .3*Math.sin(ST.time*4)), r = 1*CAM_K;
+    s += findWrap(pl, 'songbird', `<path d="M${f(X - r*1.2)} ${f(Y)}l${f(-r*1.2)} ${f(-r*.3)}" stroke="${INK}" stroke-width="${f(r*.5)}" stroke-linecap="round"/><ellipse cx="${f(X)}" cy="${f(Y)}" rx="${f(r*1.2)}" ry="${f(r*.9)}" fill="#4a7bd0" stroke="${INK}" stroke-width=".5"/><ellipse cx="${f(X + r*.2)}" cy="${f(Y + r*.3)}" rx="${f(r*.7)}" ry="${f(r*.5)}" fill="#e8743a"/><circle cx="${f(X + r)}" cy="${f(Y - r*.6)}" r="${f(r*.6)}" fill="#4a7bd0" stroke="${INK}" stroke-width=".5"/><path d="M${f(X + r*1.5)} ${f(Y - r*.6)}l${f(r*.7)} ${f(r*.15)}" stroke="#e0a63a" stroke-width="${f(r*.3)}"/>`, X, Y); }
+  if (sea === 'summer' && MILK && flowerOn(pl, MILK) && pl.spray < .5){ const [X, Y] = P(MILK.x + .9, MILK.y, MG + MILK.h*.6), r = .45*CAM_K; let c = '';
+    for (let i = 0; i < 5; i++) c += `<circle cx="${f(X + (i - 2)*r*1.1)}" cy="${f(Y + Math.sin(ST.time*3 + i)*r*.2)}" r="${f(r*.7)}" fill="${['#f6d34a', '#2a2420', '#ffffff'][i % 3]}" stroke="${INK}" stroke-width=".3"/>`;
+    s += findWrap(pl, 'caterpillar', c, X, Y); }
+  return s; }
+FINDK.push('frog', 'dragonfly', 'ladybug', 'songbird', 'caterpillar');
+Object.assign(FINDN, { frog:'frog', dragonfly:'dragonfly', ladybug:'ladybug', songbird:'songbird', caterpillar:'monarch caterpillar on milkweed' });
+
+/* ---------- design your own scene 4 ---------- */
+let designEl = null, designPick = null;
+function designDraw(){ const spent = Object.keys(PLAN).filter(k => designPick[k]).reduce((a, k) => a + PLAN[k].c, 0);
+  designEl.innerHTML = `<h4>Design scene 4</h4><p>The data centers, highway and downtown are coming. You have 100 coins to make them pollinator-friendly. Pick what to build, then watch what happens.</p>`
+    + Object.entries(PLAN).map(([k, o]) => `<button class="opt" data-r="${k}" aria-pressed="${!!designPick[k]}"><span>${o.t}</span><b>${o.c}</b></button>`).join('')
+    + `<p class="spent">Spent ${spent} of 100 coins</p><div class="row"><button class="act go">Build it and play</button><button class="act all">Show everything (150 coins)</button><button class="act x">Cancel</button></div>`;
+  designEl.querySelectorAll('.opt').forEach(b => b.onclick = () => { const k = b.dataset.r;
+    if (designPick[k]) delete designPick[k]; else if (spent + PLAN[k].c > 100) return FUI.flash('Not enough coins for that', 1600); else designPick[k] = true; designDraw(); });
+  designEl.querySelector('.go').onclick = () => { PICK = Object.fromEntries(Object.keys(PLAN).map(k => [k, !!designPick[k]])); ST.custom = true; designEl.hidden = true; startStory();
+    const list = Object.keys(PLAN).filter(k => PICK[k]).map(k => PLAN[k].t.toLowerCase()); note(list.length ? 'Your scene 4: ' + list.join(', ') : 'Your scene 4: nothing extra. Watch what happens.', 4000); };
+  designEl.querySelector('.all').onclick = () => { PICK = Object.fromEntries(Object.keys(PLAN).map(k => [k, true])); ST.custom = false; designEl.hidden = true; startStory(); };
+  designEl.querySelector('.x').onclick = () => { designEl.hidden = true; }; }
+function openDesign(){ if (!designEl){ designEl = document.createElement('div'); designEl.className = 'design'; document.querySelector('.stage').appendChild(designEl);
+    const css = document.createElement('style'); css.textContent = `.design{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:6;width:min(430px,94%);background:var(--paper);border:2px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);padding:14px 16px}
+      .design h4{margin:0 0 6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}.design p{font-size:12.5px;margin:0 0 10px;line-height:1.5}
+      .design .opt{display:flex;justify-content:space-between;width:100%;font:inherit;font-size:12.5px;padding:6px 10px;margin:0 0 5px;border-radius:9px;border:1.5px solid var(--ink);background:var(--paper);cursor:pointer;text-align:left}
+      .design .opt{color:var(--ink)}.design .opt[aria-pressed=true]{background:#a9dccf;font-weight:700}.design .spent{font-size:12px;color:var(--muted);margin:6px 0}.design .row{display:flex;flex-wrap:wrap;gap:6px}`; document.head.appendChild(css); }
+  designPick = {}; designDraw(); designEl.hidden = false; }
+
+/* ---------- behaviour: one shared clock, four realities ---------- */
+function setState(pl){ const y = ST.year, d = pl.kind === 'meadow' ? 0 : clamp01((ST.T - 2)/6.5); pl.dev = d;
+  if (pl.kind === 'meadow'){ pl.flowers = 1; pl.poll = 1; pl.pond = 1; }
+  else if (pl.kind === 'alley'){ pl.flowers = 1 - .65*d; pl.poll = 1 - .3*d - .28*clamp01(y/4); pl.pond = 1 - .22*d - .06*clamp01(y/6); }
+  else if (pl.kind === 'gone'){ pl.flowers = Math.max(0, 1 - .9*d - .1*clamp01(y/2)); pl.spray = clamp01((y - .5)/.3); pl.poll = (1 - .4*d)*(1 - clamp01((y - .3)/3.7));
+    pl.pond = (1 - .3*d)*(1 - clamp01((y - 1)/4)); pl.hand = clamp01((y - 4.3)/.4); }
+  else { pl.green = clamp01((y - .2)/2.6); const K = planK(), wK = (PICK.rain ? .45 : 0) + (PICK.cooling ? .55 : 0), base = (1 - .3*d)*(1 - .5*clamp01((y - 1)/4));
+    pl.flowers = Math.max((1 - .8*d)*(1 - .5*clamp01(y/2)), .9*pl.green*flK()); pl.poll = Math.max((1 - .4*d)*(1 - .45*clamp01(y/1.5))*(1 - .5*clamp01((y - 1.5)/3)), .92*pl.green*K); pl.pond = lerp(base, .92, pl.green*wK);
+    pl.spray = PICK.nospray ? 0 : .6*clamp01((y - .5)/.3); }
+  pl.fruit = clamp01(.12 + .88*clamp01(pl.poll/.75) + .22*pl.hand); }
+function storyStep(dt){
+  const T0 = ST.T; ST.T += dt; const T = ST.T, at = x => T0 < x && T >= x;
+  const yPrev = ST.year; if (T >= ST.y0T) ST.year += dt/2.2;
+  const y = ST.year, Y = x => T >= ST.y0T && yPrev < x && y >= x;
+  for (const pl of plots()) setState(pl);
+  if (T >= ST.y0T && (!ST.hist.length || y - ST.hist[ST.hist.length - 1].y >= .1)) ST.hist.push({ y, p: plots().map(pl => pl.poll), h: plots().map(pl => pl.fruit), s: plots().map(speciesOf) });
+  if (at(.05)) note('Four copies of the same meadow. Watch the pollinators, and the food.', 2800);
+  if (at(1.6)) note('Scene 1 stays a meadow. On scenes 2, 3 and 4, construction begins: data centers, a highway, power lines.', 3400);
+  if (at(5.2)) note('Scenes 3 and 4 also get a downtown and parking. The meadow there is paved over.', 3200);
+  if (at(8.6)) note('Scene 2 keeps a strip of meadow at the edge. Fewer flowers, fewer bees.', 3000);
+  if (Y(.3)) note('Scene 4: people build a pollinator alley: flowering roofs, native plants round the data centers, a bridge over the highway.', 3800);
+  if (Y(.75)) note('Scene 3: lawns are mowed short and the farm sprays pesticide. The last flowers go.', 3200);
+  if (Y(1.7)) note('Scene 3: paving seals the ground where most native bees nest. Less rain soaks in, and the pond shrinks.', 3600);
+  if (Y(2.7)) note('Scene 4: bees, butterflies and a hummingbird come back to the roofs, the bridge and the gardens.', 3400);
+  if (Y(3.6)) note('Scene 3: the apple trees still blossom, but with almost no bees they set little fruit.', 3400);
+  if (Y(4.45)) note('Scene 3: farmers climb ladders to pollinate apple flowers by hand, one flower at a time.', 3400);
+  if (Y(5.2)){ ST.nightGoal = 1; note('Night. Bright lights on scenes 2 and 3 pull moths away from the flowers. Scene 4 uses shielded dark-sky lights.', 4200); }
+  if (Y(6.5)){ ST.nightGoal = 0; note('Morning. Scene 3’s market stall is sold out. Scene 4 still has apples and pumpkins.', 3400); }
+  if (Y(8)) endStory(); }
+function endStory(){ if (!ST.play) return; ST.play = false;
+  ST.result = { plan: Object.keys(PLAN).filter(k => PICK[k]), custom: !!ST.custom, hills: plots().map(pl => ({ name: sceneName(pl), kind: pl.kind, sp: speciesOf(pl), poll: pl.poll, fruit: pl.fruit, pond: pl.pond, heat: heatOf(pl) })) };
+  note('Year 8: where flowers and nests were kept, pollinators and food stayed. Where they were paved over, both were lost.', 4600); }
+function startStory(live = true){ PLOTS = KINDS.map((k, i) => Object.assign(newPlot(i), { found: PLOTS[i] ? PLOTS[i].found : new Set() }));
+  Object.assign(ST, { T:0, play:true, year:0, hist:[], result:null, nightGoal:0, night:0 }); for (const pl of PLOTS) setState(pl); if (live) wake(); }
+function lifeStep(dt){ ST.time += dt; let busy = true;
+  if (ST.play) storyStep(dt);
+  if (Math.abs(ST.night - ST.nightGoal) > .001) ST.night += Math.sign(ST.nightGoal - ST.night)*Math.min(Math.abs(ST.nightGoal - ST.night), dt*.9);
+  if (typeof kioskStep === 'function') kioskStep(dt);
+  return busy; }
+function wake(){ if (ST.live || !FUI) return; ST.live = true; FUI.animate(dt => lifeStep(dt)); }
+function reframe(){ const svg = document.getElementById('fig'); if (!svg || !svg.viewBox.baseVal) return;
+  const W = SP + MW + 10, D = sceneD(), H = 40, yaw = YAW, pitch = PITCH, pts = [];
+  OX = OY = 0; RC = [(SP + MW)/2 + 2, D/2 - 4]; RCZ = H/2; setCam(YAW0, PITCH0);
+  for (const x of [0, W]) for (const y of [0, D]) for (const z of [0, H]) pts.push(P(x, y, z));
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]), bw = Math.max(...xs) - Math.min(...xs), bh = Math.max(...ys) - Math.min(...ys);
+  const PA = window.FIG_A ? FIG_A() : .75, A = PA === .75 ? .75 : Math.min(PA, Math.max(.75, bh/.88/(bw/.74)*1.08)), vbW = Math.max(bw/(PA === .75 ? .6 : .74), bh/.88/A), vbH = vbW*A;
+  OX = (vbW - bw)/2 + (PA === .75 ? vbW*.01 : 0) - Math.min(...xs); OY = (PA === .75 ? Math.max(vbH*.04, (vbH - bh)*.6) : (vbH - bh)*.3) - Math.min(...ys);
+  svg.setAttribute('viewBox', `0 0 ${f(vbW)} ${f(vbH)}`); INK_K = vbW/INK_REF_VB;
+  document.getElementById('fdefs').innerHTML = filterFor(INK_K); bakeNoise(svg);
+  setCam(yaw, pitch); if (FUI) FUI.render(); }
+
+/* ---------- scoreboard under the figure ---------- */
+const BOARD_CSS = `#fig{max-height:none!important}
+  .board{width:100%;max-width:760px;display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px}
+  .board .col{border:1.5px solid var(--ink);border-radius:12px;padding:10px 12px;background:var(--paper);box-shadow:2px 2px 0 var(--ink);min-width:0}
+  .board h3{margin:0 0 8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .board h3 i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--ink);flex:none}
+  .board .brow{display:grid;grid-template-columns:6.6em 1fr 2.8em;align-items:center;gap:8px;font-size:11.5px;margin:6px 0}
+  .board .k{color:var(--muted);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase}
+  .board .bar{height:9px;border:1.2px solid var(--ink);border-radius:99px;overflow:hidden;background:#ffffff80}
+  .board .bar i{display:block;height:100%;transition:width .3s}
+  .board b{font-variant-numeric:tabular-nums;text-align:right}
+  .board .chip{grid-column:2/4;justify-self:start;font-size:11px;font-weight:700;padding:1px 9px;border-radius:99px;border:1.2px solid var(--ink)}
+  .good{background:#9fd38a}.warn{background:#f6d77a}.bad{background:#f2a08e}
+  @media (max-width:560px){.board{grid-template-columns:1fr;gap:8px}.board .col{padding:8px 9px}.board .brow{grid-template-columns:1fr auto;gap:4px 6px}.board .brow .bar{grid-column:1/-1;grid-row:2}.board .chip{grid-column:1/-1}.board h3{font-size:10px}}`;
+function boardHtml(){
+  const row = (k, inner) => `<div class="brow"><span class="k">${k}</span>${inner}</div>`;
+  const bar = (v, cls) => `<span class="bar"><i class="${cls}" style="width:${Math.round(clamp01(v)*100)}%"></i></span>`;
+  const lvl = v => v > .66 ? 'good' : v > .33 ? 'warn' : 'bad', chip = ([t, c]) => `<span class="chip ${c}">${t}</span>`;
+  return plots().map(pl => { const n = speciesOf(pl), NM = SPECIES.length, lit = nightLit(pl), h = heatOf(pl);
+    const pond = pl.pond > .7 ? ['Full', 'good'] : pl.pond > .3 ? ['Low', 'warn'] : ['Dry', 'bad'];
+    const nights = lit > .5 ? ['Bright', 'bad'] : gk(pl, 'dark') > .5 ? ['Dark-sky lights', 'good'] : lit > .1 ? ['Some light', 'warn'] : ['Dark', 'good'];
+    const heat = h < .5 ? ['Normal', 'good'] : [`About +${Math.round(h)}°F`, h > 4 ? 'bad' : 'warn'];
+    return `<div class="col"><h3><i style="background:${PILLC[pl.kind]}"></i>${sceneName(pl)}: ${PILL[pl.kind].toLowerCase()}</h3>`
+      + row('Species', bar(n/NM, lvl(n/NM)) + `<b>${n}</b>`) + row('Pollinators', bar(pl.poll, lvl(pl.poll)) + `<b>${Math.round(pl.poll*100)}%</b>`)
+      + row('Harvest', bar(pl.fruit, lvl(pl.fruit)) + `<b>${Math.round(pl.fruit*100)}%</b>`) + row('Flowers', bar(pl.flowers, lvl(pl.flowers)) + `<b>${Math.round(pl.flowers*100)}%</b>`)
+      + row('Pond', chip(pond)) + row('Nights', chip(nights)) + row('Summer heat', chip(heat)) + `</div>`; }).join(''); }
+
+/* ---------- mount ---------- */
+const ui = mountFigure({
+  fig:'', turn:'full', title:'Pollinator Alley',
+  size:[SP + MW + 10, sceneD(), 40], center:[(SP + MW)/2 + 2, sceneD()/2 - 4], palette:'tomato',
+  state: ST, scene,
+  stats: st => [ { label:'Year', value: String(Math.floor(ST.year + 1e-6)) }, ST.find && { label:'Pollinators found', value: plots().map(pl => pl.found.size).join(' + '), small:true } ],
+  buttons:[
+    { label:'Play story', onClick: () => startStory() },
+    { label:'Design scene 4', onClick: () => openDesign() },
+    { label:'Season', choices: () => ['spring', 'summer', 'fall', 'winter'].map(x => ({ label: x[0].toUpperCase() + x.slice(1), current: ST.season === x, onClick: () => { ST.season = x; note({ spring:'Spring: apple blossoms and early flowers. Bees wake up.', summer:'Summer: the meadow is in full bloom, and monarch caterpillars eat milkweed.', fall:'Fall: goldenrod and asters feed the last bees and migrating monarchs. Pumpkins are ripe.', winter:'Winter: no flowers. Bees wait underground and in hollow stems for spring.' }[x], 3200); } })) },
+    { label:'Day / night', onClick: () => { ST.nightGoal = ST.nightGoal > .5 ? 0 : 1; wake(); } },
+    { label:'Find pollinators', onClick: () => { ST.find = !ST.find; note(ST.find ? 'Tap the bees, butterflies, hummingbirds, and at night the moths, fireflies and bats' : 'Pollinator hunt off', 2600); } } ],
+  acts: {
+    find: (st, el, u) => { const pl = plots()[+el.dataset.p], kk = el.dataset.k; if (!pl) return;
+      if (pl.found.has(kk)) return u.flash(`Already found a ${FINDN[kk]} in ${sceneName(pl).toLowerCase()}`, 1500);
+      pl.found.add(kk); u.flash(`You found a ${FINDN[kk]}! ${pl.found.size} kinds in ${sceneName(pl).toLowerCase()}`, 2200); },
+    fact: (st, el) => { if (typeof showFact === 'function') showFact(el.dataset.k); } },
+  params:(st, q) => {
+    if (SEASONS[q.get('season')]) ST.season = q.get('season');
+    if (q.has('plan')){ const L = q.get('plan').split(','); PICK = Object.fromEntries(Object.keys(PLAN).map(k => [k, L.includes(k)])); ST.custom = true; }
+    if (q.has('t')){ startStory(false); const tt = +q.get('t'); for (let x = 0; x < tt; x += .05) lifeStep(.05); }
+    if (q.get('night') === '1'){ ST.night = ST.nightGoal = 1; }
+  },
+});
+FUI = ui; window.__fui = ui;
+reframe();
+{ const h = document.querySelector('body > header h1'); if (h) h.textContent = 'Pollinator Alley'; }
+xrMount(() => ui, () => '');
+{ const css = document.createElement('style'); css.textContent = BOARD_CSS + '#btns .stepwrap:first-child .act{background:var(--ink);color:var(--paper)}'; document.head.appendChild(css);
+  const board = document.createElement('div'); board.className = 'board'; document.querySelector('.stage').after(board);
+  const r0 = ui.render; ui.render = () => { r0(); const h = boardHtml(); if (board._h !== h){ board._h = h; board.innerHTML = h; } };
+  ui.render(); }
+if (!new URLSearchParams(location.search).has("t")) startStory(false);
+wake();
+
+/* ---------- downloads: a picture of the current view, or the whole page to run offline ---------- */
+const DL = { api: null };
+const summary = pl => `${sceneName(pl)} (${PILL[pl.kind].toLowerCase()}): ${speciesOf(pl)} species · pollinators ${Math.round(pl.poll*100)}% · harvest ${Math.round(pl.fruit*100)}% · pond ${pl.pond > .7 ? 'full' : pl.pond > .3 ? 'low' : 'dry'}`;
+function snapshotPng(){ return new Promise((resolve, reject) => {
+  const svg = document.getElementById('fig'), vb = svg.viewBox.baseVal, cl = svg.cloneNode(true);
+  cl.removeAttribute('style'); cl.removeAttribute('class');
+  if (document.documentElement.classList.contains('nolabels')) cl.querySelectorAll('.tag').forEach(t => t.remove());
+  const acc = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#f4b829';
+  let bb = { x: vb.x, y: vb.y, width: vb.width, height: vb.height };
+  try { const a = document.getElementById('art').getBBox(), pad = vb.width*.02; bb = { x: Math.max(vb.x, a.x - pad), y: Math.max(vb.y, a.y - pad) }; bb.width = Math.min(vb.x + vb.width, a.x + a.width + pad) - bb.x; bb.height = Math.min(vb.y + vb.height, a.y + a.height + pad) - bb.y; } catch (e) {}
+  const W = 1800, sc = W/bb.width, H = Math.round(bb.height*sc);
+  cl.setAttribute('viewBox', `${bb.x} ${bb.y} ${bb.width} ${bb.height}`); cl.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); cl.setAttribute('width', W); cl.setAttribute('height', H);
+  const src = new XMLSerializer().serializeToString(cl).replace(/var\(--accent,#f4b829\)/g, acc), img = new Image();
+  img.onload = () => { try {
+    const head = 96, foot = 50 + 46*plots().length, c = document.createElement('canvas'); c.width = W; c.height = H + head + foot; const g = c.getContext('2d');
+    g.fillStyle = '#f2efe7'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, head, W, H);
+    g.fillStyle = '#231e16'; g.font = '800 36px ui-monospace, Menlo, monospace'; g.fillText('Pollinator Alley', 56, 64);
+    g.textAlign = 'right'; g.fillText('Year ' + Math.floor(ST.year + 1e-6), W - 56, 64); g.textAlign = 'left';
+    g.font = '600 24px ui-monospace, Menlo, monospace'; plots().forEach((pl, i) => g.fillText(summary(pl), 56, H + head + 46 + i*46));
+    c.toBlob(b => b ? resolve(b) : reject(new Error('no image')), 'image/png'); } catch (e) { reject(e); } };
+  img.onerror = () => reject(new Error('svg failed')); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(src); }); }
+async function saveFile(kind){
+  if (!DL.api) return note('Downloads are not available here');
+  let data, filename;
+  try { if (kind === 'png'){ data = await snapshotPng(); filename = `pollinator-alley-year-${Math.floor(ST.year + 1e-6)}.png`; }
+    else { const r = await fetch('pollinator-alley.html'); if (!r.ok) throw new Error('fetch'); data = await r.blob(); filename = 'pollinator-alley.html'; } }
+  catch (e) { return note(kind === 'png' ? 'Could not make the picture' : 'Could not load the page copy', 2400); }
+  try { await DL.api.save({ filename, data }); note('Saved ' + filename, 2200); }
+  catch (e) { if (e && e.code === 'declined') return; note(e && e.code === 'rate_limited' ? 'A save is already open' : 'Download is not available here', 2400); } }
+if (window.claude && typeof window.claude.use === 'function') window.claude.use('downloads').then(api => { DL.api = api; document.documentElement.classList.toggle('can-dl', !!api); }).catch(() => {});
+
+/* ============================================================ panels, facts, quiz, kiosk, sound ============================================================ */
+const SOURCES = [
+  { id:1, t:'Klein, A.-M. et al. (2007). Importance of pollinators in changing landscapes for world crops. Proceedings of the Royal Society B 274, 303-313.', u:'https://ncipmhort.cfans.umn.edu/sites/ncipmhort.cfans.umn.edu/files/2020-06/importance%20of%20pollinators%20landscapes.pdf' },
+  { id:2, t:'IPBES (2016). Summary for policymakers of the assessment report on pollinators, pollination and food production.', u:'https://www.cbd.int/doc/meetings/sbstta/sbstta-20/information/sbstta-20-inf-70-en.pdf' },
+  { id:3, t:'Knop, E. et al. (2017). Artificial light at night as a new threat to pollination. Nature 548, 206-209 (summary: ScienceDaily, 3 August 2017).', u:'https://www.sciencedaily.com/releases/2017/08/170802153907.htm' },
+  { id:4, t:'Xerces Society for Invertebrate Conservation. Nesting and overwintering habitat.', u:'https://xerces.org/pollinator-conservation/nesting' },
+  { id:5, t:'Loudoun County, Virginia. Data Centers: The Loudoun Story.', u:'https://www.loudoun.gov/6408/Data-Centers-The-Loudoun-Story' },
+  { id:6, t:'Environmental and Energy Study Institute (2025). Data Centers and Water Consumption.', u:'https://www.eesi.org/articles/view/data-centers-and-water-consumption' },
+  { id:7, t:'Krulwich, R. (2013). How important is a bee? NPR, 4 December 2013 (on Gowdy, Krall and Chen, "The Parable of the Bees").', u:'https://www.npr.org/blogs/krulwich/2013/12/04/248795791/how-important-is-a-bee' },
+  { id:8, t:'NPR (2018). EU to completely ban outdoor use of pesticides blamed for devastating bees.', u:'https://whyy.org/npr-story/eu-to-completely-ban-outdoor-use-of-pesticides-blamed-for-devastating-bees' },
+  { id:9, t:'U.S. Environmental Protection Agency. What are heat islands?', u:'https://19january2025snapshot.epa.gov/heatislands/what-are-heat-islands' },
+  { id:10, t:'Jacobs, J., Beenaerts, N. & Artois, T. (2023). Green roofs and pollinators, useful green spots for some wild bee species. Scientific Reports 13, 1449.', u:'https://link.springer.com/article/10.1038/s41598-023-28698-7' },
+  { id:11, t:'Smithsonian Magazine. Norway has built a highway for bees.', u:'https://www.smithsonianmag.com/smart-news/norway-has-highway-bees-180955703/' },
+  { id:12, t:'Argonne National Laboratory (2024). Argonne study shows insect populations flourish in the restored habitats of solar energy facilities.', u:'https://www.businesswire.com/news/home/20240117233326/en/Argonne-Study-Shows-Insect-Populations-Flourish-in-the-Restored-Habitats-of-Solar-Energy-Facilities' },
+  { id:13, t:'U.S. Geological Survey Water Science School. Infiltration and the Water Cycle.', u:'https://www.usgs.gov/water-science-school/science/infiltration-and-water-cycle' },
+  { id:14, t:'USDA Forest Service. Monarch butterfly habitat needs.', u:'https://www.fs.usda.gov/wildflowers/pollinators/Monarch_Butterfly/habitat/index.shtml' } ];
+const FACTS = {
+  crops:{ t:'Most crop types need pollinators', x:'Fruit, vegetables or seeds from 87 of the 115 leading food crops in the world depend on animal pollination. Those crops make up about 35 percent of the world’s food production by volume. Apples and pumpkins are two of them.', s:[1, 2] },
+  decline:{ t:'Pollinators are in trouble', x:'In Europe, 9 percent of bee and butterfly species are threatened, and populations are falling for 37 percent of bees and 31 percent of butterflies. The main threats are changes in land use, intensive farming and pesticides, along with pollution, invasive species, diseases and climate change.', s:[2] },
+  nests:{ t:'Most bees nest in the ground', x:'About 70 percent of native bees nest in burrows in the soil. Most of the rest nest in old beetle holes in dead wood or in hollow stems. Paving and tidy lawns take away these nesting places; patches of bare ground and bee hotels give them back.', s:[4] },
+  light:{ t:'Light at night', x:'Scientists put streetlights in Swiss meadows. Flowers on the lit meadows got 62 percent fewer visits from night pollinators such as moths, and one plant, cabbage thistle, made 13 percent less fruit.', s:[3] },
+  alley:{ t:'Data Center Alley', x:'Loudoun County, Virginia, calls itself Data Center Alley: it has the most data centers in one place anywhere in the world. In March 2026 it had about 233 data center buildings, about 56.5 million square feet, either built or under construction, with more approved.', s:[5] },
+  water:{ t:'Water', x:'Large data centers can use up to 5 million gallons of water a day, mostly for cooling: about as much as a town of 10,000 to 50,000 people. Paving also lets less rain soak into the ground, so less water reaches ponds and streams through the soil.', s:[6, 13] },
+  hand:{ t:'People doing the bees’ job', x:'In Maoxian County in China, the bees that used to arrive every spring stopped coming in the 1990s. Pesticides, over-harvesting of honey and cutting of forests were all blamed. Farmers began pollinating their apple trees by hand, with brushes made of chicken feathers.', s:[7] },
+  spray:{ t:'Pesticides and bees', x:'In 2018 the European Food Safety Authority confirmed that a group of insecticides called neonicotinoids is a risk to honeybees and wild bees. The European Union then banned all outdoor use of three of them.', s:[8] },
+  heat:{ t:'Heat islands', x:'Towns are hotter than the countryside around them: about 1 to 7°F hotter in the day and 2 to 5°F at night. Roofs, roads and parking lots soak up the sun’s heat, and there are fewer trees and plants to give shade and cool the air.', s:[9] },
+  roofs:{ t:'Green roofs', x:'Scientists checked 20 green roofs in Antwerp, Belgium, and found 40 species of wild bees on them. Flowering roofs can give bees food in the middle of a city.', s:[10] },
+  bridge:{ t:'A highway for bees', x:'Oslo, Norway, has a bee highway: flowers on rooftops and balconies and feeding stations across the city, so bees can travel safely from one green space to the next. The idea comes from the Pollinator Pathway, first proposed in 2007.', s:[11] },
+  native:{ t:'Native plants around big buildings', x:'Scientists planted native prairie plants at two solar farms in Minnesota built on old farmland. Over five years the number of insects tripled, and native bees became about 20 times more common. The same idea works on the land around data centers and other big sites.', s:[12] },
+  food:{ t:'No pollinators, less food', x:'Many fruits and vegetables only form when pollen is carried from flower to flower. With few pollinators, trees can blossom and still make little fruit, so harvests shrink or people have to do the work by hand.', s:[1, 7] },
+  monarch:{ t:'Monarchs need milkweed', x:'Monarch caterpillars eat only milkweed leaves: without milkweed they cannot grow into butterflies. Adult monarchs drink nectar from many flowers, such as goldenrod, which matters most on their long fall migration.', s:[14] },
+  cooling:{ t:'Cooling with less water', x:'Data centers can cool their computers with less fresh water. Closed-loop systems reuse the same water many times and can cut fresh water use by up to 70 percent. Air cooling and recycled, non-drinking water are other ways.', s:[6] },
+  flowers:{ t:'Flowers are food', x:'Bees, butterflies and hummingbirds drink nectar, and bees collect pollen to feed their young. A meadow with many kinds of flowers that bloom from spring to fall feeds pollinators all season.', s:[2, 4] } };
+var LABEL_FACT = { 'WILDFLOWER MEADOW':'flowers', 'APPLE ORCHARD':'crops', 'PUMPKIN FIELD':'crops', 'POND':'water', 'BEE NESTS':'nests', 'FULL MARKET STALL':'food', 'DATA CENTER':'alley', 'POWER LINES':'alley', 'HIGHWAY':'alley', 'LAST WILDFLOWERS':'flowers',
+  'MOWED LAWN':'nests', 'BRIGHT STREETLIGHTS':'light', 'DOWNTOWN':'heat', 'PARKING':'heat', 'PESTICIDE SPRAY':'spray', 'HAND POLLINATION':'hand', 'DRY POND':'water', 'EMPTY MARKET STALL':'food', 'BLOSSOMS, NO FRUIT':'food',
+  'GREEN ROOF':'roofs', 'POLLINATOR BRIDGE':'bridge', 'BEE HOTEL':'nests', 'NESTING PATCH':'nests', 'RAIN GARDEN':'water', 'TREE ROW':'native', 'DARK-SKY LIGHTS':'light', 'SERVER RACKS':'water', 'GROUND-NEST BEES':'nests', 'SEALED SOIL':'nests', 'BEEHIVES':'crops', 'MILKWEED':'monarch', 'SOLAR MEADOW':'native', 'WATER-SAVING COOLING':'cooling' };
+const srcLink = id => { const q = SOURCES.find(x => x.id === id); return `<a href="${q.u}" target="_blank" rel="noopener">[${id}]</a>`; };
+const PANEL_CSS = `
+  .tabs-wrap{width:100%;max-width:760px;margin:0 0 20px}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .tabs button{font:inherit;font-size:12px;padding:5px 12px;border-radius:999px;border:1.5px solid var(--ink);background:var(--paper);cursor:pointer}
+  .tabs button[aria-selected=true]{background:var(--ink);color:var(--paper)}
+  .tabpanel{display:none}.tabpanel.on{display:block}
+  .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pgrid .wide{grid-column:1/-1}
+  .card{border:1.5px solid var(--ink);border-radius:12px;padding:12px 14px;background:var(--paper);box-shadow:2px 2px 0 var(--ink);min-width:0}
+  .card h4{margin:0 0 8px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase}
+  .card p,.card li,.card dd{font-size:12.5px;line-height:1.55;margin:0 0 8px;max-width:68ch}
+  .card dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12.5px}.card dt{color:var(--muted);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding-top:2px}.card dd{margin:0}
+  .card a{color:var(--ink)}.card .small{font-size:11px;color:var(--muted)}.card .act{margin-top:6px}
+  .chart text{font:10.5px ui-monospace,Menlo,monospace;fill:var(--ink)}
+  .quiz-q{margin:0 0 12px}.quiz-q p{font-weight:700;margin-bottom:6px}.quiz-q .opts{display:flex;flex-wrap:wrap;gap:6px}
+  .quiz-q button{font:inherit;font-size:12px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--ink);background:var(--paper);cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+  .quiz-q button.right{background:#9fd38a}.quiz-q button.wrong{background:#f2a08e}.quiz-q .fb{font-size:12px;margin-top:6px;min-height:1.2em}
+  .src{font-size:12px;line-height:1.5;margin:0 0 6px}.factlist h5{margin:10px 0 2px;font-size:12px}
+  .dl-row{display:flex;flex-wrap:wrap;gap:8px}.dl-off{display:block}.can-dl .dl-off{display:none}.dl-row .act{display:none}.can-dl .dl-row .act{display:inline-block}
+  .qr{width:150px;height:150px;background:#fff;padding:8px;border:1.5px solid var(--ink);border-radius:8px}
+  .fact{position:absolute;left:0;bottom:56px;z-index:4;max-width:min(360px,92%);background:var(--paper);border:2px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);padding:10px 34px 10px 12px;font-size:12.5px;line-height:1.5}
+  .fact h4{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase}.fact p{margin:0 0 4px}.fact .x{position:absolute;right:6px;top:6px;border:0;background:none;font:700 15px ui-monospace,monospace;cursor:pointer;padding:2px 6px}.fact a{color:var(--ink)}
+  html.kiosk body{padding:8px 12px}html.kiosk body > header,html.kiosk .controls,html.kiosk .tabs-wrap,html.kiosk .made-with,html.kiosk #btns,html.kiosk .zchip{display:none!important}
+  html.kiosk .stage,html.kiosk #fig,html.kiosk .board{max-width:min(1500px,100%)}html.kiosk #fig{max-height:calc(100vh - 230px)!important;margin:0 auto}html.kiosk .board{grid-template-columns:repeat(4,1fr)}html.kiosk .board .brow{margin:2px 0}
+  @media (max-width:560px){.pgrid{grid-template-columns:1fr}.fact{bottom:8px}}`;
+{ const css = document.createElement('style'); css.textContent = PANEL_CSS; document.head.appendChild(css); }
+var factEl = document.createElement('div'); factEl.className = 'fact'; factEl.hidden = true; document.querySelector('.stage').appendChild(factEl);
+function showFact(k){ const F = FACTS[k]; if (!F || !factEl) return;
+  factEl.innerHTML = `<button class="x" aria-label="Close">×</button><h4>${F.t}</h4><p>${F.x}</p><p class="small">Source: ${F.s.map(srcLink).join(' ')}</p>`;
+  factEl.hidden = false; factEl.querySelector('.x').onclick = () => { factEl.hidden = true; }; }
+
+const tabsWrap = document.createElement('div'); tabsWrap.className = 'tabs-wrap'; document.querySelector('.board').after(tabsWrap);
+const TABS = [['exp', 'Experiment'], ['world', 'Real world'], ['quiz', 'Quiz'], ['act', 'What you can do'], ['src', 'Facts and sources'], ['share', 'Share']];
+const QUIZ = [
+  { q:'Why did scene 3’s apple trees make so little fruit?', o:['No pollinators carried pollen between the flowers', 'The trees were too old', 'It was too cold'], a:0, e:'Apple flowers need pollen from another apple tree, and bees carry it.' },
+  { q:'Where do most native bees make their nests?', o:['In holes in the ground', 'In beehives', 'In houses'], a:0, e:'About 70 percent nest in the soil, so paving takes away their homes.' },
+  { q:'Why do bright streetlights hurt pollination?', o:['They pull moths away from the flowers at night', 'They make flowers grow too fast', 'They scare bees in the day'], a:0, e:'In a Swiss study, lit meadows got 62 percent fewer night visits.' },
+  { q:'About how many of the leading food crops depend on animal pollinators?', o:['87 of 115', '5 of 115', 'All of them'], a:0, e:'Fruit, vegetables and seeds from 87 of the 115 leading crops depend on them.' },
+  { q:'What did farmers in Maoxian County do when the bees disappeared?', o:['Pollinated apple flowers by hand', 'Stopped growing apples', 'Painted the flowers'], a:0, e:'They used brushes made of chicken feathers.' },
+  { q:'Which of these helps pollinators in a city?', o:['Flowering green roofs and native plants', 'More parking lots', 'Brighter lights'], a:0, e:'Scientists found 40 wild bee species on 20 green roofs in Antwerp.' },
+  { q:'What do monarch caterpillars eat?', o:['Only milkweed leaves', 'Any leaf', 'Nectar'], a:0, e:'Without milkweed, monarch caterpillars cannot grow into butterflies.' },
+  { q:'Why did scene 4 keep its harvest?', o:['People built flowers, nests and dark nights back into the development', 'It had no buildings', 'It rained more'], a:0, e:'It has the same buildings as scene 3, built for pollinators.' } ];
+const quizState = QUIZ.map(() => null);
+tabsWrap.innerHTML = `<div class="tabs" role="tablist">${TABS.map(([k, t], i) => `<button role="tab" id="tab-${k}" aria-selected="${i === 0}" data-t="${k}">${t}</button>`).join('')}</div>`
+  + `<section class="tabpanel on" data-p="exp"><div class="pgrid">
+      <div class="card"><h4>Our experiment</h4><dl>
+        <dt>Question</dt><dd>Do pollinators hold a landscape, its food and its wildlife together, and can a city be built so they stay?</dd>
+        <dt>Hypothesis</dt><dd>If flowers, nests and dark nights are paved over, then pollinators will disappear and the harvest will fall, because fruit only forms when pollen is carried between flowers.</dd>
+        <dt>We change</dt><dd>What is built on the land: nothing (1), data centers and a highway (2), the full build-out with lawns, pesticide and bright lights (3), the same build-out made for pollinators (4)</dd>
+        <dt>We keep the same</dt><dd>The land, the weather, the orchard, the field and the homes</dd>
+        <dt>We measure</dt><dd>Species, pollinators, harvest, flowers, the pond, light at night, summer heat</dd></dl>
+        <button class="act" id="exp-run">Run the story</button> <button class="act" id="exp-design">Design scene 4</button></div>
+      <div class="card" id="v-results"></div>
+      <div class="card wide"><h4>Bloom calendar</h4><div class="chart" id="ch-bloom"></div><p class="small">Typical bloom times in the eastern United States; they shift with place and weather. Pollinators need something in bloom every month they are flying, so a garden with flowers from spring to fall feeds them all season.</p></div>
+      <div class="card wide"><h4>Pollinators over the years</h4><div class="chart" id="ch-p"></div><h4 style="margin-top:10px">Harvest over the years</h4><div class="chart" id="ch-h"></div></div>
+    </div></section>`
+  + `<section class="tabpanel" data-p="world"><div class="pgrid">
+      <div class="card"><h4>Data Center Alley, Virginia</h4><p>Loudoun County has the most data centers in one place anywhere in the world: about 233 buildings and 56.5 million square feet built or being built in March 2026, with more approved. Data centers paid about 39 percent of the county’s budget in 2026.</p><p class="small">${srcLink(5)}</p></div>
+      <div class="card"><h4>Human pollinators, China</h4><p>In Maoxian County, the bees stopped coming in the 1990s. Farmers now climb into their apple trees and pollinate each flower by hand with feather brushes.</p><p class="small">${srcLink(7)}</p></div>
+      <div class="card"><h4>A bee highway, Oslo</h4><p>Oslo set up a chain of flowers on rooftops and balconies and feeding stations so bees can cross the city safely from one green space to the next.</p><p class="small">${srcLink(11)}</p></div>
+      <div class="card"><h4>Meadows round big sites, Minnesota</h4><p>Native plants were sown round two solar farms on old farmland. In five years, insects tripled and native bees became about 20 times more common.</p><p class="small">${srcLink(12)}</p></div>
+    </div></section>`
+  + `<section class="tabpanel" data-p="quiz"><div class="card" id="quiz"></div></section>`
+  + `<section class="tabpanel" data-p="act"><div class="pgrid">
+      <div class="card"><h4>Plant native flowers</h4><p>Plant flowers that belong where you live, with something in bloom from spring to fall. Swap some lawn for a flower bed.</p></div>
+      <div class="card"><h4>Leave homes for bees</h4><p>Keep a sunny patch of bare ground, and leave hollow stems standing over winter. A bee hotel helps the bees that nest in holes.</p></div>
+      <div class="card"><h4>Turn lights down at night</h4><p>Switch off outdoor lights you don’t need, and use shielded, warm-coloured lights that point down.</p></div>
+      <div class="card"><h4>Skip the bug spray</h4><p>Avoid insecticides in the garden. Many flowers and weeds are food for pollinators.</p></div>
+      <div class="card"><h4>Ask builders to plan for pollinators</h4><p>Green roofs, native plants round big buildings, tree rows and flowering bridges can be part of new data centers, roads and downtowns.</p></div>
+      <div class="card"><h4>Share what you learned</h4><p>Tell your family and friends how pollinators turn flowers into food.</p></div>
+    </div></section>`
+  + `<section class="tabpanel" data-p="src"><div class="card factlist"><h4>Facts in this project</h4>${Object.values(FACTS).map(F => `<h5>${F.t}</h5><p>${F.x} ${F.s.map(srcLink).join(' ')}</p>`).join('')}
+      <h4 style="margin-top:14px">Sources</h4>${SOURCES.map(q => `<p class="src">[${q.id}] ${q.t} <a href="${q.u}" target="_blank" rel="noopener">Link</a></p>`).join('')}
+      <p class="small">This is a model, not a measurement. The numbers of species, the pollinator and harvest curves, the timing and the heat values are simplified to show the ideas in the sources.</p></div></section>`
+  + `<section class="tabpanel" data-p="share"><div class="pgrid">
+      <div class="card"><h4>Save</h4><p>Save a picture of whatever is on screen right now, or the whole working page to open without internet.</p>
+        <div class="dl-row"><button class="act" id="dl-png">Picture (PNG)</button><button class="act" id="dl-html">Page for offline use (HTML)</button></div><p class="dl-off small">Saving works when this page is opened in Claude.</p></div>
+<div class="card wide"><h4>Part of a three-part project</h4><p>This is one part of <b>Roots, pollinators and water</b>. <a href="https://claude.ai/artifact/5QbS2Aw5VySrhAtaFYSE2d" target="_blank" rel="noopener">Open the start page</a> or go straight to <a href="https://claude.ai/artifact/TfcYtLqXT3QeTP6hapmFBX" target="_blank" rel="noopener">Forest and its roots</a>, or <a href="https://claude.ai/artifact/FQQHdnj9ub79aAJqdXtvQy" target="_blank" rel="noopener">Pond to Ocean</a>.</p></div>
+      <div class="card" id="qr-card"><h4>Scan to open</h4><svg class="qr" viewBox="0 0 33 33" shape-rendering="crispEdges" role="img" aria-label="QR code for this page"><path d="M0 0h1v1h-1zM1 0h1v1h-1zM2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM6 0h1v1h-1zM8 0h1v1h-1zM10 0h1v1h-1zM11 0h1v1h-1zM12 0h1v1h-1zM14 0h1v1h-1zM15 0h1v1h-1zM16 0h1v1h-1zM18 0h1v1h-1zM19 0h1v1h-1zM20 0h1v1h-1zM23 0h1v1h-1zM26 0h1v1h-1zM27 0h1v1h-1zM28 0h1v1h-1zM29 0h1v1h-1zM30 0h1v1h-1zM31 0h1v1h-1zM32 0h1v1h-1zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM9 1h1v1h-1zM11 1h1v1h-1zM12 1h1v1h-1zM14 1h1v1h-1zM16 1h1v1h-1zM17 1h1v1h-1zM20 1h1v1h-1zM23 1h1v1h-1zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM6 2h1v1h-1zM9 2h1v1h-1zM11 2h1v1h-1zM12 2h1v1h-1zM13 2h1v1h-1zM14 2h1v1h-1zM16 2h1v1h-1zM18 2h1v1h-1zM19 2h1v1h-1zM20 2h1v1h-1zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h1v1h-1zM29 2h1v1h-1zM30 2h1v1h-1zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM18 3h1v1h-1zM22 3h1v1h-1zM24 3h1v1h-1zM26 3h1v1h-1zM28 3h1v1h-1zM29 3h1v1h-1zM30 3h1v1h-1zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM9 4h1v1h-1zM11 4h1v1h-1zM12 4h1v1h-1zM16 4h1v1h-1zM18 4h1v1h-1zM24 4h1v1h-1zM26 4h1v1h-1zM28 4h1v1h-1zM29 4h1v1h-1zM30 4h1v1h-1zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM9 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM15 5h1v1h-1zM16 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM27 6h1v1h-1zM28 6h1v1h-1zM29 6h1v1h-1zM30 6h1v1h-1zM31 6h1v1h-1zM32 6h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM10 7h1v1h-1zM12 7h1v1h-1zM15 7h1v1h-1zM16 7h1v1h-1zM17 7h1v1h-1zM18 7h1v1h-1zM19 7h1v1h-1zM22 7h1v1h-1zM23 7h1v1h-1zM24 7h1v1h-1zM0 8h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM5 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM10 8h1v1h-1zM14 8h1v1h-1zM15 8h1v1h-1zM17 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM22 8h1v1h-1zM26 8h1v1h-1zM29 8h1v1h-1zM31 8h1v1h-1zM32 8h1v1h-1zM0 9h1v1h-1zM4 9h1v1h-1zM5 9h1v1h-1zM7 9h1v1h-1zM8 9h1v1h-1zM13 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM19 9h1v1h-1zM20 9h1v1h-1zM23 9h1v1h-1zM26 9h1v1h-1zM27 9h1v1h-1zM29 9h1v1h-1zM30 9h1v1h-1zM31 9h1v1h-1zM32 9h1v1h-1zM0 10h1v1h-1zM3 10h1v1h-1zM6 10h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM13 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM27 10h1v1h-1zM28 10h1v1h-1zM29 10h1v1h-1zM31 10h1v1h-1zM32 10h1v1h-1zM0 11h1v1h-1zM1 11h1v1h-1zM2 11h1v1h-1zM3 11h1v1h-1zM5 11h1v1h-1zM8 11h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM24 11h1v1h-1zM27 11h1v1h-1zM29 11h1v1h-1zM1 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM14 12h1v1h-1zM16 12h1v1h-1zM20 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM25 12h1v1h-1zM29 12h1v1h-1zM32 12h1v1h-1zM1 13h1v1h-1zM2 13h1v1h-1zM3 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM10 13h1v1h-1zM14 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM21 13h1v1h-1zM24 13h1v1h-1zM27 13h1v1h-1zM29 13h1v1h-1zM31 13h1v1h-1zM0 14h1v1h-1zM1 14h1v1h-1zM4 14h1v1h-1zM6 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM26 14h1v1h-1zM29 14h1v1h-1zM30 14h1v1h-1zM2 15h1v1h-1zM3 15h1v1h-1zM4 15h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM9 15h1v1h-1zM11 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM15 15h1v1h-1zM18 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM24 15h1v1h-1zM25 15h1v1h-1zM26 15h1v1h-1zM27 15h1v1h-1zM29 15h1v1h-1zM30 15h1v1h-1zM2 16h1v1h-1zM4 16h1v1h-1zM6 16h1v1h-1zM7 16h1v1h-1zM8 16h1v1h-1zM11 16h1v1h-1zM13 16h1v1h-1zM16 16h1v1h-1zM18 16h1v1h-1zM21 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM24 16h1v1h-1zM25 16h1v1h-1zM26 16h1v1h-1zM28 16h1v1h-1zM29 16h1v1h-1zM30 16h1v1h-1zM0 17h1v1h-1zM2 17h1v1h-1zM5 17h1v1h-1zM7 17h1v1h-1zM9 17h1v1h-1zM10 17h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM20 17h1v1h-1zM22 17h1v1h-1zM23 17h1v1h-1zM24 17h1v1h-1zM25 17h1v1h-1zM26 17h1v1h-1zM28 17h1v1h-1zM29 17h1v1h-1zM32 17h1v1h-1zM0 18h1v1h-1zM1 18h1v1h-1zM3 18h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM7 18h1v1h-1zM8 18h1v1h-1zM11 18h1v1h-1zM13 18h1v1h-1zM14 18h1v1h-1zM15 18h1v1h-1zM16 18h1v1h-1zM18 18h1v1h-1zM20 18h1v1h-1zM25 18h1v1h-1zM27 18h1v1h-1zM28 18h1v1h-1zM30 18h1v1h-1zM1 19h1v1h-1zM4 19h1v1h-1zM5 19h1v1h-1zM8 19h1v1h-1zM11 19h1v1h-1zM12 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 19h1v1h-1zM20 19h1v1h-1zM23 19h1v1h-1zM26 19h1v1h-1zM28 19h1v1h-1zM1 20h1v1h-1zM2 20h1v1h-1zM3 20h1v1h-1zM6 20h1v1h-1zM8 20h1v1h-1zM10 20h1v1h-1zM12 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM19 20h1v1h-1zM21 20h1v1h-1zM24 20h1v1h-1zM28 20h1v1h-1zM29 20h1v1h-1zM30 20h1v1h-1zM0 21h1v1h-1zM1 21h1v1h-1zM2 21h1v1h-1zM3 21h1v1h-1zM7 21h1v1h-1zM8 21h1v1h-1zM9 21h1v1h-1zM12 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM20 21h1v1h-1zM21 21h1v1h-1zM22 21h1v1h-1zM26 21h1v1h-1zM32 21h1v1h-1zM3 22h1v1h-1zM4 22h1v1h-1zM6 22h1v1h-1zM9 22h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM14 22h1v1h-1zM15 22h1v1h-1zM17 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM23 22h1v1h-1zM24 22h1v1h-1zM26 22h1v1h-1zM27 22h1v1h-1zM28 22h1v1h-1zM29 22h1v1h-1zM31 22h1v1h-1zM32 22h1v1h-1zM1 23h1v1h-1zM3 23h1v1h-1zM4 23h1v1h-1zM5 23h1v1h-1zM7 23h1v1h-1zM8 23h1v1h-1zM9 23h1v1h-1zM13 23h1v1h-1zM15 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM23 23h1v1h-1zM26 23h1v1h-1zM27 23h1v1h-1zM28 23h1v1h-1zM0 24h1v1h-1zM3 24h1v1h-1zM6 24h1v1h-1zM8 24h1v1h-1zM9 24h1v1h-1zM11 24h1v1h-1zM12 24h1v1h-1zM17 24h1v1h-1zM19 24h1v1h-1zM22 24h1v1h-1zM24 24h1v1h-1zM25 24h1v1h-1zM26 24h1v1h-1zM27 24h1v1h-1zM28 24h1v1h-1zM29 24h1v1h-1zM8 25h1v1h-1zM14 25h1v1h-1zM15 25h1v1h-1zM19 25h1v1h-1zM21 25h1v1h-1zM23 25h1v1h-1zM24 25h1v1h-1zM28 25h1v1h-1zM29 25h1v1h-1zM32 25h1v1h-1zM0 26h1v1h-1zM1 26h1v1h-1zM2 26h1v1h-1zM3 26h1v1h-1zM4 26h1v1h-1zM5 26h1v1h-1zM6 26h1v1h-1zM8 26h1v1h-1zM11 26h1v1h-1zM12 26h1v1h-1zM14 26h1v1h-1zM16 26h1v1h-1zM17 26h1v1h-1zM18 26h1v1h-1zM19 26h1v1h-1zM20 26h1v1h-1zM22 26h1v1h-1zM23 26h1v1h-1zM24 26h1v1h-1zM26 26h1v1h-1zM28 26h1v1h-1zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h1v1h-1zM10 27h1v1h-1zM13 27h1v1h-1zM14 27h1v1h-1zM15 27h1v1h-1zM16 27h1v1h-1zM17 27h1v1h-1zM18 27h1v1h-1zM19 27h1v1h-1zM20 27h1v1h-1zM21 27h1v1h-1zM23 27h1v1h-1zM24 27h1v1h-1zM28 27h1v1h-1zM29 27h1v1h-1zM30 27h1v1h-1zM0 28h1v1h-1zM2 28h1v1h-1zM3 28h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM12 28h1v1h-1zM13 28h1v1h-1zM16 28h1v1h-1zM17 28h1v1h-1zM18 28h1v1h-1zM19 28h1v1h-1zM20 28h1v1h-1zM21 28h1v1h-1zM22 28h1v1h-1zM23 28h1v1h-1zM24 28h1v1h-1zM25 28h1v1h-1zM26 28h1v1h-1zM27 28h1v1h-1zM28 28h1v1h-1zM30 28h1v1h-1zM0 29h1v1h-1zM2 29h1v1h-1zM3 29h1v1h-1zM4 29h1v1h-1zM6 29h1v1h-1zM8 29h1v1h-1zM10 29h1v1h-1zM11 29h1v1h-1zM12 29h1v1h-1zM16 29h1v1h-1zM19 29h1v1h-1zM21 29h1v1h-1zM22 29h1v1h-1zM27 29h1v1h-1zM30 29h1v1h-1zM32 29h1v1h-1zM0 30h1v1h-1zM2 30h1v1h-1zM3 30h1v1h-1zM4 30h1v1h-1zM6 30h1v1h-1zM8 30h1v1h-1zM10 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM16 30h1v1h-1zM17 30h1v1h-1zM18 30h1v1h-1zM20 30h1v1h-1zM21 30h1v1h-1zM23 30h1v1h-1zM26 30h1v1h-1zM27 30h1v1h-1zM30 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM10 31h1v1h-1zM13 31h1v1h-1zM14 31h1v1h-1zM17 31h1v1h-1zM18 31h1v1h-1zM20 31h1v1h-1zM22 31h1v1h-1zM26 31h1v1h-1zM27 31h1v1h-1zM28 31h1v1h-1zM32 31h1v1h-1zM0 32h1v1h-1zM1 32h1v1h-1zM2 32h1v1h-1zM3 32h1v1h-1zM4 32h1v1h-1zM5 32h1v1h-1zM6 32h1v1h-1zM8 32h1v1h-1zM9 32h1v1h-1zM12 32h1v1h-1zM13 32h1v1h-1zM14 32h1v1h-1zM17 32h1v1h-1zM18 32h1v1h-1zM19 32h1v1h-1zM21 32h1v1h-1zM22 32h1v1h-1zM23 32h1v1h-1zM25 32h1v1h-1zM26 32h1v1h-1zM28 32h1v1h-1zM30 32h1v1h-1z"/></svg><p class="small">Opens this page on a phone. It works for anyone you have shared the page with from its Share menu.</p></div>
+    </div></section>`;
+tabsWrap.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  tabsWrap.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  tabsWrap.querySelectorAll('.tabpanel').forEach(x => x.classList.toggle('on', x.dataset.p === b.dataset.t)); panelsUpdate(); });
+const $ = id => document.getElementById(id);
+$('exp-run').onclick = () => { startStory(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+$('exp-design').onclick = () => { window.scrollTo({ top: 0, behavior: 'smooth' }); openDesign(); };
+{ const BL = [['Apple blossom', 3.4, 5, '#fbe6ee'], ['White clover', 4.5, 9, '#ffffff'], ['Butterfly milkweed', 5.5, 8.2, '#f08a3c'], ['Purple coneflower', 5.7, 9, '#9b59b6'], ['Goldenrod', 7.5, 10.2, '#f2c43c'], ['Aster', 7.8, 10.5, '#7a6fd6']], M = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], W = 560, L0 = 128, xw = W - L0 - 14, X = m => L0 + xw*(m - 2)/9;
+  let s = `<svg viewBox="0 0 ${W} ${30 + BL.length*24}" width="100%" role="img" aria-label="Bloom calendar">`; M.forEach((m, i) => s += `<text x="${X(i + 2.5)}" y="14" text-anchor="middle">${m}</text><path d="M${X(i + 2)} 20V${24 + BL.length*24}" stroke="#ddd6c8"/>`);
+  BL.forEach(([n, a, b, c], i) => { const y = 26 + i*24; s += `<text x="${L0 - 8}" y="${y + 12}" text-anchor="end">${n}</text><rect x="${X(a)}" y="${y + 2}" width="${X(b) - X(a)}" height="14" rx="7" fill="${c}" stroke="#231e16" stroke-width="1.2"/>`; });
+  $('ch-bloom').innerHTML = s + '</svg>'; }
+$('dl-png').onclick = () => saveFile('png'); $('dl-html').onclick = () => saveFile('html');
+function quizDraw(){ const el = $('quiz'), sc = quizState.filter((v, i) => v === QUIZ[i].a).length, done = quizState.every(v => v != null);
+  el.innerHTML = `<h4>Pollinator quiz</h4>` + QUIZ.map((Q, i) => `<div class="quiz-q"><p>${i + 1}. ${Q.q}</p><div class="opts">${Q.o.map((o, j) => `<button data-q="${i}" data-o="${j}" class="${quizState[i] == null ? '' : j === Q.a ? 'right' : j === quizState[i] ? 'wrong' : ''}">${o}</button>`).join('')}</div>
+    <div class="fb">${quizState[i] == null ? '' : (quizState[i] === Q.a ? 'Yes! ' : 'Not quite. ') + Q.e}</div></div>`).join('')
+    + `<p><b>${done ? `You got ${sc} of ${QUIZ.length}!` : `Score: ${sc} of ${QUIZ.length}`}</b></p><button class="act" id="quiz-reset">Start again</button>`;
+  el.querySelectorAll('.opts button').forEach(b => b.onclick = () => { const i = +b.dataset.q; if (quizState[i] != null) return; quizState[i] = +b.dataset.o; quizDraw(); });
+  $('quiz-reset').onclick = () => { quizState.fill(null); quizDraw(); }; }
+quizDraw();
+// results and charts
+const COLS = ['#3f8f4a', '#b8901a', '#c56a1c', '#2f8f9a'];
+function chartSvg(key){ const W = 560, H = 180, L0 = 40, Rr = 96, T0 = 12, B0 = 26, xw = W - L0 - Rr, yh = H - T0 - B0, YM = 8, X = y => L0 + xw*Math.min(y, YM)/YM, Y = v => T0 + yh*(1 - v), hs = ST.hist;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${key === 'p' ? 'Pollinators' : 'Harvest'} in the four scenes over 8 years">`;
+  for (const v of [0, .25, .5, .75, 1]) s += `<path d="M${L0} ${Y(v)}H${L0 + xw}" stroke="#ddd6c8" stroke-width="1"/><text x="${L0 - 6}" y="${Y(v) + 4}" text-anchor="end">${Math.round(v*100)}%</text>`;
+  for (let y = 0; y <= YM; y += 2) s += `<text x="${X(y)}" y="${H - 8}" text-anchor="middle">${y === 0 ? 'year 0' : y}</text>`;
+  if (hs.length > 1){ const e = hs[hs.length - 1], ys = e[key].map((v, i) => ({ i, y: Y(v) })).sort((a, b) => a.y - b.y);
+    for (let j = 1; j < ys.length; j++) if (ys[j].y - ys[j - 1].y < 13) ys[j].y = ys[j - 1].y + 13;
+    for (const { i, y } of ys){ const d = 'M' + hs.map(q => `${X(q.y).toFixed(1)} ${Y(q[key][i]).toFixed(1)}`).join('L');
+      s += `<path d="${d}" fill="none" stroke="${COLS[i]}" stroke-width="2.6" stroke-linejoin="round"/><circle cx="${X(e.y)}" cy="${Y(e[key][i])}" r="4" fill="${COLS[i]}" stroke="#231e16" stroke-width="1"/><text x="${Math.min(X(e.y) + 7, L0 + xw + 6)}" y="${y + 4}" fill="${COLS[i]}" font-weight="700">scene ${i + 1}</text>`; } }
+  else s += `<text x="${L0 + xw/2}" y="${T0 + yh/2}" text-anchor="middle" fill="#857d6e">Press Run the story or Play story to draw this</text>`;
+  return s + '</svg>'; }
+function resultsHtml(){ const r = ST.result;
+  if (!r) return `<h4>Results</h4><p>${ST.play ? 'Collecting results… year ' + Math.floor(ST.year) : 'Press <b>Run the story</b> to collect results.'}</p>`;
+  const H = r.hills, pct = v => Math.round(v*100) + '%', each = fn => H.map(h => `${h.name.toLowerCase()} ${fn(h)}`).join(', ');
+  const plan = r.plan.length === Object.keys(PLAN).length ? 'everything' : r.plan.length ? r.plan.map(k => PLAN[k].t.toLowerCase()).join(', ') : 'nothing extra';
+  return `<h4>Results (year 8)</h4><dl><dt>Scene 4 built</dt><dd>${plan}${r.custom ? ` (your design, ${r.plan.reduce((a, k) => a + PLAN[k].c, 0)} coins)` : ''}</dd><dt>Species</dt><dd>${each(h => h.sp)} (out of ${SPECIES.length})</dd><dt>Pollinators</dt><dd>${each(h => pct(h.poll))}</dd>
+    <dt>Harvest</dt><dd>${each(h => pct(h.fruit))}</dd><dt>Pond</dt><dd>${each(h => h.pond > .7 ? 'full' : h.pond > .3 ? 'low' : 'dry')}</dd>
+    <dt>Conclusion</dt><dd><b>Supported. Scene 3, where flowers, nests and dark nights were paved over, lost its pollinators and most of its harvest. ${H[3].poll > .6 ? 'Scene 4 had the same buildings but kept flowers, nests and dark nights, and kept most of its pollinators and food.' : 'Scene 4 had the same buildings; with only part of the plan, it kept some pollinators and food. Try a different design.'}</b></dd></dl>`; }
+const panelCache = {};
+function setHtml(id, h){ if (panelCache[id] !== h){ panelCache[id] = h; $(id).innerHTML = h; } }
+function panelsUpdate(){ if (!tabsWrap.querySelector('[data-p="exp"]').classList.contains('on')) return; setHtml('v-results', resultsHtml()); setHtml('ch-p', chartSvg('p')); setHtml('ch-h', chartSvg('h')); }
+{ let last = 0; const r1 = ui.render; ui.render = () => { r1(); const now = performance.now(); if (now - last > 400){ last = now; panelsUpdate(); } }; }
+
+// kiosk: full screen, the story loops on its own
+var KIOSK = { on:false, wait:0, fs:false };
+function kioskStep(dt){ if (!KIOSK || !KIOSK.on || ST.play) return; KIOSK.wait += dt; if (KIOSK.wait > 6){ KIOSK.wait = 0; startStory(); } }
+const vrow = document.querySelector('.vset .vrow');
+const sndB = document.createElement('button'), kB = document.createElement('button');
+sndB.className = kB.className = 'act'; sndB.textContent = 'Sound'; kB.textContent = 'Kiosk'; sndB.setAttribute('aria-pressed', 'false'); kB.setAttribute('aria-pressed', 'false');
+vrow.append(sndB, kB);
+function kioskSet(on){ const html = document.documentElement; KIOSK.on = on; html.classList.toggle('kiosk', on); kB.setAttribute('aria-pressed', on);
+  if (on){ html.classList.remove('nolabels'); const lb = $('lblb'); if (lb) lb.setAttribute('aria-pressed', 'true'); ST.find = false; factEl.hidden = true; KIOSK.wait = 0; startStory();
+    try { const r = html.requestFullscreen && html.requestFullscreen(); if (r && r.catch) r.catch(() => {}); } catch (e) {} }
+  else { try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {} }
+  ui.render(); }
+kB.onclick = () => kioskSet(!KIOSK.on);
+document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement) KIOSK.fs = true; else if (KIOSK.on && KIOSK.fs){ KIOSK.fs = false; kioskSet(false); } });
+// sound: birdsong and bee buzz where pollinators live, the hum of traffic where the land is built
+const SND = { on:false, ctx:null, nextBird:0 };
+function sndInit(){ const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false; const ctx = new AC(); SND.ctx = ctx;
+  const master = ctx.createGain(); master.gain.value = .5; master.connect(ctx.destination); SND.master = master;
+  const buf = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
+  const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = 220; const g = ctx.createGain(); g.gain.value = 0; src.connect(fl); fl.connect(g); g.connect(master); src.start(); SND.traffic = g;
+  const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 210; const bf = ctx.createBiquadFilter(); bf.type = 'bandpass'; bf.frequency.value = 420; bf.Q.value = 2; const og = ctx.createGain(); og.gain.value = 0; o.connect(bf); bf.connect(og); og.connect(master); o.start(); SND.buzz = og; SND.buzzO = o;
+  return true; }
+function chirp(){ const ctx = SND.ctx, t = ctx.currentTime, n = 2 + Math.floor(Math.random()*3), base = 2200 + Math.random()*1800;
+  for (let i = 0; i < n; i++){ const o = ctx.createOscillator(), g = ctx.createGain(), t0 = t + i*.12; o.type = 'sine'; o.frequency.setValueAtTime(base, t0); o.frequency.exponentialRampToValueAtTime(base*(1.3 + Math.random()*.4), t0 + .08);
+    g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.06, t0 + .01); g.gain.exponentialRampToValueAtTime(.0005, t0 + .1); o.connect(g); g.connect(SND.master); o.start(t0); o.stop(t0 + .12); } }
+setInterval(() => { if (!SND.on || !SND.ctx) return; const t = SND.ctx.currentTime, set = (g, v) => g.gain.setTargetAtTime(v, t, .2), P4 = plots();
+  const poll = P4.reduce((a, pl) => a + pl.poll, 0)/4, dev = P4.reduce((a, pl) => a + built(pl), 0)/4;
+  set(SND.buzz, .03*poll*(1 - ST.night)); SND.buzzO.frequency.setTargetAtTime(200 + 30*Math.random(), t, .1); set(SND.traffic, .12*dev);
+  if (t > SND.nextBird && ST.night < .5 && poll > .3){ chirp(); SND.nextBird = t + 1 + Math.random()*3/poll; } }, 150);
+sndB.onclick = () => { if (!SND.ctx && !sndInit()) return ui.flash('Sound is not available here', 1800);
+  SND.on = !SND.on; sndB.setAttribute('aria-pressed', SND.on); SND.ctx.resume && SND.ctx.resume(); SND.master.gain.setTargetAtTime(SND.on ? .5 : 0, SND.ctx.currentTime, .1); };
+ui.render();
+
+</script>
+<style>@media (max-width:560px),(pointer:coarse){#art{filter:none!important}.ctl:has(#wb){display:none!important}}</style><style>@media (max-width:560px){html body .kpad{width:100%;box-sizing:border-box;justify-content:space-between;gap:10px;margin:10px 0 0;padding:0;border:0;background:none;box-shadow:none}
+html body .kpad .dp{display:flex;gap:8px}html body .kpad .hub{display:none}
+html body .kpad .k{width:46px;height:42px;font-size:14px;border-radius:9px}
+html body .kpad .go{width:auto;height:42px;padding:0 26px;border-radius:999px;flex-direction:row;font-size:13px;box-shadow:0 3px 0 var(--ink),inset 0 -4px 0 rgba(0,0,0,.18)}
+html body .kpad .go small{display:none}html body .kpad .go.down{transform:translateY(2px);box-shadow:0 1px 0 var(--ink),inset 0 -2px 0 rgba(0,0,0,.18)}}</style>
+<script>requestAnimationFrame(() => { const o = { "◀": 0, "▲": 1, "▼": 2, "▶": 3 }; for (const k of document.querySelectorAll(".kpad .k")) k.style.order = o[k.textContent] ?? 0; });</script><style>@media (max-width:560px){.vset{margin:8px 0 2px!important}}</style><script>requestAnimationFrame(() => { const v = document.querySelector(".vset"), s = document.getElementById("stats"), z = document.querySelector(".zwrap"); if (!v) return; if (z && z.parentNode === v.parentNode){ const kp = document.querySelector(".kpad"); if (kp && innerWidth <= 560){ z.after(kp); kp.after(v); } else z.after(v); } else if (s && s.parentNode) s.parentNode.insertBefore(v, s); });</script><script>(() => { const fit = () => { const fig = document.getElementById("fig"); if (!fig) return;
+  fig.style.maxHeight = ""; if (innerWidth <= 560) return;
+  const extra = document.documentElement.scrollHeight - fig.clientHeight, room = innerHeight - extra - 12;
+  if (room < fig.clientHeight) fig.style.maxHeight = Math.max(320, room) + "px"; };
+  addEventListener("load", () => requestAnimationFrame(fit)); addEventListener("resize", fit); setTimeout(fit, 400); })();</script><style>.zwrap{position:relative}.zwrap.on{overflow:hidden}@media (min-width:561px){.zwrap.on{overflow:visible}html.zoomed,html.zoomed body{overflow:hidden}}.zwrap #fig{transform-origin:0 0}
+.zchip{position:absolute;right:2px;bottom:6px;display:flex;align-items:center;gap:2px;font:600 11px ui-monospace,Menlo,monospace;
+ background:rgba(242,239,231,.88);border:1px solid rgba(35,30,22,.25);border-radius:999px;padding:2px;z-index:3;user-select:none}
+.zchip button{all:unset;cursor:pointer;min-width:22px;height:22px;line-height:22px;text-align:center;border-radius:999px;color:#231e16}
+.zchip button:hover{background:rgba(35,30,22,.08)}.zchip .zp{min-width:44px}</style>
+<script>(() => { const fig = document.getElementById("fig"); if (!fig) return;
+  const wrap = document.createElement("div"); wrap.className = "zwrap"; fig.parentNode.insertBefore(wrap, fig); wrap.appendChild(fig);
+  const chip = document.createElement("div"); chip.className = "zchip";
+  chip.innerHTML = '<button class="zm" aria-label="Zoom out">−</button><button class="zp" aria-label="Reset zoom">100%</button><button class="zi" aria-label="Zoom in">+</button>';
+  wrap.appendChild(chip);
+  let s = 1, tx = 0, ty = 0;
+  const box = () => ({ w: fig.clientWidth, h: fig.clientHeight });
+  const apply = () => { const { w, h } = box(); s = Math.min(5, Math.max(1, s));
+    if (s <= 1.001){ s = 1; tx = ty = 0; } else { tx = Math.min(0, Math.max(w - w*s, tx)); ty = Math.min(0, Math.max(h - h*s, ty)); }
+    fig.style.transform = s === 1 ? "" : `translate(${tx}px,${ty}px) scale(${s})`; wrap.classList.toggle("on", s > 1); document.documentElement.classList.toggle("zoomed", s > 1);   /* desktop: nothing is cut off, the page just does not scroll while zoomed */
+    chip.querySelector(".zp").textContent = Math.round(s*100) + "%"; grain(); };
+  // the paper grain is noise in drawing units: zoomed, it would blow up into blotches, so its frequency rises with the
+  // zoom and it stays the same fine grain on screen (the filter is rebuilt on resize, so this re-applies then too)
+  const grain = () => { const fl = document.getElementById("hand"); if (!fl) return;
+    const ts = [...fl.querySelectorAll("feTurbulence")]; if (!ts.length) return;
+    const g = ts.find(t => t.getAttribute("result") === "n1") || ts.reduce((a, b) => parseFloat(b.getAttribute("baseFrequency")) > parseFloat(a.getAttribute("baseFrequency")) ? b : a);
+    if (!g.dataset.f0) g.dataset.f0 = g.getAttribute("baseFrequency");
+    const v = (parseFloat(g.dataset.f0) * s).toFixed(4); if (g.getAttribute("baseFrequency") !== v) g.setAttribute("baseFrequency", v); };
+  const fd = document.getElementById("fdefs"); if (fd) new MutationObserver(() => grain()).observe(fd, { childList: true, subtree: true });
+  const zoomAt = (k, px, py) => { const s2 = Math.min(5, Math.max(1, s*k)); tx = px - (px - tx)*s2/s; ty = py - (py - ty)*s2/s; s = s2; apply(); };
+  const local = e => { const r = wrap.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  wrap.addEventListener("wheel", e => {
+    if (e.ctrlKey || e.metaKey){ e.preventDefault(); const [x, y] = local(e); zoomAt(Math.exp(-Math.max(-50, Math.min(50, e.deltaY))*.006), x, y);   /* a wheel notch ~1.35x, a pinch stays smooth */ }
+    else if (s > 1){ e.preventDefault(); tx -= e.deltaX; ty -= e.deltaY; apply(); } }, { passive: false });
+  const center = () => { const { w, h } = box(); return [w/2, h/2]; };
+  chip.querySelector(".zi").onclick = () => zoomAt(1.5, ...center());
+  chip.querySelector(".zm").onclick = () => zoomAt(1/1.5, ...center());
+  chip.querySelector(".zp").onclick = () => { s = 1; apply(); };
+  chip.addEventListener("pointerdown", e => e.stopPropagation());
+  // two fingers: pinch to zoom and move to pan; the figure's own one-finger turn waits while they are down
+  const pts = new Map(); let pinch = null;
+  const two = () => { const [a, b] = [...pts.values()]; return { d: Math.hypot(a.x - b.x, a.y - b.y), x: (a.x + b.x)/2, y: (a.y + b.y)/2 }; };
+  wrap.addEventListener("pointerdown", e => { if (e.pointerType !== "touch") return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pts.size === 2){ pinch = two(); e.stopPropagation(); } }, true);
+  wrap.addEventListener("pointermove", e => { if (!pts.has(e.pointerId)) return; pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pinch && pts.size === 2){ e.stopPropagation(); e.preventDefault(); const n = two(), r = wrap.getBoundingClientRect();
+      tx += n.x - pinch.x; ty += n.y - pinch.y; zoomAt(n.d / pinch.d, n.x - r.left, n.y - r.top); pinch = n; } }, true);
+  const up = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch = null; };
+  wrap.addEventListener("pointerup", up, true); wrap.addEventListener("pointercancel", up, true);
+  addEventListener("resize", apply);
+})();</script><style>.toast{position:absolute!important;left:50%!important;right:auto!important;top:6%!important;bottom:auto!important;z-index:4!important;
+  transform:translate(-50%,8px)!important;opacity:0!important;pointer-events:none!important;display:flex!important;align-items:center;gap:8px;
+  width:max-content;max-width:min(86%,440px);white-space:normal!important;font:600 12.5px/1.35 ui-monospace,Menlo,monospace!important;
+  letter-spacing:.01em!important;text-transform:none!important;color:#231e16!important;background:#fff1bf!important;
+  border:1px solid rgba(35,30,22,.28)!important;border-radius:8px!important;box-shadow:0 8px 22px rgba(35,30,22,.16)!important;
+  padding:7px 13px 7px 9px!important;transition:opacity .18s ease,transform .18s ease!important}
+.toast::before{content:"!";flex:none;width:17px;height:17px;border-radius:50%;background:#231e16;color:#fff1bf;font:800 11px/17px ui-monospace,Menlo,monospace;text-align:center}
+.toast.show{opacity:1!important;transform:translate(-50%,0)!important}</style>
+<script>(() => { const cap = () => { const t = document.getElementById("toast"); if (!t) return; const s = t.textContent;
+  if (s && s[0] !== s[0].toUpperCase()) t.textContent = s[0].toUpperCase() + s.slice(1); };
+  let seen = null; const watch = () => { const t = document.getElementById("toast"); if (!t || t === seen) return; seen = t;
+    const zw = document.querySelector(".zwrap"); if (zw && t.parentNode !== zw) zw.appendChild(t);   // sits on the figure itself
+    new MutationObserver(cap).observe(t, { childList: true, characterData: true, subtree: true }); cap(); };
+  watch(); const st = document.querySelector(".stage"); if (st) new MutationObserver(watch).observe(st, { childList: true }); })();</script><script>(() => { const fix = () => { const art = document.getElementById('art'); if (!art) return;
+    for (const el of art.querySelectorAll('[fill="#41538f" i]')){ let top = null, a = el.parentElement;
+      while (a && a !== art){ const o = a.getAttribute('opacity'); if (o !== null && +o < 1) top = a; a = a.parentElement; }
+      if (top) top.parentNode.insertBefore(el, top); } };
+  const go = () => { const art = document.getElementById('art'); if (!art) return setTimeout(go, 50); fix(); new MutationObserver(fix).observe(art, { childList: true }); };
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', go); else go(); })();</script><style>.lgd{display:none}@media (max-width:560px){html:not(.nolabels) .lgd.has{display:grid}}
+.lgd{grid-template-columns:1fr 1fr;gap:2px 8px;margin:4px 0 12px;font:700 10.5px/1.25 ui-monospace,Menlo,monospace;letter-spacing:.03em;color:#231e16}
+.lgd button{all:unset;display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px;border-radius:7px;-webkit-tap-highlight-color:transparent}
+.lgd b{flex:none;min-width:17px;height:17px;padding:0 3px;box-sizing:border-box;border-radius:999px;border:1.2px solid #231e16;background:#fff4d6;text-align:center;font:800 10px/15px ui-monospace,Menlo,monospace}
+.lgd .on b{background:var(--accent,#f4b829)}.lgd .sel{background:rgba(35,30,22,.09)}.lgd .sel b{background:#231e16;color:#fff4d6}</style>
+<script>(() => { const fig = document.getElementById("fig"); if (!fig) return;
+  const lg = document.createElement("div"); lg.className = "lgd"; const at = document.querySelector(".zwrap") || fig; at.parentNode.insertBefore(lg, at.nextSibling);
+  const hs = document.createElement("style"); document.head.appendChild(hs);
+  let sig = "", sel = 0, q = 0, names = "", num = new Map();
+  // the figure's own numbers count every label it has ever drawn; here they are reset to 1, 2, 3... down the left
+  // column then the right, each time the set of labels changes (so they hold still while the figure turns)
+  const renum = () => { if (innerWidth > 560) return; const gs = [...fig.querySelectorAll(".tag[data-t]")];
+    const key = gs.map(g => g.dataset.t).sort().join("|");
+    if (key !== names){ names = key; num = new Map(); const vb = fig.viewBox.baseVal, cx = vb.x + vb.width/2;
+      const at = g => { const r = g.querySelector("rect"); return r ? [+r.getAttribute("x") + r.getAttribute("width")/2, +r.getAttribute("y")] : [0, 0]; };
+      gs.map(g => [g.dataset.t, ...at(g)]).sort((a, b) => ((a[1] > cx) - (b[1] > cx)) || a[2] - b[2]).forEach(([t]) => { if (!num.has(t)) num.set(t, num.size + 1); }); }
+    for (const g of gs){ const n = String(num.get(g.dataset.t)); if (g.dataset.n !== n){ g.dataset.n = n; const t = g.querySelector("text"); if (t) t.textContent = n; } } };
+  const mark = () => { hs.textContent = sel ? `#fig .tag[data-n="${sel}"] rect{fill:#231e16!important}#fig .tag[data-n="${sel}"] text{fill:#fff4d6}#fig .tag[data-n="${sel}"] path{stroke-width:2.4}` : "";
+    for (const x of lg.children) x.classList.toggle("sel", +x.dataset.n === sel); };
+  const upd = () => { q = 0; const m = new Map();
+    if (innerWidth <= 560) for (const g of fig.querySelectorAll(".tag[data-n]")){ const n = +g.dataset.n; if (!m.has(n)) m.set(n, [g.dataset.t, g.classList.contains("on")]); }
+    const a = [...m].sort((x, y) => x[0] - y[0]), s = JSON.stringify(a); if (s === sig) return; sig = s;
+    lg.classList.toggle("has", a.length > 0);
+    lg.innerHTML = a.map(([n, [t, on]]) => `<button data-n="${n}" class="${on ? "on" : ""}"><b>${n}</b><span>${t}</span></button>`).join(""); mark(); };
+  lg.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; sel = sel === +b.dataset.n ? 0 : +b.dataset.n; mark(); });
+  new MutationObserver(() => { renum(); if (!q) q = requestAnimationFrame(upd); }).observe(fig, { childList: true, subtree: true }); renum();
+  addEventListener("resize", () => { if (!q) q = requestAnimationFrame(upd); }); upd(); })();</script></body></html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reserve your spot — STEM4U Robotics & Engineering (Ashburn, VA)</title>
+<meta name="description" content="Weekly robotics that leads to a real competition team. 7 live FIRST LEGO League & FTC teams. Free first class. Reserve your spot — Ashburn & Northern Virginia, grades K–8.">
+<style>
+  :root{--navy:#0D2B7A;--orange:#E8651A;--gold:#F5C518;--chalk:#F2F0EB;--ink:#1b2333;--muted:#55607a;--line:#d6def5;--tint:#eef2fb}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.55;background:#fff}
+  a{color:inherit}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  .bar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 20px}
+  .logo{font-weight:800;color:var(--navy);font-size:20px;letter-spacing:.3px}.logo b{color:var(--orange)}
+  .btn{display:inline-block;background:var(--orange);color:#fff;font-weight:800;text-decoration:none;padding:11px 18px;border-radius:9px;border:none;cursor:pointer;font-size:15px}
+  .btn.ghost{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+  .hero{background:var(--navy);color:#fff;padding:46px 0 40px;position:relative;overflow:hidden}
+  .hero:after{content:'';position:absolute;right:-90px;top:-90px;width:320px;height:320px;border:18px solid rgba(232,101,26,.18);border-radius:50%}
+  .eye{color:var(--gold);font-weight:800;letter-spacing:2.5px;font-size:12px;margin-bottom:10px}
+  h1{font-size:38px;line-height:1.08;letter-spacing:-.7px;max-width:16ch}
+  .hero p.sub{color:#dfe6f5;font-size:17px;margin-top:14px;max-width:52ch}
+  .proof{display:inline-block;margin-top:18px;background:var(--orange);color:#fff;font-weight:800;font-size:15px;padding:8px 16px;border-radius:9px}
+  .proof b{color:var(--gold)}
+  .cta-row{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .cta-note{color:#cdd7ef;font-size:14px}
+  .strip{background:var(--chalk);padding:16px 0;border-bottom:1px solid var(--line)}
+  .strip .wrap{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;font-weight:700;color:var(--navy);font-size:15px}
+  .strip span b{color:var(--orange)}
+  section{padding:40px 0}
+  h2{color:var(--navy);font-size:26px;letter-spacing:-.4px;margin-bottom:6px}
+  .lead{color:var(--muted);font-size:16px;max-width:60ch;margin-bottom:20px}
+  .ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:end}
+  .rung{border:1px solid var(--line);border-radius:14px;padding:20px;background:#fff}
+  .rung.build{border:2px solid var(--orange)}
+  .rung.compete{border:2px solid var(--navy);background:var(--navy);color:#fff}
+  .rung .tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;margin-bottom:8px}
+  .rung.build .tag{background:var(--orange);color:#fff}.rung.compete .tag{background:var(--gold);color:var(--navy)}
+  .rung .nm{font-size:19px;font-weight:800;color:var(--navy)}.rung.compete .nm{color:#fff}
+  .rung .role{font-size:13px;color:var(--muted);margin-bottom:8px}.rung.compete .role{color:#cdd7ef}
+  .rung .price{font-size:32px;font-weight:800;color:var(--navy)}.rung.build .price{color:var(--orange)}.rung.compete .price{color:var(--gold)}
+  .rung .per{font-size:14px;color:var(--muted);font-weight:600}.rung.compete .per{color:#cdd7ef}
+  .rung ul{list-style:none;margin-top:12px}.rung li{font-size:14px;padding-left:20px;position:relative;margin:5px 0}.rung.compete li{color:#e7ecf8}
+  .rung li:before{content:'✓';position:absolute;left:0;color:var(--orange);font-weight:800}.rung.compete li:before{color:var(--gold)}
+  .rung .teams{margin-top:10px;border-top:1px solid rgba(255,255,255,.25);padding-top:9px;font-size:13px;color:#e7ecf8}.rung .teams b{color:var(--gold)}
+  .why{background:var(--tint)}
+  .cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card h3{color:var(--navy);font-size:16px;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--muted)}
+  .faq dt{font-weight:800;color:var(--navy);margin-top:16px;font-size:16px}
+  .faq dd{color:var(--muted);font-size:15px;margin-top:4px}
+  .reserve{background:var(--navy);color:#fff}
+  .reserve h2{color:#fff}.reserve .lead{color:#cdd7ef}
+  form{background:#fff;color:var(--ink);border-radius:14px;padding:24px;max-width:620px}
+  .field{margin-bottom:14px}
+  label{display:block;font-weight:700;font-size:13px;color:var(--navy);margin-bottom:5px}
+  input,select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:15px;font-family:inherit}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .hp{position:absolute;left:-9999px;opacity:0}
+  .ok{display:none;background:#e9f7ef;border:1px solid #1A7F57;color:#0f5132;border-radius:10px;padding:14px;font-weight:700}
+  .foot{background:#07205f;color:var(--gold);font-weight:700;font-size:14px;padding:16px 0}
+  .foot .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}.foot .u{color:#fff}
+  @media(max-width:820px){.ladder,.cols{grid-template-columns:1fr}.two{grid-template-columns:1fr}h1{font-size:30px}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="logo">STEM<b>4</b>U</span>
+  <a href="#reserve" class="btn">Reserve your spot</a>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eye">ROBOTICS & ENGINEERING · ASHBURN & NORTHERN VIRGINIA · GRADES K–8</div>
+    <h1>Every subject builds real skills. Robotics and Drone take them to a real team.</h1>
+    <p class="sub">Not a screen and not a kit they snap together once. Kids build and program a real robot — or fly a real drone — every week, and climb toward a live competition team.</p>
+    <div class="proof">PROOF: <b>7 competition teams</b> this year — 3 FIRST LEGO League &amp; 4 FTC</div>
+    <div class="cta-row">
+      <a href="#reserve" class="btn">Reserve your spot →</a>
+      <span class="cta-note">Your <b>first class is free</b> · month-to-month · cancel anytime</span>
+    </div>
+  </div>
+</header>
+
+<div class="strip"><div class="wrap">
+  <span><b>Real</b> motors, sensors &amp; code</span>
+  <span><b>7 live</b> FLL &amp; FTC teams</span>
+  <span><b>Small</b> groups, real bench time</span>
+  <span><b>Sat</b> mornings or <b>Fri</b> evenings</span>
+</div></div>
+
+<section class="wrap">
+  <h2>One ladder. Every subject climbs it.</h2>
+  <p class="lead">Explore → Build → Compete. Robotics and Drone take the climb all the way to a real competition team — one simple system parents learn once.</p>
+  <div class="ladder">
+    <div class="rung explore">
+      <div class="nm">① Explore</div><div class="role">The way in</div>
+      <div class="price">$149<span class="per">/mo</span></div>
+      <ul><li>One weekly class</li><li>Academy kits, on-site</li><li>Small groups</li></ul>
+    </div>
+    <div class="rung build">
+      <div class="tag">MOST FAMILIES</div>
+      <div class="nm">② Build</div><div class="role">Skills + a portfolio</div>
+      <div class="price">$189<span class="per">/mo</span></div>
+      <ul><li>Everything in Explore</li><li>Weekly open-lab hour</li><li>Take-home kit</li><li>Project portfolio</li><li>End-of-term showcase</li><li>Priority re-enrollment</li></ul>
+    </div>
+    <div class="rung compete">
+      <div class="tag">THE DESTINATION</div>
+      <div class="nm">③ Compete</div><div class="role">A seat on a real competition team</div>
+      <div class="price">$195–$245<span class="per">/mo</span></div>
+      <div style="font-size:14px;font-weight:800;color:var(--gold);margin:2px 0 4px">FLL $195 <span style="font-weight:600;color:#cdd7ef">(K–6)</span> · FTC $245 <span style="font-weight:600;color:#cdd7ef">(gr 7–12)</span></div>
+      <ul><li>Everything in Build</li><li>Extra mentor / coach hours</li><li>Tournament registration</li></ul>
+      <div class="teams"><b>Robotics:</b> 7 live teams (3 FLL · 4 FTC)<br><b>Drone:</b> the Aerial Drone Competition</div>
+    </div>
+  </div>
+</section>
+
+<section class="why"><div class="wrap">
+  <h2>Why STEM4U is different</h2>
+  <p class="lead">The free school club meets once and has no structure. The franchises teach coding but go nowhere. We're the only place that does both — weekly instruction <em>and</em> a real competition path.</p>
+  <div class="cols">
+    <div class="card"><h3>It's real engineering</h3><p>Real motors, sensors, and code every week — kids build a working robot and a portfolio you can see, not LEGO play.</p></div>
+    <div class="card"><h3>It goes somewhere</h3><p>A clear path — Sparks → Builders → Engineers — onto our live FIRST LEGO League and FTC teams (7 this year) and the Aerial Drone Competition.</p></div>
+    <div class="card"><h3>Nothing to lose</h3><p>Your first class is free, groups stay small, and it's month-to-month. Try it before you commit.</p></div>
+  </div>
+</div></section>
+
+<section class="wrap faq">
+  <h2>Parent questions</h2>
+  <dl>
+    <dt>Isn't there a free club at school or the library?</dt>
+    <dd>There is — and it usually meets once, with no equipment, no weekly coaching, and no real path to a competition. We're structured instruction that leads to a live team.</dd>
+    <dt>Is this real engineering or just LEGO play?</dt>
+    <dd>Real motors, sensors and programming every week. By the end of a term your child has built and programmed a working robot and has a portfolio to show for it.</dd>
+    <dt>Will my young child stick with it?</dt>
+    <dd>The first class is free and there's no lock-in, so there's no risk in finding out. Small groups keep every kid engaged.</dd>
+    <dt>Our schedule is full.</dt>
+    <dd>Pick one hour — Saturday mornings or Friday evenings. That's it.</dd>
+    <dt>What does it cost?</dt>
+    <dd>$149 Explore, $189 Build (most families), and $195–$245 for a seat on a competition team. About $24 a session on Build, including the open-lab hour.</dd>
+  </dl>
+</section>
+
+<section class="reserve" id="reserve"><div class="wrap">
+  <h2>Reserve your spot</h2>
+  <p class="lead">Tell us about your child and we'll hold a spot and send you the next free-class and demo dates. First class free — no payment today.</p>
+  <form id="presaleForm" onsubmit="return submitPresale(event)">
+    <div class="ok" id="okMsg">✓ You're on the list! We'll email you the next free-class and demo dates shortly.</div>
+    <div class="two">
+      <div class="field"><label>Parent first name</label><input name="parent_first_name" required></div>
+      <div class="field"><label>Parent last name</label><input name="parent_last_name"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Email</label><input type="email" name="email" required></div>
+      <div class="field"><label>Mobile</label><input name="phone" inputmode="tel"></div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Child's first name</label><input name="child_first_name"></div>
+      <div class="field"><label>Grade</label>
+        <select name="grade"><option value="">Select…</option><option>K</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select>
+      </div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Interested in</label>
+        <select name="programs"><option value="">Select a track…</option><option>Robotics Engineering</option><option>LEGO CS &amp; AI</option><option>Drone</option><option>Math</option><option>FLL / FTC competition team</option><option>Not sure yet</option></select>
+      </div>
+      <div class="field"><label>Preferred time</label>
+        <select name="schedule"><option value="">Select…</option><option>Saturday mornings</option><option>Friday evenings</option><option>Either</option></select>
+      </div>
+    </div>
+    <input class="hp" tabindex="-1" autocomplete="off" name="_gotcha" aria-hidden="true">
+    <input type="hidden" name="source" value="pre-sale">
+    <button type="submit" class="btn" style="width:100%;font-size:16px;padding:14px">Reserve my spot — first class free</button>
+    <p style="font-size:12px;color:var(--muted);margin-top:10px">No payment today. We'll follow up with free-class and demo dates. Cancel anytime.</p>
+  </form>
+</div></section>
+
+<div class="foot"><div class="wrap">
+  <span>Real tools. Real teams. Real engineers.</span>
+  <span class="u">STEM4U · Ashburn, VA · stem4u.com</span>
+</div></div>
+
+<script>
+function submitPresale(e){
+  e.preventDefault();
+  var f=e.target, data={};
+  new FormData(f).forEach(function(v,k){data[k]=v;});
+  var btn=f.querySelector('button[type=submit]'); btn.disabled=true; btn.textContent='Reserving…';
+  fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+    .then(function(r){return r.ok;})
+    .then(function(ok){
+      if(ok){ document.getElementById('okMsg').style.display='block'; f.querySelectorAll('.two,button,p').forEach(function(el){el.style.display='none';}); document.getElementById('okMsg').scrollIntoView({behavior:'smooth',block:'center'}); }
+      else { btn.disabled=false; btn.textContent='Reserve my spot — first class free'; alert('Something went wrong — please email contact@stem4u.com and we\'ll hold your spot.'); }
+    })
+    .catch(function(){ btn.disabled=false; btn.textContent='Reserve my spot — first class free'; alert('Network error — please email contact@stem4u.com and we\'ll hold your spot.'); });
+  return false;
+}
+</script>
+</body>
+</html>

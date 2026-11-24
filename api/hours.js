@@ -66,7 +66,7 @@ async function hoursFor(url, H, id, date) {
   return rows[0] ? rows[0].hours : null;
 }
 // Programs an instructor can log hours against (stored in tutor_sessions.team).
-const HOUR_PROGRAMS = ['FLL', 'FTC', 'Robotics', 'Drone', 'Stonehill PTO'];
+const HOUR_PROGRAMS = ['FLL', 'FTC', 'Robotics', 'CS & AI', 'Drone', 'Stonehill PTO'];
 async function hoursList(url, H, id, date) {
   // Every hours entry this instructor logged on this date, one per class/program.
   const hr = await fetch(`${url}/rest/v1/tutor_sessions?select=team,hours&tutor_id=eq.${encodeURIComponent(id)}&session_date=eq.${encodeURIComponent(date)}`, { headers: H });

@@ -9,9 +9,13 @@ export default function handler(req, res) {
     pin = String(b.pin || '').trim();
   } catch (_) {}
 
-  const pins = String(process.env.DOC_PINS || '').split(',').map(s => s.trim()).filter(Boolean);
+  const pins = String(process.env.DOC_PINS || process.env.DOC_PIN || '').split(',').map(s => s.trim()).filter(Boolean);
   const token = process.env.DOCS_UNLOCK_TOKEN || '';
-  if (!pins.length || !token) { res.status(500).json({ ok: false, error: 'not_configured' }); return; }
+  if (!pins.length || !token) {
+    res.status(500).json({ ok: false, error: 'not_configured',
+      missing: [!pins.length && 'DOC_PINS', !token && 'DOCS_UNLOCK_TOKEN'].filter(Boolean) });
+    return;
+  }
 
   if (!pins.includes(pin)) { res.status(401).json({ ok: false }); return; }
 

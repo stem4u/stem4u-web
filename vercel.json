@@ -5,6 +5,14 @@
     { "source": "/instructor", "destination": "/instructor.html" },
     { "source": "/i/:code", "destination": "/instructor.html" }
   ],
+  "headers": [
+    {
+      "source": "/:page(resourcesy1|csai-k2-hub|csai-3to5-hub|csai-6to8-hub|sci-k2-hub|sci-3to5-hub|sci-6to8-hub|microbit-hub|forest-roots|pollinator-alley|mission-models|biobuzz-ref).html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    }
+  ],
   "crons": [
     { "path": "/api/log-digest", "schedule": "0 12 * * *" }
   ]

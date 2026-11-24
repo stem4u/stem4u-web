@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>RootWatch — Manta Bricks · Presentation</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTMiIGZpbGw9IiMxQjJBNEEiLz48dGV4dCB4PSIzMiIgeT0iNDMiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZm9udC13ZWlnaHQ9IjgwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRzcGFuIGZpbGw9IiNGMkYwRUIiPlM8L3RzcGFuPjx0c3BhbiBmaWxsPSIjRTg2NTFBIj40PC90c3Bhbj48dHNwYW4gZmlsbD0iI0YyRjBFQiI+VTwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==">
+<style>
+ *{box-sizing:border-box;margin:0;padding:0}
+ html,body{height:100%}
+ body{font-family:'Space Grotesk','Trebuchet MS',Arial,sans-serif;background:#0A1E52;color:#fff;overflow:hidden}
+ .stage{height:100vh;display:flex;align-items:center;justify-content:center;padding:4vh 5vw}
+ .slide{display:none;max-width:1000px;width:100%;animation:in .3s ease}
+ .slide.on{display:block}
+ @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+ .kicker{display:inline-block;background:#FF5500;color:#fff;font-weight:700;font-size:clamp(12px,1.6vw,16px);padding:5px 14px;border-radius:999px;letter-spacing:.5px;margin-bottom:18px}
+ h1{font-size:clamp(30px,6vw,64px);line-height:1.05;margin-bottom:18px}
+ h2{font-size:clamp(26px,4.6vw,48px);line-height:1.1;margin-bottom:18px}
+ p.big{font-size:clamp(18px,2.6vw,30px);line-height:1.4;color:#dfe6f6;max-width:900px}
+ ul{list-style:none;margin-top:10px} li{font-size:clamp(17px,2.4vw,27px);line-height:1.5;color:#eef2fb;margin:10px 0;padding-left:34px;position:relative}
+ li:before{content:"";position:absolute;left:0;top:.55em;width:16px;height:16px;border-radius:4px;background:#FF5500}
+ .say{margin-top:22px;background:rgba(255,255,255,.08);border-left:5px solid #F5C518;border-radius:0 12px 12px 0;padding:14px 18px;font-size:clamp(15px,2vw,22px);color:#fff}
+ .say b{color:#F5C518}
+ .three{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap}
+ .three .c{flex:1;min-width:220px;background:rgba(255,255,255,.07);border-radius:14px;padding:16px 18px}
+ .three .c h3{color:#FF7733;font-size:clamp(17px,2.2vw,24px);margin-bottom:6px}
+ .three .c p{font-size:clamp(14px,1.8vw,19px);color:#eef2fb;line-height:1.4}
+ .bar{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(0,0,0,.25)}
+ .bar .brand{font-weight:700;font-size:13px;color:#aeb9d6}
+ .bar .brand b{color:#FF7733}
+ .nav{display:flex;gap:8px;align-items:center}
+ .nav button{background:#1B2A4A;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:9px;padding:9px 15px;font-size:16px;font-weight:700;cursor:pointer}
+ .nav button:hover{border-color:#FF5500}
+ .count{color:#aeb9d6;font-size:13px;min-width:54px;text-align:center}
+ .prog{position:fixed;top:0;left:0;height:4px;background:#FF5500;transition:width .2s}
+ .close{font-size:clamp(34px,7vw,76px)}
+ .hint{position:fixed;top:12px;right:16px;color:rgba(255,255,255,.5);font-size:12px}
+</style></head>
+<body>
+<div class="prog" id="prog"></div>
+<div class="hint">← → or Space to move · F for fullscreen</div>
+<div class="stage">
+ <!-- Hook -->
+ <section class="slide on">
+   <span class="kicker">Manta Bricks · FLL BIOGLOW</span>
+   <h1>RootWatch</h1>
+   <p class="big">Reconnecting the Living Ground Beneath Us</p>
+   <div class="say"><b>Driving question:</b> How can we reconnect a world that people have divided?<br><b>Do it live:</b> pour water on the bare-soil tray. 💧</div>
+ </section>
+ <!-- Problem -->
+ <section class="slide">
+   <span class="kicker">The problem</span>
+   <h2>People divide the world</h2>
+   <ul><li>Roads and buildings cut into hills — and cut their roots</li><li>Clearing forests &amp; mowing takes away the plants that hold soil</li><li>Wildfires burn the plants, so rain can't soak in</li></ul>
+   <div class="say"><b>Say one fact</b> you checked: e.g. after a wildfire, less rain soaks into the soil.</div>
+ </section>
+ <!-- Science -->
+ <section class="slide">
+   <span class="kicker">The science</span>
+   <h2>The underground army</h2>
+   <ul><li><b>Grasses</b> — a root net that holds the top layer</li><li><b>Deep-rooted natives</b> — long anchor roots pin the soil</li><li><b>Fungi &amp; worms</b> — glue soil crumbs, help rain soak in</li></ul>
+   <div class="say"><b>Show:</b> the root-window cups — different plants, different roots, different jobs.</div>
+ </section>
+ <!-- Heal -->
+ <section class="slide">
+   <span class="kicker">Our solution · Heal</span>
+   <h2>The Root Team Mat</h2>
+   <p class="big">A seed blanket that rots away — grasses sprout first, deep roots anchor next, wildflowers bring back bees &amp; butterflies, and it leaves a living hillside.</p>
+   <div class="say"><b>Show the mat.</b></div>
+ </section>
+ <!-- Watch -->
+ <section class="slide">
+   <span class="kicker">Our solution · Watch</span>
+   <h2>The RootWatch sensor</h2>
+   <p class="big">A LEGO stake with tilt + wetness sensors. If the soil soaks or the stake leans, it flashes and sounds an alarm — a warning before the slide.</p>
+   <div class="say"><b>Set off the alarm live!</b> 🔔</div>
+ </section>
+ <!-- Care -->
+ <section class="slide">
+   <span class="kicker">Our solution · Care</span>
+   <h2>The Hillside Helper guide</h2>
+   <div class="three">
+     <div class="c"><h3>Spot</h3><p>How to tell a hillside is hurt</p></div>
+     <div class="c"><h3>Lay a mat</h3><p>How to cover a bare slope</p></div>
+     <div class="c"><h3>Stop mowing</h3><p>Let native roots grow deep</p></div>
+   </div>
+ </section>
+ <!-- Findings -->
+ <section class="slide">
+   <span class="kicker">What we found</span>
+   <h2>Our storm test</h2>
+   <ul><li>Three trays, same soil, same angle, same rain — <b>bare</b> vs. <b>lawn grass</b> vs. our <b>root team</b></li><li>We weighed the mud that washed off, 3 tries each</li><li>Result: the <b>root-team tray lost the least soil</b> — mixed roots beat bare ground and lawn alone</li></ul>
+   <div class="say"><b>Show the results table.</b> We kept the versions that failed — they show how we improved.</div>
+ </section>
+ <!-- Recommendations -->
+ <section class="slide">
+   <span class="kicker">Our recommendations</span>
+   <h2>What we'd tell a community</h2>
+   <ul><li>Cover bare slopes with a <b>Root Team Mat</b> — mixed deep + shallow roots, not just lawn</li><li><b>Stop mowing</b> steep slopes so deep roots can grow</li><li>Put a <b>RootWatch sensor</b> above homes, roads &amp; streams — and act on the alarm</li><li>Heal a bare or burned hillside <b>before</b> the next big storm</li><li>Plants help shallow slides; <b>deep landslides still need engineers</b></li></ul>
+ </section>
+ <!-- Close -->
+ <section class="slide">
+   <span class="kicker">Close</span>
+   <h2 class="close">Roots reconnect the soil.<br>Plants reconnect the habitat.<br>RootWatch reconnects people to the land.</h2>
+ </section>
+</div>
+<div class="bar">
+ <span class="brand">STEM<b>4</b>U · Manta Bricks · RootWatch</span>
+ <div class="nav"><button onclick="go(-1)">‹ Back</button><span class="count" id="count"></span><button onclick="go(1)">Next ›</button></div>
+</div>
+<script>
+ const slides=[...document.querySelectorAll('.slide')]; let i=0;
+ function show(n){ i=Math.max(0,Math.min(slides.length-1,n)); slides.forEach((s,x)=>s.classList.toggle('on',x===i));
+   document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+   document.getElementById('prog').style.width=((i+1)/slides.length*100)+'%'; }
+ function go(d){ show(i+d); }
+ document.addEventListener('keydown',e=>{
+   if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(1);}
+   else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(-1);}
+   else if(e.key==='Home'){show(0);} else if(e.key==='End'){show(slides.length-1);}
+   else if(e.key==='f'||e.key==='F'){ if(!document.fullscreenElement)document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+ });
+ document.querySelector('.stage').addEventListener('click',e=>{ if(e.clientX < window.innerWidth*0.3) go(-1); else go(1); });
+ show(0);
+</script>
+</body></html>

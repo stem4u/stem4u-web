@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Pollinator Alley — Turtle Bricks · Presentation</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTMiIGZpbGw9IiMxQjJBNEEiLz48dGV4dCB4PSIzMiIgeT0iNDMiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyNiIgZm9udC13ZWlnaHQ9IjgwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PHRzcGFuIGZpbGw9IiNGMkYwRUIiPlM8L3RzcGFuPjx0c3BhbiBmaWxsPSIjRTg2NTFBIj40PC90c3Bhbj48dHNwYW4gZmlsbD0iI0YyRjBFQiI+VTwvdHNwYW4+PC90ZXh0Pjwvc3ZnPg==">
+<style>
+ *{box-sizing:border-box;margin:0;padding:0} html,body{height:100%}
+ body{font-family:'Space Grotesk','Trebuchet MS',Arial,sans-serif;background:#0A1E52;color:#fff;overflow:hidden}
+ .stage{height:100vh;display:flex;align-items:center;justify-content:center;padding:4vh 5vw}
+ .slide{display:none;max-width:1000px;width:100%;animation:in .3s ease} .slide.on{display:block}
+ @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+ .kicker{display:inline-block;background:#FF5500;color:#fff;font-weight:700;font-size:clamp(12px,1.6vw,16px);padding:5px 14px;border-radius:999px;letter-spacing:.5px;margin-bottom:18px}
+ h1{font-size:clamp(30px,6vw,64px);line-height:1.05;margin-bottom:18px}
+ h2{font-size:clamp(26px,4.6vw,48px);line-height:1.1;margin-bottom:18px}
+ p.big{font-size:clamp(18px,2.6vw,30px);line-height:1.4;color:#dfe6f6;max-width:900px}
+ ul{list-style:none;margin-top:10px} li{font-size:clamp(17px,2.4vw,27px);line-height:1.5;color:#eef2fb;margin:10px 0;padding-left:34px;position:relative}
+ li:before{content:"";position:absolute;left:0;top:.55em;width:16px;height:16px;border-radius:4px;background:#FF5500}
+ .say{margin-top:22px;background:rgba(255,255,255,.08);border-left:5px solid #F5C518;border-radius:0 12px 12px 0;padding:14px 18px;font-size:clamp(15px,2vw,22px)} .say b{color:#F5C518}
+ .three{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap}
+ .three .c{flex:1;min-width:200px;background:rgba(255,255,255,.07);border-radius:14px;padding:16px 18px}
+ .three .c h3{color:#FF7733;font-size:clamp(16px,2vw,22px);margin-bottom:6px}
+ .three .c p{font-size:clamp(13px,1.7vw,18px);color:#eef2fb;line-height:1.4}
+ .bar{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(0,0,0,.25)}
+ .bar .brand{font-weight:700;font-size:13px;color:#aeb9d6} .bar .brand b{color:#FF7733}
+ .nav{display:flex;gap:8px;align-items:center}
+ .nav button{background:#1B2A4A;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:9px;padding:9px 15px;font-size:16px;font-weight:700;cursor:pointer}
+ .nav button:hover{border-color:#FF5500}
+ .count{color:#aeb9d6;font-size:13px;min-width:54px;text-align:center}
+ .prog{position:fixed;top:0;left:0;height:4px;background:#FF5500;transition:width .2s}
+ .close{font-size:clamp(30px,6vw,60px)} .hint{position:fixed;top:12px;right:16px;color:rgba(255,255,255,.5);font-size:12px}
+</style></head>
+<body>
+<div class="prog" id="prog"></div>
+<div class="hint">← → or Space to move · F for fullscreen</div>
+<div class="stage">
+ <section class="slide on"><span class="kicker">Turtle Bricks · FLL BIOGLOW</span><h1>Pollinator Alley</h1><p class="big">Keeping pollinators alive and safe</p><div class="say"><b>Driving question:</b> How do we keep pollinators alive and safe?<br><b>Do it live:</b> hold up a flower picture and a mowed-grass picture — which has more bees? 🐝</div></section>
+ <section class="slide"><span class="kicker">Why it matters</span><h2>Pollinators feed us</h2><ul><li>Bees carry pollen so plants make fruit and seeds</li><li>About one third of what farms grow needs pollinators</li><li>More than 3 of 4 food-crop types need them at least a little</li></ul><div class="say"><b>Say one fact you checked</b> (USDA / IPBES).</div></section>
+ <section class="slide"><span class="kicker">The problem</span><h2>They're in trouble</h2><ul><li>People cut down flowers and clear land</li><li>Pesticides can poison pollinators</li><li>A changing climate makes it harder</li></ul></section>
+ <section class="slide"><span class="kicker">Our solution</span><h2>Pollinator Alley</h2><div class="three"><div class="c"><h3>Big garden</h3><p>Native flowers to live and eat</p></div><div class="c"><h3>No pesticides</h3><p>Keep poison out</p></div><div class="c"><h3>Covered roads</h3><p>Keep bees and cars apart</p></div><div class="c"><h3>AI cameras</h3><p>Count pollinators, send data to scientists</p></div></div></section>
+ <section class="slide"><span class="kicker">Where it could go</span><h2>Data Center Alley</h2><p class="big">Loudoun County has ~200 data centers surrounded by mowed grass and power lines. Turn those green strips into one long flower path — meadows between the buildings, maybe gardens on low roofs.</p><div class="say">This is our big idea — we still need to check the data-center facts.</div></section>
+ <section class="slide"><span class="kicker">What we found</span><h2>Our count test</h2><ul><li>Watch a <b>flower patch</b> and a <b>mowed-grass patch</b> for 10 minutes each</li><li>Tally every pollinator that lands — on 3 different days</li><li>We expect the <b>flower patch wins by a lot</b></li></ul><div class="say"><b>Show the tally chart.</b></div></section>
+ <section class="slide"><span class="kicker">Our recommendations</span><h2>What we'd tell a community</h2><ul><li>Turn mowed strips &amp; power-line land into <b>native flower meadows</b></li><li><b>No pesticides</b> on the meadows</li><li>Add a <b>covered crossing</b> where the path meets a road</li><li>Use <b>AI cameras</b> and share the data with scientists</li></ul></section>
+ <section class="slide"><span class="kicker">Close</span><h2 class="close">Flowers feed pollinators.<br>Pollinators feed us.<br>Pollinator Alley reconnects them.</h2></section>
+</div>
+<div class="bar"><span class="brand">STEM<b>4</b>U · Turtle Bricks · Pollinator Alley</span>
+ <div class="nav"><button onclick="go(-1)">‹ Back</button><span class="count" id="count"></span><button onclick="go(1)">Next ›</button></div></div>
+<script>
+ const slides=[...document.querySelectorAll('.slide')]; let i=0;
+ function show(n){ i=Math.max(0,Math.min(slides.length-1,n)); slides.forEach((s,x)=>s.classList.toggle('on',x===i));
+   document.getElementById('count').textContent=(i+1)+' / '+slides.length; document.getElementById('prog').style.width=((i+1)/slides.length*100)+'%'; }
+ function go(d){ show(i+d); }
+ document.addEventListener('keydown',e=>{ if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(1);}
+   else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(-1);} else if(e.key==='Home'){show(0);} else if(e.key==='End'){show(slides.length-1);}
+   else if(e.key==='f'||e.key==='F'){ if(!document.fullscreenElement)document.documentElement.requestFullscreen(); else document.exitFullscreen(); } });
+ document.querySelector('.stage').addEventListener('click',e=>{ if(e.clientX < window.innerWidth*0.3) go(-1); else go(1); });
+ show(0);
+</script></body></html>
