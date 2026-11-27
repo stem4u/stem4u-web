@@ -210,7 +210,7 @@
       TEAMS=d.teams||[];
       var sel=document.getElementById('team');
       sel.innerHTML='<option value="">Select team…</option>'+TEAMS.map(function(t){return '<option value="'+esc(t)+'">'+esc(t)+'</option>';}).join('');
-      PROGRAMS=d.programs||['FLL','FTC','Robotics','CS & AI','Drone','Stonehill PTO'];
+      PROGRAMS=d.programs||['FLL','FTC','Robotics','CS & AI','Drone','Young Inventors Lab','Engineering Design Studio','Stonehill PTO'];
       var psel=document.getElementById('hprog');
       psel.innerHTML='<option value="">Select class…</option>'+PROGRAMS.map(function(p){return '<option value="'+esc(p)+'">'+esc(p)+'</option>';}).join('');
       document.getElementById('adate').value=todayET();
